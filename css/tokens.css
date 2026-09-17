@@ -1,0 +1,51 @@
+/* August design tokens — map 1:1 to Shopify theme settings later */
+:root {
+  --color-ink: #0f0f0f;
+  --color-ink-soft: #1c1f1c;
+  --color-muted: #6b6b66;
+  --color-muted-2: #6b706b;
+  --color-body: #404540;
+  --color-placeholder: #9ea199;
+  --color-surface: #ffffff;
+  --color-page: #f4f4f1;
+  --color-page-plp: #edf0e8;
+  --color-page-plp-end: #f4f4f1;
+  --color-chip: #f5f5f2;
+  --color-border: rgba(0, 0, 0, 0.18);
+  --color-border-soft: rgba(0, 0, 0, 0.06);
+  --color-border-mid: rgba(0, 0, 0, 0.14);
+  --color-link: #264d8c;
+  --color-island: rgba(255, 255, 255, 0.86);
+  --color-island-border: rgba(255, 255, 255, 0.9);
+  --color-glass: rgba(255, 255, 255, 0.88);
+  --color-footer: rgba(0, 0, 0, 0.4);
+  --color-dot: #7cff6b;
+
+  --font: "Geist", "Helvetica Neue", Helvetica, Arial, sans-serif;
+  --shadow-island: 0 4px 10.6px rgba(0, 0, 0, 0.07);
+  --shadow-card: 0 18px 40px -4px rgba(0, 0, 0, 0.08);
+  --shadow-soft: 0 12px 28px -8px rgba(0, 0, 0, 0.07);
+  --shadow-player: 0 20px 48px -10px rgba(0, 0, 0, 0.18);
+  --shadow-banner: 0 24px 48px -12px rgba(0, 0, 0, 0.18);
+  --shadow-product: 0 4px 20px -4px rgba(0, 0, 0, 0.10);
+  --shadow-brand-banner: 0 20px 40px -10px rgba(0, 0, 0, 0.16);
+  --shadow-morph: 0 28px 64px -8px rgba(0, 0, 0, 0.28);
+
+  --radius-pill: 100px;
+  --radius-chip: 999px;
+  --radius-card: 16px;
+  --radius-panel: 28px;
+  --radius-panel-sm: 22px;
+
+  --page-max: 1440px;
+  --gutter: 64px;
+  --header-top: 39px;
+  --header-h: 57px;
+  --footer-h: 48px;
+  --footer-inset: 24px;
+  --player-h: 59px;
+  --player-gap: 12px;
+  /* space reserved under scroll content so last items clear chrome */
+  --chrome-bottom: calc(var(--footer-inset) + var(--footer-h) + var(--player-gap) + var(--player-h) + 16px);
+  --chrome-top: calc(var(--header-top) + var(--header-h) + 24px);
+}

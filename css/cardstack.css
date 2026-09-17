@@ -1,0 +1,756 @@
+/* August — 3D Card Stack (iOS-style stacked cards) */
+
+.card-stack {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  perspective: 1200px;
+  perspective-origin: 50% 45%;
+  overflow: hidden;
+}
+
+/* ── Individual card ──────────────────────────────────────── */
+.card-stack__card {
+  position: absolute;
+  inset: 0;
+  will-change: transform, opacity;
+  transform-style: preserve-3d;
+  backface-visibility: hidden;
+  border-radius: 0;
+  overflow: hidden;
+  transition:
+    transform 0.38s cubic-bezier(0.22, 1, 0.36, 1),
+    opacity 0.3s ease,
+    filter 0.3s ease;
+}
+
+/* Hero card gets its own background */
+.card-stack__card:first-child {
+  background: #fff;
+}
+
+/* Brand cards fill fully */
+.card-stack__card--brand {
+  background: #111;
+}
+
+.brand-banner--full {
+  position: absolute;
+  inset: 0;
+  display: block;
+  width: 100%;
+  height: 100%;
+  aspect-ratio: auto;
+  border-radius: 0;
+  box-shadow: none;
+}
+
+.brand-banner--full .brand-banner__media {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.brand-banner--full .brand-banner__content {
+  position: absolute;
+  left: 72px;
+  bottom: calc(var(--footer-inset, 24px) + var(--footer-h, 48px) + var(--player-gap, 12px) + var(--player-h, 59px) + 48px);
+  top: auto;
+  transform: none;
+}
+
+/* ── Card states (set by JS) ──────────────────────────────── */
+
+/* Active / front card */
+.card-stack__card[data-state="active"] {
+  transform: translateZ(0) translateY(0) scale(1);
+  opacity: 1;
+  z-index: 4;
+  filter: brightness(1);
+  pointer-events: auto;
+}
+
+/* Next card peeking behind (stack-1) */
+.card-stack__card[data-state="stack-1"] {
+  transform: translateZ(-50px) translateY(14px) scale(0.965);
+  opacity: 1;
+  z-index: 3;
+  filter: brightness(0.92);
+  pointer-events: none;
+}
+
+/* Second behind (stack-2) */
+.card-stack__card[data-state="stack-2"] {
+  transform: translateZ(-100px) translateY(28px) scale(0.93);
+  opacity: 1;
+  z-index: 2;
+  filter: brightness(0.84);
+  pointer-events: none;
+}
+
+/* Third behind (stack-3) / invisible */
+.card-stack__card[data-state="stack-3"] {
+  transform: translateZ(-150px) translateY(42px) scale(0.895);
+  opacity: 0.6;
+  z-index: 1;
+  filter: brightness(0.76);
+  pointer-events: none;
+}
+
+/* Dismissed (swiped up / off top) */
+.card-stack__card[data-state="dismissed"] {
+  transform: translateZ(80px) translateY(-110%) scale(1.02);
+  opacity: 0;
+  z-index: 5;
+  pointer-events: none;
+  transition:
+    transform 0.36s cubic-bezier(0.22, 1, 0.36, 1),
+    opacity 0.24s ease;
+}
+
+/* Hidden (wrapped around, waiting below stack) */
+.card-stack__card[data-state="hidden"] {
+  transform: translateZ(-180px) translateY(56px) scale(0.86);
+  opacity: 0;
+  z-index: 0;
+  pointer-events: none;
+}
+
+/* ── Dragging mid-gesture (smoother) ──────────────────────── */
+.card-stack__card.is-dragging {
+  transition: none !important;
+}
+
+/* ── Pagination dots ──────────────────────────────────────── */
+.card-stack__dots {
+  position: absolute;
+  bottom: calc(var(--footer-inset, 24px) + var(--footer-h, 48px) + var(--player-gap, 12px) + var(--player-h, 59px) + 16px);
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 50;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 12px;
+  border-radius: 100px;
+  background: rgba(255, 255, 255, 0.65);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.5);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+}
+
+.card-stack__dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: rgba(15, 15, 15, 0.2);
+  border: 0;
+  padding: 0;
+  cursor: pointer;
+  transition: background 0.24s ease, transform 0.24s ease, width 0.24s ease;
+}
+
+.card-stack__dot.is-active {
+  width: 22px;
+  border-radius: 4px;
+  background: var(--color-ink-soft);
+}
+
+.card-stack__dot:hover:not(.is-active) {
+  background: rgba(15, 15, 15, 0.4);
+  transform: scale(1.2);
+}
+
+/* ── Home hero adjustments inside card ────────────────────── */
+
+/* Hero stretches to fill the entire card height */
+.card-stack .home-hero {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  min-height: 0;
+  padding-bottom: calc(var(--footer-inset, 24px) + var(--footer-h, 48px) + var(--player-gap, 12px) + var(--player-h, 59px) + 48px);
+  overflow: hidden;
+}
+
+/* Layout grid fills remaining vertical space */
+.card-stack .home-layout {
+  flex: 1 1 0;
+  align-items: stretch !important;
+  min-height: 0;
+  gap: 28px;
+}
+
+/* Copy column centers its text block vertically */
+.card-stack .home-copy {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  min-height: 0;
+}
+
+/* Scale down the banner so it doesn't eat vertical space */
+.card-stack .bts-banner {
+  height: auto;
+  aspect-ratio: 520 / 192;
+  margin-bottom: 24px;
+}
+
+/* Product grid fills the full height of its cell */
+.card-stack .home-grid {
+  grid-template-rows: 1fr 1fr;
+  align-content: stretch;
+  gap: 16px 28px;
+  min-height: 0;
+  height: 100%;
+}
+
+/* Tiles stretch to fill grid rows instead of using fixed aspect ratios */
+.card-stack .home-tile,
+.card-stack .home-tile--tall {
+  aspect-ratio: auto;
+  min-height: 0;
+  height: 100%;
+}
+
+.card-stack .home-tile img,
+.card-stack .home-tile--tall img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+/* ── Responsive ───────────────────────────────────────────── */
+
+/* Mid-desktop (~1024–1280px) — tighter gaps, smaller banner */
+@media (max-width: 1280px) {
+  .card-stack .home-hero {
+    padding: var(--chrome-top) 24px 48px;
+    padding-bottom: calc(var(--footer-inset, 24px) + var(--footer-h, 48px) + var(--player-gap, 12px) + var(--player-h, 59px) + 48px);
+  }
+
+  .card-stack .home-layout {
+    gap: 20px;
+    grid-template-columns: minmax(200px, 0.7fr) minmax(0, 1fr);
+  }
+
+  .card-stack .bts-banner {
+    aspect-ratio: 520 / 166;
+    margin-bottom: 16px;
+  }
+
+  .card-stack .home-copy h1 {
+    font-size: clamp(26px, 3.2vw, 36px);
+    margin-bottom: 16px;
+  }
+
+  .card-stack .home-copy p {
+    margin-bottom: 16px;
+  }
+
+  .card-stack .home-grid {
+    gap: 12px 16px;
+  }
+}
+
+/* Tablet (≤900px) — single-column, stacked layout */
+@media (max-width: 900px) {
+  .card-stack {
+    perspective: 900px;
+  }
+
+  .card-stack__card[data-state="stack-1"] {
+    transform: translateZ(-40px) translateY(10px) scale(0.97);
+  }
+
+  .card-stack__card[data-state="stack-2"] {
+    transform: translateZ(-80px) translateY(20px) scale(0.94);
+  }
+
+  .card-stack__card[data-state="stack-3"] {
+    transform: translateZ(-120px) translateY(30px) scale(0.91);
+  }
+
+  .brand-banner--full .brand-banner__content {
+    left: 24px;
+    bottom: 200px;
+  }
+
+  .card-stack__dots {
+    bottom: 180px;
+  }
+
+  .card-stack .home-hero {
+    padding: 80px 16px calc(var(--footer-inset, 12px) + var(--footer-h, 48px) + var(--player-gap, 10px) + var(--player-h, 59px) + 48px);
+  }
+
+  .card-stack .home-layout {
+    grid-template-columns: 1fr;
+    grid-template-rows: auto 1fr;
+    gap: 16px;
+  }
+
+  .card-stack .home-copy {
+    justify-content: flex-start;
+  }
+
+  .card-stack .bts-banner {
+    aspect-ratio: 520 / 153;
+    margin-bottom: 12px;
+  }
+
+  .card-stack .home-grid {
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: 1fr 1fr;
+    gap: 10px;
+  }
+}
+
+/* Phone (≤560px) */
+@media (max-width: 560px) {
+  .card-stack__card[data-state="stack-1"] {
+    transform: translateZ(-30px) translateY(8px) scale(0.975);
+  }
+
+  .card-stack__card[data-state="stack-2"] {
+    transform: translateZ(-60px) translateY(16px) scale(0.95);
+  }
+
+  .brand-banner--full .brand-banner__content {
+    left: 20px;
+    bottom: 180px;
+    gap: 14px;
+  }
+
+  .brand-banner--full .brand-banner__title {
+    font-size: clamp(28px, 8vw, 40px);
+  }
+
+  .card-stack .home-grid {
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+  }
+}
+
+/* ══════════════════════════════════════════════════════════════
+   Card 4 — August Radio + Newsletter (dark theme)
+   ══════════════════════════════════════════════════════════════ */
+
+.card-stack__card--radio {
+  background: #0a0a0a;
+  color: #f0f0ec;
+}
+
+.radio-card {
+  position: absolute;
+  inset: 0;
+  overflow-y: auto;
+  overflow-x: hidden;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255,255,255,0.15) transparent;
+}
+
+.radio-card__inner {
+  max-width: 860px;
+  margin: 0 auto;
+  padding: 120px 48px calc(var(--footer-inset, 24px) + var(--footer-h, 48px) + var(--player-gap, 12px) + var(--player-h, 59px) + 64px);
+  display: flex;
+  flex-direction: column;
+  gap: 48px;
+  min-height: 100%;
+}
+
+/* ── Radio Hero Section ───────────────────────────────────── */
+
+.radio-hero {
+  display: flex;
+  flex-direction: column;
+  gap: 40px;
+}
+
+.radio-hero__header {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.radio-hero__badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--color-dot, #7cff6b);
+}
+
+.radio-hero__live-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--color-dot, #7cff6b);
+  animation: radio-pulse 1.6s ease-in-out infinite;
+}
+
+@keyframes radio-pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.3; }
+}
+
+.radio-hero__tagline {
+  font-size: 15px;
+  color: rgba(255,255,255,0.45);
+  font-weight: 400;
+  margin: 0;
+}
+
+/* ── Cover Art Grid ───────────────────────────────────────── */
+
+.radio-hero__covers {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 20px;
+}
+
+.radio-cover {
+  border: 0;
+  background: none;
+  padding: 0;
+  cursor: pointer;
+  transition: transform 0.32s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.28s ease;
+}
+
+.radio-cover:hover {
+  transform: translateY(-4px) scale(1.02);
+}
+
+.radio-cover.is-active {
+  transform: translateY(-6px) scale(1.04);
+}
+
+.radio-cover__art {
+  aspect-ratio: 1;
+  border-radius: 12px;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  padding: 18px;
+  position: relative;
+  overflow: hidden;
+}
+
+.radio-cover__art::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: 12px;
+  border: 1px solid rgba(255,255,255,0.08);
+  pointer-events: none;
+  z-index: 1;
+}
+
+.radio-cover.is-active .radio-cover__art::before {
+  border-color: var(--color-dot, #7cff6b);
+  box-shadow: 0 0 24px rgba(124, 255, 107, 0.15);
+}
+
+.radio-cover__art--vol14 {
+  background: linear-gradient(145deg, #1a1a2e 0%, #16213e 40%, #0f3460 100%);
+}
+.radio-cover__art--vol15 {
+  background: linear-gradient(145deg, #1b1b1b 0%, #2d2d2d 40%, #0d4b3c 100%);
+}
+.radio-cover__art--vol16 {
+  background: linear-gradient(145deg, #2d1b2e 0%, #1a1023 40%, #3d1c47 100%);
+}
+
+.radio-cover__vol {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: rgba(255,255,255,0.5);
+  margin-bottom: 4px;
+}
+
+.radio-cover__name {
+  font-size: 15px;
+  font-weight: 600;
+  line-height: 1.25;
+  color: #fff;
+}
+
+/* ── Now Playing Bar ──────────────────────────────────────── */
+
+.radio-hero__now-playing {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  padding: 18px 24px;
+  background: rgba(255,255,255,0.04);
+  border-radius: 14px;
+  border: 1px solid rgba(255,255,255,0.06);
+}
+
+.radio-hero__track-info {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.radio-hero__track-title {
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: rgba(255,255,255,0.75);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.radio-hero__track-sub {
+  font-size: 14px;
+  font-weight: 400;
+  color: rgba(255,255,255,0.4);
+}
+
+.radio-hero__play {
+  flex-shrink: 0;
+  width: 48px;
+  height: 48px;
+  border: 0;
+  background: none;
+  color: #fff;
+  cursor: pointer;
+  padding: 0;
+  transition: transform 0.2s ease, color 0.2s ease;
+}
+
+.radio-hero__play:hover {
+  transform: scale(1.08);
+  color: var(--color-dot, #7cff6b);
+}
+
+.radio-hero__play svg {
+  width: 48px;
+  height: 48px;
+}
+
+.radio-hero__play svg[hidden] {
+  display: none !important;
+}
+
+/* ── Waveform Visualizer ──────────────────────────────────── */
+
+.radio-wave {
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  height: 32px;
+  flex-shrink: 0;
+}
+
+.radio-wave span {
+  display: block;
+  width: 2.5px;
+  border-radius: 2px;
+  background: var(--color-dot, #7cff6b);
+  opacity: 0.35;
+  height: 6px;
+  transition: height 0.15s ease;
+}
+
+.radio-card.is-playing .radio-wave span {
+  animation: radio-bar 0.8s ease-in-out infinite alternate;
+  opacity: 0.7;
+}
+
+.radio-wave span:nth-child(1)  { height: 10px; animation-delay: 0.00s; }
+.radio-wave span:nth-child(2)  { height: 18px; animation-delay: 0.05s; }
+.radio-wave span:nth-child(3)  { height: 12px; animation-delay: 0.10s; }
+.radio-wave span:nth-child(4)  { height: 24px; animation-delay: 0.15s; }
+.radio-wave span:nth-child(5)  { height: 16px; animation-delay: 0.20s; }
+.radio-wave span:nth-child(6)  { height: 28px; animation-delay: 0.06s; }
+.radio-wave span:nth-child(7)  { height: 20px; animation-delay: 0.12s; }
+.radio-wave span:nth-child(8)  { height: 14px; animation-delay: 0.18s; }
+.radio-wave span:nth-child(9)  { height: 26px; animation-delay: 0.03s; }
+.radio-wave span:nth-child(10) { height: 10px; animation-delay: 0.09s; }
+.radio-wave span:nth-child(11) { height: 22px; animation-delay: 0.14s; }
+.radio-wave span:nth-child(12) { height: 16px; animation-delay: 0.02s; }
+.radio-wave span:nth-child(13) { height: 30px; animation-delay: 0.08s; }
+.radio-wave span:nth-child(14) { height: 12px; animation-delay: 0.16s; }
+.radio-wave span:nth-child(15) { height: 20px; animation-delay: 0.04s; }
+.radio-wave span:nth-child(16) { height: 8px;  animation-delay: 0.11s; }
+.radio-wave span:nth-child(17) { height: 26px; animation-delay: 0.07s; }
+.radio-wave span:nth-child(18) { height: 14px; animation-delay: 0.13s; }
+.radio-wave span:nth-child(19) { height: 18px; animation-delay: 0.01s; }
+.radio-wave span:nth-child(20) { height: 24px; animation-delay: 0.17s; }
+.radio-wave span:nth-child(21) { height: 10px; animation-delay: 0.06s; }
+.radio-wave span:nth-child(22) { height: 20px; animation-delay: 0.12s; }
+.radio-wave span:nth-child(23) { height: 28px; animation-delay: 0.03s; }
+.radio-wave span:nth-child(24) { height: 14px; animation-delay: 0.09s; }
+.radio-wave span:nth-child(25) { height: 22px; animation-delay: 0.15s; }
+.radio-wave span:nth-child(26) { height: 8px;  animation-delay: 0.04s; }
+.radio-wave span:nth-child(27) { height: 18px; animation-delay: 0.10s; }
+.radio-wave span:nth-child(28) { height: 26px; animation-delay: 0.02s; }
+.radio-wave span:nth-child(29) { height: 12px; animation-delay: 0.08s; }
+.radio-wave span:nth-child(30) { height: 16px; animation-delay: 0.14s; }
+
+@keyframes radio-bar {
+  0%   { height: 4px;  }
+  100% { height: 28px; }
+}
+
+/* ── Divider ──────────────────────────────────────────────── */
+
+.radio-card__divider {
+  border: 0;
+  height: 1px;
+  background: rgba(255,255,255,0.08);
+  margin: 0;
+}
+
+/* ── Newsletter Section ───────────────────────────────────── */
+
+.radio-newsletter {
+  display: flex;
+  flex-direction: column;
+  gap: 28px;
+}
+
+.radio-newsletter__heading {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: rgba(255,255,255,0.35);
+  margin: 0;
+}
+
+.radio-newsletter__list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+.radio-newsletter__item {
+  padding: 24px 0;
+  border-top: 1px solid rgba(255,255,255,0.06);
+}
+
+.radio-newsletter__item:last-child {
+  border-bottom: 1px solid rgba(255,255,255,0.06);
+}
+
+.radio-newsletter__date {
+  display: block;
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.06em;
+  color: rgba(255,255,255,0.28);
+  margin-bottom: 8px;
+}
+
+.radio-newsletter__title {
+  font-size: 17px;
+  font-weight: 600;
+  line-height: 1.35;
+  color: #f0f0ec;
+  margin: 0 0 6px;
+}
+
+.radio-newsletter__excerpt {
+  font-size: 14px;
+  line-height: 1.55;
+  color: rgba(255,255,255,0.4);
+  margin: 0;
+  max-width: 580px;
+}
+
+/* ── Responsive — Radio Card ──────────────────────────────── */
+
+@media (max-width: 900px) {
+  .radio-card__inner {
+    padding: 100px 28px calc(var(--footer-inset, 12px) + var(--footer-h, 48px) + var(--player-gap, 10px) + var(--player-h, 59px) + 80px);
+  }
+
+  .radio-hero__covers {
+    gap: 14px;
+  }
+
+  .radio-cover__art {
+    padding: 14px;
+  }
+
+  .radio-cover__name {
+    font-size: 13px;
+  }
+}
+
+@media (max-width: 560px) {
+  .radio-card__inner {
+    padding: 88px 20px calc(var(--footer-inset, 12px) + var(--footer-h, 48px) + var(--player-gap, 10px) + var(--player-h, 59px) + 80px);
+    gap: 36px;
+  }
+
+  .radio-hero {
+    gap: 28px;
+  }
+
+  .radio-hero__covers {
+    gap: 10px;
+  }
+
+  .radio-cover__art {
+    padding: 10px;
+    border-radius: 8px;
+  }
+
+  .radio-cover__vol {
+    font-size: 8px;
+  }
+
+  .radio-cover__name {
+    font-size: 11px;
+  }
+
+  .radio-hero__now-playing {
+    padding: 14px 16px;
+    gap: 14px;
+    flex-wrap: wrap;
+  }
+
+  .radio-wave {
+    order: 3;
+    width: 100%;
+    justify-content: center;
+  }
+
+  .radio-hero__play {
+    width: 42px;
+    height: 42px;
+  }
+
+  .radio-hero__play svg {
+    width: 42px;
+    height: 42px;
+  }
+
+  .radio-newsletter__title {
+    font-size: 15px;
+  }
+
+  .radio-newsletter__excerpt {
+    font-size: 13px;
+  }
+}

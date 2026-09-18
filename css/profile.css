@@ -16,8 +16,13 @@
   transition: transform 0.14s ease, box-shadow 0.14s ease;
 }
 
-.avatar-btn:hover {
-  transform: scale(1.06);
+@media (hover: hover) {
+  .avatar-btn:hover {
+    transform: scale(1.06);
+  }
+}
+.avatar-btn:active {
+  transform: scale(0.94);
 }
 
 .avatar-btn:focus-visible {
@@ -93,8 +98,14 @@
   margin-bottom: 8px;
 }
 
-.profile-drop__btn--primary:hover {
+@media (hover: hover) {
+  .profile-drop__btn--primary:hover {
+    background: #2a2a2a;
+  }
+}
+.profile-drop__btn--primary:active {
   background: #2a2a2a;
+  transform: scale(0.98);
 }
 
 .profile-drop__btn:not(.profile-drop__btn--primary) {
@@ -102,7 +113,12 @@
   color: var(--color-ink);
 }
 
-.profile-drop__btn:not(.profile-drop__btn--primary):hover {
+@media (hover: hover) {
+  .profile-drop__btn:not(.profile-drop__btn--primary):hover {
+    background: rgba(15, 15, 15, 0.09);
+  }
+}
+.profile-drop__btn:not(.profile-drop__btn--primary):active {
   background: rgba(15, 15, 15, 0.09);
 }
 
@@ -160,8 +176,13 @@
   transition: background 0.12s ease;
 }
 
-.profile-drop__link:hover {
-  background: rgba(15, 15, 15, 0.05);
+@media (hover: hover) {
+  .profile-drop__link:hover {
+    background: rgba(15, 15, 15, 0.05);
+  }
+}
+.profile-drop__link:active {
+  background: rgba(15, 15, 15, 0.08);
 }
 
 .profile-drop__link svg {
@@ -241,7 +262,13 @@
   transition: opacity 0.12s ease, background 0.12s ease;
 }
 
-.profile-modal__close:hover {
+@media (hover: hover) {
+  .profile-modal__close:hover {
+    opacity: 0.8;
+    background: rgba(15, 15, 15, 0.06);
+  }
+}
+.profile-modal__close:active {
   opacity: 0.8;
   background: rgba(15, 15, 15, 0.06);
 }
@@ -355,8 +382,13 @@
   transition: background 0.12s ease, border-color 0.12s ease, color 0.12s ease;
 }
 
-.pref-chip:hover {
-  background: rgba(15, 15, 15, 0.04);
+@media (hover: hover) {
+  .pref-chip:hover {
+    background: rgba(15, 15, 15, 0.04);
+  }
+}
+.pref-chip:active {
+  background: rgba(15, 15, 15, 0.08);
 }
 
 .pref-chip.is-active {
@@ -428,8 +460,10 @@
   transition: color 0.12s ease;
 }
 
-.profile-skip:hover {
-  color: var(--color-ink);
+@media (hover: hover) {
+  .profile-skip:hover {
+    color: var(--color-ink);
+  }
 }
 
 /* ── Step transitions ─────────────────────────────────────── */

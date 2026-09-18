@@ -1,0 +1,152 @@
+/* August — Mobile bottom tab bar (iOS UITabBar pattern)
+   Persistent bottom navigation on ≤900px only. Sits above the home indicator
+   via safe-area. Audio player floats above it. Site footer hides on mobile
+   (its links live in the tab bar / Profile sheet instead). */
+
+.tabbar {
+  display: none; /* desktop hides it by default */
+}
+
+@media (max-width: 900px) {
+  .tabbar {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 40;
+    display: flex;
+    align-items: stretch;
+    justify-content: space-around;
+    height: calc(56px + var(--safe-bottom));
+    padding: 6px 4px calc(6px + var(--safe-bottom));
+    background: rgba(255, 255, 255, 0.94);
+    backdrop-filter: blur(24px) saturate(160%);
+    -webkit-backdrop-filter: blur(24px) saturate(160%);
+    border-top: 1px solid rgba(15, 15, 15, 0.06);
+    /* Hairline shadow for depth */
+    box-shadow: 0 -1px 0 rgba(15, 15, 15, 0.03),
+                0 -8px 24px -8px rgba(15, 15, 15, 0.08);
+    pointer-events: auto;
+  }
+
+  .tabbar__item {
+    flex: 1 1 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 3px;
+    background: none;
+    border: 0;
+    padding: 4px 0;
+    color: var(--color-muted-2);
+    font-size: 10px;
+    font-weight: 500;
+    letter-spacing: 0.2px;
+    -webkit-tap-highlight-color: transparent;
+    transition: color 0.16s ease, transform 0.16s ease;
+    min-height: 44px; /* HIG tap target */
+  }
+
+  .tabbar__item svg {
+    width: 24px;
+    height: 24px;
+    display: block;
+    stroke: currentColor;
+    fill: none;
+    stroke-width: 1.5;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+
+  .tabbar__item.is-active {
+    color: var(--color-ink);
+  }
+
+  .tabbar__item.is-active svg {
+    /* Filled-icon feel for active state — use stroke-width bump */
+    stroke-width: 2;
+  }
+
+  .tabbar__item:active {
+    transform: scale(0.92);
+  }
+
+  /* Optional badge on Bag */
+  .tabbar__badge {
+    position: absolute;
+    top: 2px;
+    right: calc(50% - 18px);
+    min-width: 16px;
+    height: 16px;
+    padding: 0 4px;
+    border-radius: 100px;
+    background: var(--color-ink);
+    color: #fff;
+    font-size: 9px;
+    font-weight: 600;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    line-height: 1;
+    box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.94);
+  }
+
+  /* Wrap tabbar items in a relative container so badge positions correctly */
+  .tabbar__item {
+    position: relative;
+  }
+
+  /* Reflow chrome to make room for the tab bar */
+
+  /* Site footer is redundant on mobile — its links live in tab bar / profile */
+  .site-footer {
+    display: none;
+  }
+
+  /* Audio player sits above the tab bar with an 8px gap */
+  .site-player {
+    bottom: calc(56px + 10px + var(--safe-bottom));
+  }
+
+  /* Player chip (dismissed state) also above tab bar */
+  .site-player.is-dismissed {
+    bottom: calc(56px + 12px + var(--safe-bottom));
+  }
+
+  /* Reserve enough scroll clearance under content so bottom items aren't
+     hidden by tab bar + player + a small gap. */
+  :root {
+    --chrome-bottom: calc(
+      56px + 10px + var(--player-h) + 12px + 8px + var(--safe-bottom)
+    );
+  }
+
+  /* Card-stack pagination dots — above the tab bar too */
+  .card-stack__dots {
+    bottom: calc(56px + 12px + var(--player-h) + 12px + var(--safe-bottom));
+  }
+
+  /* Brand-banner content inside card stack — lift above tab bar */
+  .brand-banner--full .brand-banner__content {
+    bottom: calc(56px + 12px + var(--player-h) + 24px + var(--safe-bottom));
+  }
+}
+
+/* Phone (≤560px) — very slight tightening */
+@media (max-width: 560px) {
+  .tabbar {
+    padding-left: 2px;
+    padding-right: 2px;
+  }
+
+  .tabbar__item {
+    font-size: 9.5px;
+    letter-spacing: 0.16px;
+  }
+
+  .tabbar__item svg {
+    width: 22px;
+    height: 22px;
+  }
+}

@@ -2,7 +2,13 @@
 <html lang="en">
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta name="theme-color" content="#f4f4f1" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+    <meta name="apple-mobile-web-app-title" content="August" />
+    <meta name="format-detection" content="telephone=no" />
     <title>August — Home</title>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -13,6 +19,9 @@
     <link rel="stylesheet" href="css/pages.css" />
     <link rel="stylesheet" href="css/profile.css" />
     <link rel="stylesheet" href="css/cardstack.css" />
+    <link rel="stylesheet" href="css/sheet.css" />
+    <link rel="stylesheet" href="css/tabbar.css" />
+    <link rel="stylesheet" href="css/segmented.css" />
   </head>
   <body>
     <div class="mega-backdrop" data-mega-backdrop hidden></div>
@@ -348,8 +357,31 @@
           <a href="#">Visit</a>
         </nav>
       </footer>
+
+      <!-- ── Mobile tab bar (≤900px) ────────────────────────── -->
+      <nav class="tabbar" aria-label="Primary" data-tabbar>
+        <a class="tabbar__item is-active" href="index.html" aria-current="page">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 10l9-7 9 7v11a1 1 0 01-1 1h-5v-7h-6v7H4a1 1 0 01-1-1V10z"/></svg>
+          <span>Shop</span>
+        </a>
+        <button type="button" class="tabbar__item" data-sheet-open="search-sheet">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="10.5" cy="10.5" r="6.5"/><path d="M15 15l5 5"/></svg>
+          <span>Search</span>
+        </button>
+        <a class="tabbar__item" href="cart.html">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 8h14l-1 12a2 2 0 01-2 2H8a2 2 0 01-2-2L5 8z"/><path d="M9 8V6a3 3 0 016 0v2"/></svg>
+          <span class="tabbar__badge">3</span>
+          <span>Bag</span>
+        </a>
+        <button type="button" class="tabbar__item" data-sheet-open="profile-sheet">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 4-7 8-7s8 3 8 7"/></svg>
+          <span>Profile</span>
+        </button>
+      </nav>
     </div>
     <script src="js/main.js"></script>
+    <script src="js/sheet.js"></script>
+    <script src="js/segmented.js"></script>
     <script src="js/player.js"></script>
     <script src="js/profile.js"></script>
     <script src="js/cardstack.js"></script>

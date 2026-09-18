@@ -254,6 +254,72 @@ document.addEventListener("DOMContentLoaded", () => {
 
   /* ── Render state ───────────────────────────────────────── */
 
+  /* Profile sheet (mobile) — mirrors dropdown content into a bottom sheet */
+  const profileSheetBody = document.querySelector("[data-profile-sheet-body]");
+
+  const renderSheetBody = (user) => {
+    if (!profileSheetBody) return;
+    if (user && user.name) {
+      profileSheetBody.innerHTML = `
+        <div class="profile-sheet__user">
+          <span class="profile-sheet__avatar-lg">${initials(user.name)}</span>
+          <div class="profile-sheet__user-meta">
+            <p class="profile-sheet__name">${user.name}</p>
+            <p class="profile-sheet__email">${user.email}</p>
+          </div>
+        </div>
+        <div class="sheet-list">
+          <button class="sheet-list__row" type="button" data-profile-action="settings">
+            <span>My Settings</span>
+            <svg width="10" height="10" viewBox="0 0 10 10" fill="none" aria-hidden="true"><path d="M3 1l4 4-4 4" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </button>
+          <a class="sheet-list__row" href="cart.html">
+            <span>Your bag</span>
+            <svg width="10" height="10" viewBox="0 0 10 10" fill="none" aria-hidden="true"><path d="M3 1l4 4-4 4" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </a>
+          <a class="sheet-list__row" href="#">
+            <span>Order history</span>
+            <svg width="10" height="10" viewBox="0 0 10 10" fill="none" aria-hidden="true"><path d="M3 1l4 4-4 4" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </a>
+          <a class="sheet-list__row" href="#">
+            <span>Help &amp; support</span>
+            <svg width="10" height="10" viewBox="0 0 10 10" fill="none" aria-hidden="true"><path d="M3 1l4 4-4 4" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </a>
+        </div>
+        <button class="btn btn--ghost btn--block profile-sheet__signout" type="button" data-profile-action="signout">Sign out</button>
+      `;
+    } else {
+      profileSheetBody.innerHTML = `
+        <div class="profile-sheet__hero">
+          <div class="profile-sheet__hero-icon" aria-hidden="true">
+            <svg width="40" height="40" viewBox="0 0 32 32" fill="none"><circle cx="16" cy="12" r="5" stroke="currentColor" stroke-width="1.6"/><path d="M6 28c0-5.5 4.5-10 10-10s10 4.5 10 10" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
+          </div>
+          <h3 class="profile-sheet__hero-title">Welcome to August</h3>
+          <p class="profile-sheet__hero-sub">Sign in or create an account to personalize your experience.</p>
+        </div>
+        <button class="btn btn--primary btn--block" type="button" data-profile-action="create">Create Account</button>
+        <button class="btn btn--ghost btn--block" type="button" data-profile-action="signin">Sign In</button>
+        <div class="sheet-section">
+          <p class="sheet-section__label">Explore without an account</p>
+          <div class="sheet-list">
+            <a class="sheet-list__row" href="cart.html">
+              <span>Your bag</span>
+              <svg width="10" height="10" viewBox="0 0 10 10" fill="none" aria-hidden="true"><path d="M3 1l4 4-4 4" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </a>
+            <a class="sheet-list__row" href="collection.html">
+              <span>Browse new arrivals</span>
+              <svg width="10" height="10" viewBox="0 0 10 10" fill="none" aria-hidden="true"><path d="M3 1l4 4-4 4" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </a>
+            <a class="sheet-list__row" href="#">
+              <span>Help &amp; support</span>
+              <svg width="10" height="10" viewBox="0 0 10 10" fill="none" aria-hidden="true"><path d="M3 1l4 4-4 4" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </a>
+          </div>
+        </div>
+      `;
+    }
+  };
+
   const render = () => {
     const user = load();
     const triggers = $$("[data-avatar-trigger]");
@@ -290,6 +356,8 @@ document.addEventListener("DOMContentLoaded", () => {
       signedOut.hidden = false;
       signedIn.hidden = true;
     }
+
+    renderSheetBody(user);
   };
 
   render();
@@ -317,10 +385,22 @@ document.addEventListener("DOMContentLoaded", () => {
     dropOpen = false;
   };
 
+  const mobileMQ = window.matchMedia("(max-width: 900px)");
+
   document.addEventListener("click", (e) => {
     const trigger = e.target.closest("[data-avatar-trigger]");
     if (trigger) {
       e.stopPropagation();
+      // Mobile: route to the profile sheet primitive.
+      // Desktop: use the dropdown as before.
+      if (mobileMQ.matches && window.Sheet) {
+        if (window.Sheet.isOpen("profile-sheet")) {
+          window.Sheet.close("profile-sheet");
+        } else {
+          window.Sheet.open("profile-sheet");
+        }
+        return;
+      }
       if (dropOpen) closeDrop();
       else openDrop(trigger);
       return;

@@ -2,7 +2,13 @@
 <html lang="en">
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta name="theme-color" content="#f4f4f1" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+    <meta name="apple-mobile-web-app-title" content="August" />
+    <meta name="format-detection" content="telephone=no" />
     <title>August — Your bag</title>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -12,6 +18,9 @@
     <link rel="stylesheet" href="css/components.css" />
     <link rel="stylesheet" href="css/pages.css" />
     <link rel="stylesheet" href="css/profile.css" />
+    <link rel="stylesheet" href="css/sheet.css" />
+    <link rel="stylesheet" href="css/tabbar.css" />
+    <link rel="stylesheet" href="css/segmented.css" />
   </head>
   <body>
     <div class="mega-backdrop" data-mega-backdrop hidden></div>
@@ -135,39 +144,76 @@
         <p class="cart-page__count">3 items</p>
 
         <div class="cart-layout">
-          <div class="glass-panel cart-lines">
-            <div class="cart-line">
-              <div class="cart-line__left">
-                <div class="cart-line__thumb"><img src="assets/cart-1.png" alt="" /></div>
-                <div>
-                  <div class="cart-line__title">Premium Old Skool 36 Souvenir</div>
-                  <div class="cart-line__meta">Vans · Qty 1</div>
-                </div>
+          <div class="glass-panel cart-lines" data-cart-list>
+            <div class="cart-swipe" data-cart-swipe>
+              <div class="cart-swipe__actions" aria-hidden="true">
+                <button class="cart-swipe__action cart-swipe__action--save" data-cart-save type="button" aria-label="Save for later">
+                  <svg width="18" height="18" viewBox="0 0 18 18" fill="none" aria-hidden="true"><path d="M4 3h10v13l-5-3-5 3V3z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/></svg>
+                  <span>Save</span>
+                </button>
+                <button class="cart-swipe__action cart-swipe__action--delete" data-cart-remove type="button" aria-label="Remove">
+                  <svg width="18" height="18" viewBox="0 0 18 18" fill="none" aria-hidden="true"><path d="M3 5h12M6 5V3.5A1.5 1.5 0 017.5 2h3A1.5 1.5 0 0112 3.5V5m1 0v9.5A1.5 1.5 0 0111.5 16h-5A1.5 1.5 0 015 14.5V5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+                  <span>Remove</span>
+                </button>
               </div>
-              <div class="cart-line__price">$125.00</div>
+              <div class="cart-swipe__row cart-line">
+                <div class="cart-line__left">
+                  <div class="cart-line__thumb"><img src="assets/cart-1.png" alt="" /></div>
+                  <div>
+                    <div class="cart-line__title">Premium Old Skool 36 Souvenir</div>
+                    <div class="cart-line__meta">Vans · Size 8 · Qty 1</div>
+                  </div>
+                </div>
+                <div class="cart-line__price">$125.00</div>
+              </div>
             </div>
             <div class="cart-divider"></div>
-            <div class="cart-line">
-              <div class="cart-line__left">
-                <div class="cart-line__thumb"><img src="assets/cart-2.png" alt="" /></div>
-                <div>
-                  <div class="cart-line__title">Ora Primo EXT (Black/Frost)</div>
-                  <div class="cart-line__meta">Hoka · Qty 1</div>
-                </div>
+            <div class="cart-swipe" data-cart-swipe>
+              <div class="cart-swipe__actions" aria-hidden="true">
+                <button class="cart-swipe__action cart-swipe__action--save" data-cart-save type="button" aria-label="Save for later">
+                  <svg width="18" height="18" viewBox="0 0 18 18" fill="none" aria-hidden="true"><path d="M4 3h10v13l-5-3-5 3V3z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/></svg>
+                  <span>Save</span>
+                </button>
+                <button class="cart-swipe__action cart-swipe__action--delete" data-cart-remove type="button" aria-label="Remove">
+                  <svg width="18" height="18" viewBox="0 0 18 18" fill="none" aria-hidden="true"><path d="M3 5h12M6 5V3.5A1.5 1.5 0 017.5 2h3A1.5 1.5 0 0112 3.5V5m1 0v9.5A1.5 1.5 0 0111.5 16h-5A1.5 1.5 0 015 14.5V5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+                  <span>Remove</span>
+                </button>
               </div>
-              <div class="cart-line__price">$130.00</div>
+              <div class="cart-swipe__row cart-line">
+                <div class="cart-line__left">
+                  <div class="cart-line__thumb"><img src="assets/cart-2.png" alt="" /></div>
+                  <div>
+                    <div class="cart-line__title">Ora Primo EXT (Black/Frost)</div>
+                    <div class="cart-line__meta">Hoka · Size 9 · Qty 1</div>
+                  </div>
+                </div>
+                <div class="cart-line__price">$130.00</div>
+              </div>
             </div>
             <div class="cart-divider"></div>
-            <div class="cart-line">
-              <div class="cart-line__left">
-                <div class="cart-line__thumb"><img src="assets/cart-3.png" alt="" /></div>
-                <div>
-                  <div class="cart-line__title">Mafate 2 OG (Citrus/Black)</div>
-                  <div class="cart-line__meta">Hoka · Qty 1</div>
-                </div>
+            <div class="cart-swipe" data-cart-swipe>
+              <div class="cart-swipe__actions" aria-hidden="true">
+                <button class="cart-swipe__action cart-swipe__action--save" data-cart-save type="button" aria-label="Save for later">
+                  <svg width="18" height="18" viewBox="0 0 18 18" fill="none" aria-hidden="true"><path d="M4 3h10v13l-5-3-5 3V3z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/></svg>
+                  <span>Save</span>
+                </button>
+                <button class="cart-swipe__action cart-swipe__action--delete" data-cart-remove type="button" aria-label="Remove">
+                  <svg width="18" height="18" viewBox="0 0 18 18" fill="none" aria-hidden="true"><path d="M3 5h12M6 5V3.5A1.5 1.5 0 017.5 2h3A1.5 1.5 0 0112 3.5V5m1 0v9.5A1.5 1.5 0 0111.5 16h-5A1.5 1.5 0 015 14.5V5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+                  <span>Remove</span>
+                </button>
               </div>
-              <div class="cart-line__price">$190.00</div>
+              <div class="cart-swipe__row cart-line">
+                <div class="cart-line__left">
+                  <div class="cart-line__thumb"><img src="assets/cart-3.png" alt="" /></div>
+                  <div>
+                    <div class="cart-line__title">Mafate 2 OG (Citrus/Black)</div>
+                    <div class="cart-line__meta">Hoka · Size 10 · Qty 1</div>
+                  </div>
+                </div>
+                <div class="cart-line__price">$190.00</div>
+              </div>
             </div>
+            <p class="cart-lines__hint">Swipe left on any item to save or remove.</p>
           </div>
 
           <aside class="glass-panel cart-summary">
@@ -251,8 +297,32 @@
           <a href="#">Visit</a>
         </nav>
       </footer>
+
+      <!-- ── Mobile tab bar (≤900px) ────────────────────────── -->
+      <nav class="tabbar" aria-label="Primary" data-tabbar>
+        <a class="tabbar__item" href="index.html">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 10l9-7 9 7v11a1 1 0 01-1 1h-5v-7h-6v7H4a1 1 0 01-1-1V10z"/></svg>
+          <span>Shop</span>
+        </a>
+        <button type="button" class="tabbar__item" data-sheet-open="search-sheet">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="10.5" cy="10.5" r="6.5"/><path d="M15 15l5 5"/></svg>
+          <span>Search</span>
+        </button>
+        <a class="tabbar__item is-active" href="cart.html" aria-current="page">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 8h14l-1 12a2 2 0 01-2 2H8a2 2 0 01-2-2L5 8z"/><path d="M9 8V6a3 3 0 016 0v2"/></svg>
+          <span class="tabbar__badge">3</span>
+          <span>Bag</span>
+        </a>
+        <button type="button" class="tabbar__item" data-sheet-open="profile-sheet">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 4-7 8-7s8 3 8 7"/></svg>
+          <span>Profile</span>
+        </button>
+      </nav>
     </div>
     <script src="js/main.js"></script>
+    <script src="js/sheet.js"></script>
+    <script src="js/segmented.js"></script>
+    <script src="js/cart.js"></script>
     <script src="js/player.js"></script>
     <script src="js/profile.js"></script>
   </body>

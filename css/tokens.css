@@ -39,10 +39,20 @@
 
   --page-max: 1440px;
   --gutter: 64px;
-  --header-top: 39px;
+
+  /* iOS safe-area insets — read from viewport-fit=cover.
+     Fallback to 0 for non-iOS / older browsers. */
+  --safe-top: env(safe-area-inset-top, 0px);
+  --safe-right: env(safe-area-inset-right, 0px);
+  --safe-bottom: env(safe-area-inset-bottom, 0px);
+  --safe-left: env(safe-area-inset-left, 0px);
+
+  /* Chrome offsets — safe-area baked in so header sits below the notch,
+     and footer/player sit above the home indicator. */
+  --header-top: calc(39px + var(--safe-top));
   --header-h: 57px;
   --footer-h: 48px;
-  --footer-inset: 24px;
+  --footer-inset: calc(24px + var(--safe-bottom));
   --player-h: 59px;
   --player-gap: 12px;
   /* space reserved under scroll content so last items clear chrome */

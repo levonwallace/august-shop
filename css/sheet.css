@@ -1,0 +1,573 @@
+/* August — Bottom sheet primitive (iOS-style presentation)
+   Reusable for filters, add-to-bag, profile, sort, etc.
+   Declarative API:
+     <div class="sheet" id="my-sheet" data-sheet role="dialog" aria-modal="true" aria-hidden="true">
+       <div class="sheet__backdrop" data-sheet-close></div>
+       <div class="sheet__panel" data-sheet-panel>
+         <div class="sheet__grabber" aria-hidden="true"></div>
+         <header class="sheet__header">…</header>
+         <div class="sheet__body">…</div>
+         <footer class="sheet__footer">…</footer>
+       </div>
+     </div>
+     <button data-sheet-open="my-sheet">Open</button>
+*/
+
+/* ── Wrapper ─────────────────────────────────────────────── */
+.sheet {
+  position: fixed;
+  inset: 0;
+  z-index: 300;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  pointer-events: none;
+  visibility: hidden;
+  transition: visibility 0.42s ease;
+}
+
+.sheet.is-open {
+  pointer-events: auto;
+  visibility: visible;
+}
+
+/* ── Backdrop ────────────────────────────────────────────── */
+.sheet__backdrop {
+  position: absolute;
+  inset: 0;
+  background: rgba(10, 13, 10, 0.42);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  opacity: 0;
+  transition: opacity 0.32s ease;
+  cursor: pointer;
+}
+
+.sheet.is-open .sheet__backdrop {
+  opacity: 1;
+}
+
+/* ── Panel ───────────────────────────────────────────────── */
+.sheet__panel {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  max-width: 560px;
+  max-height: 92dvh;
+  background: rgba(255, 255, 255, 0.98);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-top-left-radius: 28px;
+  border-top-right-radius: 28px;
+  box-shadow: 0 -20px 48px -12px rgba(0, 0, 0, 0.28);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  transform: translateY(100%);
+  transition: transform 0.42s cubic-bezier(0.22, 1, 0.36, 1);
+  will-change: transform;
+}
+
+.sheet.is-open .sheet__panel {
+  transform: translateY(0);
+}
+
+/* Mid-drag: kill transition so finger tracks 1:1 */
+.sheet__panel.is-dragging {
+  transition: none;
+}
+
+/* Size variants */
+.sheet--medium .sheet__panel {
+  height: 60dvh;
+  min-height: 400px;
+}
+
+.sheet--large .sheet__panel {
+  height: 92dvh;
+}
+
+/* ── Grabber (drag handle) ───────────────────────────────── */
+.sheet__grabber {
+  width: 36px;
+  height: 5px;
+  border-radius: 100px;
+  background: rgba(15, 15, 15, 0.18);
+  margin: 8px auto 4px;
+  flex-shrink: 0;
+  touch-action: none;
+}
+
+/* Drag zone spans grabber + header so users can drag from either */
+.sheet__grabber,
+.sheet__header {
+  cursor: grab;
+  touch-action: none;
+}
+
+.sheet__panel.is-dragging .sheet__grabber,
+.sheet__panel.is-dragging .sheet__header {
+  cursor: grabbing;
+}
+
+/* ── Header ──────────────────────────────────────────────── */
+.sheet__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 10px 16px 12px 24px;
+  flex-shrink: 0;
+}
+
+.sheet__title {
+  font-size: 17px;
+  font-weight: 600;
+  letter-spacing: -0.2px;
+  color: var(--color-ink);
+  margin: 0;
+}
+
+.sheet__eyebrow {
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 1.2px;
+  text-transform: uppercase;
+  color: var(--color-muted);
+  margin: 0 0 2px;
+}
+
+.sheet__close {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--color-ink);
+  background: rgba(15, 15, 15, 0.06);
+  flex-shrink: 0;
+  transition: background 0.14s ease, transform 0.14s ease;
+  /* Header itself is grab-cursor; close button overrides */
+  cursor: pointer;
+}
+
+.sheet__close svg {
+  width: 12px;
+  height: 12px;
+}
+
+@media (hover: hover) {
+  .sheet__close:hover {
+    background: rgba(15, 15, 15, 0.1);
+  }
+}
+
+.sheet__close:active {
+  background: rgba(15, 15, 15, 0.14);
+  transform: scale(0.94);
+}
+
+/* ── Body ────────────────────────────────────────────────── */
+.sheet__body {
+  padding: 8px 24px 24px;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
+  flex: 1 1 auto;
+  min-height: 0;
+}
+
+.sheet__body--flush {
+  padding-left: 0;
+  padding-right: 0;
+}
+
+/* ── Footer (sticky primary action) ──────────────────────── */
+.sheet__footer {
+  padding: 14px 20px calc(14px + var(--safe-bottom));
+  border-top: 1px solid rgba(15, 15, 15, 0.06);
+  background: rgba(255, 255, 255, 0.96);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+/* Ensure body-only sheets still respect home indicator */
+.sheet__panel:not(:has(.sheet__footer)) .sheet__body {
+  padding-bottom: calc(24px + var(--safe-bottom));
+}
+
+/* ── Body scroll lock ────────────────────────────────────── */
+body.sheet-open {
+  overflow: hidden;
+}
+
+body.sheet-open .page-scroll {
+  overflow: hidden;
+}
+
+/* ── iOS 15+ card presentation effect (mobile only)
+   The page behind scales down + rounds, revealing a dark backdrop.
+   Instantly reads as "sheet is presenting a modal." ── */
+@media (max-width: 900px) {
+  body.sheet-open .page {
+    transform: scale(0.93);
+    transform-origin: 50% 0;
+    border-radius: 14px;
+    overflow: hidden;
+    transition:
+      transform 0.44s cubic-bezier(0.22, 1, 0.36, 1),
+      border-radius 0.44s ease;
+  }
+
+  /* Dark backdrop behind the scaled page */
+  body.sheet-open::before {
+    content: "";
+    position: fixed;
+    inset: 0;
+    background: #000;
+    z-index: -1;
+  }
+}
+
+/* ── Reusable sheet content atoms ────────────────────────── */
+
+/* Grouped list row (iOS UITableView inset-grouped style) */
+.sheet-list {
+  display: flex;
+  flex-direction: column;
+  border-radius: 14px;
+  background: rgba(15, 15, 15, 0.03);
+  overflow: hidden;
+}
+
+.sheet-list__row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 14px 16px;
+  background: transparent;
+  border-bottom: 1px solid rgba(15, 15, 15, 0.06);
+  font-size: 15px;
+  color: var(--color-ink);
+  text-align: left;
+  width: 100%;
+  transition: background 0.14s ease;
+}
+
+.sheet-list__row:last-child {
+  border-bottom: 0;
+}
+
+.sheet-list__row:active {
+  background: rgba(15, 15, 15, 0.05);
+}
+
+.sheet-list__row.is-active {
+  color: var(--color-link);
+  font-weight: 500;
+}
+
+.sheet-list__row-check {
+  width: 18px;
+  height: 18px;
+  color: var(--color-link);
+  opacity: 0;
+  flex-shrink: 0;
+}
+
+.sheet-list__row.is-active .sheet-list__row-check {
+  opacity: 1;
+}
+
+/* Filter chip grid (for brand / color pickers in filter sheet) */
+.sheet-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.sheet-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 9px 14px;
+  border-radius: var(--radius-chip);
+  border: 1px solid rgba(15, 15, 15, 0.14);
+  background: #fff;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--color-ink);
+  transition: background 0.14s ease, border-color 0.14s ease, color 0.14s ease;
+}
+
+.sheet-chip.is-selected {
+  background: var(--color-ink);
+  border-color: var(--color-ink);
+  color: #fff;
+}
+
+.sheet-chip:active {
+  transform: scale(0.96);
+}
+
+/* Sheet-embedded search input (iOS-style rounded field with icon) */
+.sheet-search {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  height: 44px;
+  padding: 0 14px;
+  margin: 4px 0 8px;
+  border-radius: 14px;
+  background: rgba(15, 15, 15, 0.05);
+  border: 1px solid rgba(15, 15, 15, 0.06);
+}
+
+.sheet-search svg {
+  width: 15px;
+  height: 15px;
+  color: var(--color-muted);
+  flex-shrink: 0;
+}
+
+.sheet-search input {
+  border: 0;
+  outline: 0;
+  background: transparent;
+  width: 100%;
+  font-size: 16px; /* prevent iOS zoom on focus */
+  color: var(--color-ink);
+  min-width: 0;
+}
+
+.sheet-search input::placeholder {
+  color: var(--color-placeholder);
+}
+
+/* Section heading inside a sheet body */
+.sheet-section {
+  margin-top: 20px;
+}
+
+.sheet-section:first-child {
+  margin-top: 4px;
+}
+
+.sheet-section__label {
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 1.2px;
+  text-transform: uppercase;
+  color: var(--color-muted);
+  margin: 0 0 10px;
+  padding: 0 4px;
+}
+
+/* Add-to-bag confirmation content */
+.sheet-confirm {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 8px 4px 16px;
+}
+
+.sheet-confirm__thumb {
+  width: 64px;
+  height: 64px;
+  border-radius: 14px;
+  background: #f6f6f4;
+  overflow: hidden;
+  flex-shrink: 0;
+  box-shadow: var(--shadow-product);
+}
+
+.sheet-confirm__thumb img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+.sheet-confirm__meta {
+  min-width: 0;
+  flex: 1 1 auto;
+}
+
+.sheet-confirm__title {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--color-ink);
+  margin: 0 0 2px;
+}
+
+.sheet-confirm__sub {
+  font-size: 12px;
+  color: var(--color-muted);
+  margin: 0;
+}
+
+.sheet-confirm__badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 10px;
+  border-radius: var(--radius-chip);
+  background: rgba(124, 255, 107, 0.14);
+  color: #1f7a13;
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.6px;
+  text-transform: uppercase;
+  margin-bottom: 10px;
+}
+
+.sheet-confirm__badge-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #1f7a13;
+}
+
+/* Two buttons side by side in a sheet footer */
+.sheet__footer .btn-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+/* ── Profile sheet content atoms (mobile-only) ─────────────── */
+
+.profile-sheet__user {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 8px 4px 20px;
+  border-bottom: 1px solid rgba(15, 15, 15, 0.06);
+  margin-bottom: 20px;
+}
+
+.profile-sheet__avatar-lg {
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background: var(--color-ink-soft);
+  color: #fff;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+  font-weight: 600;
+  letter-spacing: 0.6px;
+  flex-shrink: 0;
+}
+
+.profile-sheet__user-meta {
+  min-width: 0;
+}
+
+.profile-sheet__name {
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--color-ink);
+  margin: 0 0 2px;
+}
+
+.profile-sheet__email {
+  font-size: 13px;
+  color: var(--color-muted);
+  margin: 0;
+}
+
+.profile-sheet__hero {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 12px 24px;
+  text-align: center;
+}
+
+.profile-sheet__hero-icon {
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  background: rgba(15, 15, 15, 0.05);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--color-ink);
+  margin-bottom: 4px;
+}
+
+.profile-sheet__hero-title {
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--color-ink);
+  letter-spacing: -0.2px;
+  margin: 0;
+}
+
+.profile-sheet__hero-sub {
+  font-size: 13px;
+  color: var(--color-muted);
+  line-height: 1.4;
+  max-width: 320px;
+  margin: 0 0 8px;
+}
+
+/* Sign-out row in profile sheet */
+.profile-sheet__signout {
+  margin-top: 20px;
+  color: #b3261e;
+  border-color: rgba(179, 38, 30, 0.24);
+}
+
+@media (hover: hover) {
+  .profile-sheet__signout:hover {
+    background: rgba(179, 38, 30, 0.06);
+  }
+}
+
+.profile-sheet__signout:active {
+  background: rgba(179, 38, 30, 0.12);
+}
+
+/* ── Responsive ───────────────────────────────────────────── */
+
+/* Desktop: bring the sheet off the very bottom edge slightly, all-round corners */
+@media (min-width: 900px) {
+  .sheet {
+    padding: 32px;
+  }
+
+  .sheet__panel {
+    max-height: min(720px, 84dvh);
+    border-radius: 24px;
+    box-shadow: 0 24px 64px -12px rgba(0, 0, 0, 0.34);
+  }
+}
+
+/* Phone: slightly smaller radius, tighter padding */
+@media (max-width: 560px) {
+  .sheet__panel {
+    border-top-left-radius: 22px;
+    border-top-right-radius: 22px;
+  }
+
+  .sheet__header {
+    padding: 8px 12px 10px 20px;
+  }
+
+  .sheet__body {
+    padding: 6px 20px 20px;
+  }
+
+  .sheet__footer {
+    padding: 12px 16px calc(12px + var(--safe-bottom));
+  }
+}

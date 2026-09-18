@@ -2,7 +2,13 @@
 <html lang="en">
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta name="theme-color" content="#f4f4f1" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+    <meta name="apple-mobile-web-app-title" content="August" />
+    <meta name="format-detection" content="telephone=no" />
     <title>August — Premium Old Skool 36 Souvenir</title>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -12,6 +18,9 @@
     <link rel="stylesheet" href="css/components.css" />
     <link rel="stylesheet" href="css/pages.css" />
     <link rel="stylesheet" href="css/profile.css" />
+    <link rel="stylesheet" href="css/sheet.css" />
+    <link rel="stylesheet" href="css/tabbar.css" />
+    <link rel="stylesheet" href="css/segmented.css" />
   </head>
   <body>
     <div class="mega-backdrop" data-mega-backdrop hidden></div>
@@ -147,12 +156,14 @@
           <div class="buy-box__price">$125.00</div>
           <p class="buy-box__desc">Vans Premium Old Skool 36 in Souvenir Navy. Classic silhouette, elevated materials. Available now at August.</p>
           <div class="buy-box__label">SIZE</div>
-          <div class="size-selector" data-size-group>
-            <button type="button" class="is-active">8</button>
-            <button type="button">9</button>
-            <button type="button">10</button>
+          <div class="segmented segmented--block" data-segmented role="radiogroup" aria-label="Size">
+            <button type="button" class="segmented__segment is-active" role="radio" aria-checked="true" data-value="8">8</button>
+            <button type="button" class="segmented__segment" role="radio" aria-checked="false" data-value="9">9</button>
+            <button type="button" class="segmented__segment" role="radio" aria-checked="false" data-value="10">10</button>
+            <button type="button" class="segmented__segment" role="radio" aria-checked="false" data-value="11">11</button>
+            <button type="button" class="segmented__segment" role="radio" aria-checked="false" data-value="12">12</button>
           </div>
-          <a class="btn btn--primary btn--block" href="cart.html">Add to bag — $125.00</a>
+          <button type="button" class="btn btn--primary btn--block" data-sheet-open="atb-sheet">Add to bag — $125.00</button>
           <p class="buy-box__note">Free local pickup in Madison  ·  Ships nationwide</p>
         </div>
       </section>
@@ -182,10 +193,12 @@
         </div>
 
         <div class="white-panel tabs-card" data-tabs>
-          <div class="tab-bar">
-            <button type="button" class="is-active" data-tab="contact">Contact Us</button>
-            <button type="button" data-tab="shipping">Shipping</button>
-            <button type="button" data-tab="returns">Returns</button>
+          <div class="tabs-card__seg">
+            <div class="segmented segmented--block" data-segmented role="radiogroup" aria-label="Info">
+              <button type="button" class="segmented__segment is-active" role="radio" aria-checked="true" data-tab="contact" data-value="contact">Contact Us</button>
+              <button type="button" class="segmented__segment" role="radio" aria-checked="false" data-tab="shipping" data-value="shipping">Shipping</button>
+              <button type="button" class="segmented__segment" role="radio" aria-checked="false" data-tab="returns" data-value="returns">Returns</button>
+            </div>
           </div>
           <div class="tab-panel is-active" data-panel="contact">
             <h3>Customer Service/Order Inquiries</h3>
@@ -266,8 +279,66 @@
           <a href="#">Visit</a>
         </nav>
       </footer>
+
+      <!-- ── Mobile tab bar (≤900px) ────────────────────────── -->
+      <nav class="tabbar" aria-label="Primary" data-tabbar>
+        <a class="tabbar__item is-active" href="index.html" aria-current="page">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 10l9-7 9 7v11a1 1 0 01-1 1h-5v-7h-6v7H4a1 1 0 01-1-1V10z"/></svg>
+          <span>Shop</span>
+        </a>
+        <button type="button" class="tabbar__item" data-sheet-open="search-sheet">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="10.5" cy="10.5" r="6.5"/><path d="M15 15l5 5"/></svg>
+          <span>Search</span>
+        </button>
+        <a class="tabbar__item" href="cart.html">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 8h14l-1 12a2 2 0 01-2 2H8a2 2 0 01-2-2L5 8z"/><path d="M9 8V6a3 3 0 016 0v2"/></svg>
+          <span class="tabbar__badge">3</span>
+          <span>Bag</span>
+        </a>
+        <button type="button" class="tabbar__item" data-sheet-open="profile-sheet">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 4-7 8-7s8 3 8 7"/></svg>
+          <span>Profile</span>
+        </button>
+      </nav>
+
+      <!-- ── Add-to-bag confirmation sheet ───────────────────── -->
+      <div class="sheet" id="atb-sheet" data-sheet aria-labelledby="atb-sheet-title">
+        <div class="sheet__backdrop" data-sheet-close></div>
+        <div class="sheet__panel" data-sheet-panel>
+          <div class="sheet__grabber" aria-hidden="true"></div>
+          <header class="sheet__header">
+            <div>
+              <span class="sheet-confirm__badge">
+                <span class="sheet-confirm__badge-dot" aria-hidden="true"></span>
+                Added to bag
+              </span>
+              <h2 class="sheet__title" id="atb-sheet-title">Nice pick</h2>
+            </div>
+            <button class="sheet__close" type="button" aria-label="Close" data-sheet-close>
+              <svg viewBox="0 0 12 12" fill="none" aria-hidden="true"><path d="M1 1l10 10M11 1L1 11" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>
+            </button>
+          </header>
+          <div class="sheet__body">
+            <div class="sheet-confirm">
+              <div class="sheet-confirm__thumb"><img src="assets/cart-1.png" alt="" /></div>
+              <div class="sheet-confirm__meta">
+                <p class="sheet-confirm__title">Premium Old Skool 36 Souvenir</p>
+                <p class="sheet-confirm__sub">Vans &middot; Size 8 &middot; $125.00</p>
+              </div>
+            </div>
+          </div>
+          <footer class="sheet__footer">
+            <div class="btn-row">
+              <button type="button" class="btn btn--ghost" data-sheet-close>Continue shopping</button>
+              <a class="btn btn--primary" href="cart.html">View bag</a>
+            </div>
+          </footer>
+        </div>
+      </div>
     </div>
     <script src="js/main.js"></script>
+    <script src="js/sheet.js"></script>
+    <script src="js/segmented.js"></script>
     <script src="js/player.js"></script>
     <script src="js/profile.js"></script>
   </body>

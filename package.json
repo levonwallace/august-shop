@@ -1,0 +1,14 @@
+{
+  "name": "august-shop",
+  "version": "0.1.0",
+  "private": true,
+  "description": "August Shop — iOS-inspired UX prototype (pre-Shopify Liquid). No build step required.",
+  "scripts": {
+    "dev": "./scripts/dev.sh",
+    "start": "./scripts/dev.sh",
+    "open": "open http://localhost:5173/index.html"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}

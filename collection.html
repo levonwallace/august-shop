@@ -2,7 +2,13 @@
 <html lang="en">
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta name="theme-color" content="#edf0e8" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+    <meta name="apple-mobile-web-app-title" content="August" />
+    <meta name="format-detection" content="telephone=no" />
     <title>August — New Arrivals</title>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -12,6 +18,9 @@
     <link rel="stylesheet" href="css/components.css" />
     <link rel="stylesheet" href="css/pages.css" />
     <link rel="stylesheet" href="css/profile.css" />
+    <link rel="stylesheet" href="css/sheet.css" />
+    <link rel="stylesheet" href="css/tabbar.css" />
+    <link rel="stylesheet" href="css/segmented.css" />
   </head>
   <body>
     <div class="mega-backdrop" data-mega-backdrop hidden></div>
@@ -134,6 +143,11 @@
         <div class="plp-intro__island">
           <p>Fresh drops from Vans, Hoka, Lady White Co., and more — 24 products</p>
         </div>
+        <button class="plp-filter-btn" type="button" data-sheet-open="filter-sheet" aria-label="Filter and sort">
+          <svg viewBox="0 0 14 14" fill="none" aria-hidden="true"><path d="M2 4h10M4 7h6M6 10h2" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>
+          <span>Filter &amp; Sort</span>
+          <span class="plp-filter-btn__count" data-filter-count hidden>0</span>
+        </button>
       </section>
 
       <section class="plp-grid-wrap">
@@ -267,8 +281,99 @@
           <a href="#">Visit</a>
         </nav>
       </footer>
+
+      <!-- ── Mobile tab bar (≤900px) ────────────────────────── -->
+      <nav class="tabbar" aria-label="Primary" data-tabbar>
+        <a class="tabbar__item is-active" href="index.html" aria-current="page">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 10l9-7 9 7v11a1 1 0 01-1 1h-5v-7h-6v7H4a1 1 0 01-1-1V10z"/></svg>
+          <span>Shop</span>
+        </a>
+        <button type="button" class="tabbar__item" data-sheet-open="search-sheet">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="10.5" cy="10.5" r="6.5"/><path d="M15 15l5 5"/></svg>
+          <span>Search</span>
+        </button>
+        <a class="tabbar__item" href="cart.html">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 8h14l-1 12a2 2 0 01-2 2H8a2 2 0 01-2-2L5 8z"/><path d="M9 8V6a3 3 0 016 0v2"/></svg>
+          <span class="tabbar__badge">3</span>
+          <span>Bag</span>
+        </a>
+        <button type="button" class="tabbar__item" data-sheet-open="profile-sheet">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 4-7 8-7s8 3 8 7"/></svg>
+          <span>Profile</span>
+        </button>
+      </nav>
+
+      <!-- ── Filter & Sort sheet ─────────────────────────────── -->
+      <div class="sheet sheet--medium" id="filter-sheet" data-sheet aria-labelledby="filter-sheet-title">
+        <div class="sheet__backdrop" data-sheet-close></div>
+        <div class="sheet__panel" data-sheet-panel>
+          <div class="sheet__grabber" aria-hidden="true"></div>
+          <header class="sheet__header">
+            <div>
+              <p class="sheet__eyebrow">24 products</p>
+              <h2 class="sheet__title" id="filter-sheet-title">Filter &amp; Sort</h2>
+            </div>
+            <button class="sheet__close" type="button" aria-label="Close" data-sheet-close>
+              <svg viewBox="0 0 12 12" fill="none" aria-hidden="true"><path d="M1 1l10 10M11 1L1 11" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>
+            </button>
+          </header>
+          <div class="sheet__body" data-filter-body>
+            <div class="sheet-section">
+              <p class="sheet-section__label">Sort by</p>
+              <div class="sheet-list" role="radiogroup" aria-label="Sort by">
+                <button type="button" class="sheet-list__row is-active" role="radio" aria-checked="true" data-filter-sort="featured">
+                  <span>Featured</span>
+                  <svg class="sheet-list__row-check" viewBox="0 0 14 14" fill="none" aria-hidden="true"><path d="M2 7.5L6 11L12 3.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                </button>
+                <button type="button" class="sheet-list__row" role="radio" aria-checked="false" data-filter-sort="newest">
+                  <span>Newest</span>
+                  <svg class="sheet-list__row-check" viewBox="0 0 14 14" fill="none" aria-hidden="true"><path d="M2 7.5L6 11L12 3.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                </button>
+                <button type="button" class="sheet-list__row" role="radio" aria-checked="false" data-filter-sort="price-asc">
+                  <span>Price — Low to High</span>
+                  <svg class="sheet-list__row-check" viewBox="0 0 14 14" fill="none" aria-hidden="true"><path d="M2 7.5L6 11L12 3.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                </button>
+                <button type="button" class="sheet-list__row" role="radio" aria-checked="false" data-filter-sort="price-desc">
+                  <span>Price — High to Low</span>
+                  <svg class="sheet-list__row-check" viewBox="0 0 14 14" fill="none" aria-hidden="true"><path d="M2 7.5L6 11L12 3.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                </button>
+              </div>
+            </div>
+
+            <div class="sheet-section">
+              <p class="sheet-section__label">Brand</p>
+              <div class="sheet-chips">
+                <button type="button" class="sheet-chip" data-filter-brand="vans">Vans</button>
+                <button type="button" class="sheet-chip" data-filter-brand="hoka">Hoka</button>
+                <button type="button" class="sheet-chip" data-filter-brand="lady-white">Lady White Co.</button>
+                <button type="button" class="sheet-chip" data-filter-brand="puma">Puma</button>
+                <button type="button" class="sheet-chip" data-filter-brand="saucony">Saucony</button>
+                <button type="button" class="sheet-chip" data-filter-brand="velva-sheen">Velva Sheen</button>
+                <button type="button" class="sheet-chip" data-filter-brand="dr-martens">Dr. Martens</button>
+              </div>
+            </div>
+
+            <div class="sheet-section">
+              <p class="sheet-section__label">Category</p>
+              <div class="sheet-chips">
+                <button type="button" class="sheet-chip" data-filter-cat="footwear">Footwear</button>
+                <button type="button" class="sheet-chip" data-filter-cat="apparel">Apparel</button>
+                <button type="button" class="sheet-chip" data-filter-cat="accessories">Accessories</button>
+              </div>
+            </div>
+          </div>
+          <footer class="sheet__footer">
+            <div class="btn-row">
+              <button type="button" class="btn btn--ghost" data-filter-clear>Clear</button>
+              <button type="button" class="btn btn--primary" data-sheet-close>Show results</button>
+            </div>
+          </footer>
+        </div>
+      </div>
     </div>
     <script src="js/main.js"></script>
+    <script src="js/sheet.js"></script>
+    <script src="js/segmented.js"></script>
     <script src="js/player.js"></script>
     <script src="js/profile.js"></script>
   </body>

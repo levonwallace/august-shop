@@ -2,12 +2,16 @@
 *::before,
 *::after {
   box-sizing: border-box;
+  -webkit-tap-highlight-color: transparent;
 }
 
 html {
   -webkit-font-smoothing: antialiased;
   text-rendering: optimizeLegibility;
   height: 100%;
+  /* Prevent iOS Safari from rescaling body text after orientation change */
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
 }
 
 body {
@@ -27,6 +31,8 @@ img {
 a {
   color: inherit;
   text-decoration: none;
+  /* Kill iOS 300ms tap delay + prevent double-tap zoom on links */
+  touch-action: manipulation;
 }
 
 button,
@@ -40,6 +46,17 @@ button {
   border: 0;
   background: none;
   padding: 0;
+  touch-action: manipulation;
+  /* Prevent long-press callout / text selection on buttons */
+  -webkit-user-select: none;
+  user-select: none;
+}
+
+/* Keep text inputs selectable */
+input:not([type="range"]):not([type="checkbox"]):not([type="radio"]),
+textarea {
+  -webkit-user-select: auto;
+  user-select: auto;
 }
 
 ul {

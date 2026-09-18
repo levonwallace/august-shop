@@ -1,4 +1,5 @@
-/* August — 3D Card Stack Controller (v3) */
+/* August — 3D Card Stack Controller (v4)
+   Live-drag + rubber-band + spring release + progressive parallax + haptic. */
 document.addEventListener("DOMContentLoaded", () => {
   const stack = document.querySelector("[data-card-stack]");
   if (!stack) return;
@@ -13,6 +14,14 @@ document.addEventListener("DOMContentLoaded", () => {
   let queued = null;
   const LOCK_MS = 380;
 
+  /* ── Haptic ─────────────────────────────────────────────── */
+  const haptic = (ms = 10) => {
+    if (typeof navigator !== "undefined" && typeof navigator.vibrate === "function") {
+      try { navigator.vibrate(ms); } catch {}
+    }
+  };
+
+  /* ── State transitions ─────────────────────────────────── */
   const applyState = (card, state) => card.setAttribute("data-state", state);
 
   const offsetOf = (i, base) => {
@@ -29,7 +38,15 @@ document.addEventListener("DOMContentLoaded", () => {
     return "hidden";
   };
 
+  const clearInlineTransforms = () => {
+    cards.forEach((c) => {
+      c.style.transform = "";
+      c.style.opacity = "";
+    });
+  };
+
   const renderAll = () => {
+    clearInlineTransforms();
     cards.forEach((c, i) => applyState(c, stateForOffset(offsetOf(i, active))));
     dots.forEach((d, i) => d.classList.toggle("is-active", i === active));
   };
@@ -46,6 +63,14 @@ document.addEventListener("DOMContentLoaded", () => {
     const prev = active;
     active = target;
     animating = true;
+    haptic(12);
+
+    // Ensure no stale inline transforms are fighting the CSS transition
+    cards.forEach((c) => {
+      c.classList.remove("is-dragging");
+      c.style.transform = "";
+      c.style.opacity = "";
+    });
 
     if (dir >= 0) {
       applyState(cards[prev], "dismissed");
@@ -81,8 +106,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const next = () => goTo(active + 1, 1);
   const prev = () => goTo(active - 1, -1);
 
-  /* ── Wheel ──────────────────────────────────────────────── */
-
+  /* ── Wheel (unchanged) ─────────────────────────────────── */
   let wheelAccum = 0;
   let wheelTimer = null;
   const WHEEL_THRESHOLD = 55;
@@ -108,40 +132,144 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }, { passive: false });
 
-  /* ── Touch ──────────────────────────────────────────────── */
+  /* ── Pointer drag (touch + mouse unified) ──────────────── */
 
-  let touchY0 = 0;
-  let touchDy = 0;
-  let touching = false;
+  const skipDrag = (el) =>
+    el.closest(
+      "button, a, input, select, textarea, .waveform, .audio-player__queue, .profile-drop, .profile-modal, [data-card-scroll], .sheet, .tabbar"
+    );
 
-  const skipTouch = (el) =>
-    el.closest("button, a, input, select, textarea, .waveform, .audio-player__queue, .profile-drop, .profile-modal, [data-card-scroll]");
+  let startY = 0;
+  let startX = 0;
+  let dy = 0;
+  let dragging = false;
+  let horizontal = false;
+  let startTime = 0;
+  let activePointerId = null;
 
-  stack.addEventListener("touchstart", (e) => {
-    if (skipTouch(e.target)) return;
-    touchY0 = e.touches[0].clientY;
-    touchDy = 0;
-    touching = true;
+  const COMMIT_DIST = 90;       // px — commit gesture past this
+  const COMMIT_VEL = 0.55;      // px/ms
+  const RUBBER_MAX = 220;       // saturate drag past ~viewport height/4
+
+  // Rubber-band tapering — as drag magnitude grows, additional motion shrinks
+  const rubberBand = (val) => {
+    const abs = Math.abs(val);
+    if (abs <= RUBBER_MAX) return val;
+    const excess = abs - RUBBER_MAX;
+    // asymptotic curve: y = a * (1 - 1/(x/a + 1))
+    const tapered = RUBBER_MAX + (excess * RUBBER_MAX) / (excess + RUBBER_MAX);
+    return Math.sign(val) * tapered;
+  };
+
+  const applyDrag = (delta) => {
+    // Progress: 0 at rest, 1 at commit distance
+    const progress = Math.min(1, Math.abs(delta) / COMMIT_DIST);
+    const dir = Math.sign(delta); // positive = drag up (swipe next), negative = drag down (swipe prev)
+
+    // Active card: translate + slight scale
+    const activeCard = cards[active];
+    const scaleActive = 1 - 0.04 * progress;
+    activeCard.style.transform = `translateY(${-delta}px) scale(${scaleActive})`;
+    activeCard.style.opacity = String(1 - 0.12 * progress);
+
+    // Peek card behind — nudges up toward active state as user commits
+    if (dir > 0) {
+      // Dragging up (revealing next card behind — that's stack-1)
+      const nextIdx = (active + 1) % total;
+      const nextCard = cards[nextIdx];
+      const t = -14 * (1 - progress); // stack-1 sits +14y; approaches 0 as progress→1
+      const s = 0.965 + 0.035 * progress;
+      nextCard.style.transform = `translateZ(-50px) translateY(${t}px) scale(${s})`;
+    } else if (dir < 0) {
+      // Dragging down — bring the previous card back on top from off-top
+      const prevIdx = (active - 1 + total) % total;
+      const prevCard = cards[prevIdx];
+      const t = -110 * (1 - progress); // slides down from -110% to 0
+      const s = 1 + 0.02 * (1 - progress);
+      prevCard.style.transform = `translateY(${t}%) scale(${s})`;
+      prevCard.style.opacity = "1";
+    }
+  };
+
+  const releaseDrag = (commit) => {
+    // Remove is-dragging so transitions kick in
+    cards.forEach((c) => c.classList.remove("is-dragging"));
+
+    if (commit === "next") {
+      next();
+    } else if (commit === "prev") {
+      prev();
+    } else {
+      // Spring back to current state
+      clearInlineTransforms();
+      renderAll();
+    }
+  };
+
+  stack.addEventListener("pointerdown", (e) => {
+    if (skipDrag(e.target)) return;
+    if (e.pointerType === "mouse" && e.button !== 0) return;
+    startY = e.clientY;
+    startX = e.clientX;
+    dy = 0;
+    dragging = true;
+    horizontal = false;
+    startTime = performance.now();
+    activePointerId = e.pointerId;
   }, { passive: true });
 
-  stack.addEventListener("touchmove", (e) => {
-    if (!touching) return;
-    touchDy = touchY0 - e.touches[0].clientY;
-    if (Math.abs(touchDy) > 10) e.preventDefault();
+  stack.addEventListener("pointermove", (e) => {
+    if (!dragging || e.pointerId !== activePointerId) return;
+    const rawDy = e.clientY - startY;
+    const rawDx = e.clientX - startX;
+
+    // Lock direction: if user is scrubbing horizontally, cancel drag
+    if (!horizontal && Math.abs(rawDx) > 12 && Math.abs(rawDx) > Math.abs(rawDy)) {
+      horizontal = true;
+      dragging = false;
+      clearInlineTransforms();
+      renderAll();
+      return;
+    }
+    if (Math.abs(rawDy) < 6) return; // small threshold before starting drag visuals
+
+    // First frame of confirmed drag — mark cards as is-dragging so transitions off
+    if (!cards[active].classList.contains("is-dragging")) {
+      cards.forEach((c) => c.classList.add("is-dragging"));
+      try { stack.setPointerCapture(e.pointerId); } catch {}
+    }
+
+    dy = rubberBand(rawDy);
+    applyDrag(-dy); // drag UP is negative dy → progress positive (advance)
+    // preventDefault to keep browser from scrolling; only if pointer is captured
+    if (stack.hasPointerCapture && stack.hasPointerCapture(e.pointerId)) {
+      e.preventDefault();
+    }
   }, { passive: false });
 
-  stack.addEventListener("touchend", () => {
-    if (!touching) return;
-    touching = false;
-    if (touchDy > 50) next();
-    else if (touchDy < -50) prev();
-    touchDy = 0;
-  }, { passive: true });
+  const onUp = (e) => {
+    if (!dragging || e.pointerId !== activePointerId) {
+      if (horizontal) horizontal = false;
+      return;
+    }
+    dragging = false;
+    try { stack.releasePointerCapture(e.pointerId); } catch {}
+    const dt = Math.max(1, performance.now() - startTime);
+    const velocity = -dy / dt; // px/ms, positive = swiping up
+    const delta = -dy;
 
-  stack.addEventListener("touchcancel", () => { touching = false; touchDy = 0; }, { passive: true });
+    let commit = null;
+    if (delta > COMMIT_DIST || velocity > COMMIT_VEL) commit = "next";
+    else if (delta < -COMMIT_DIST || velocity < -COMMIT_VEL) commit = "prev";
 
-  /* ── Keyboard ───────────────────────────────────────────── */
+    releaseDrag(commit);
+    activePointerId = null;
+  };
 
+  stack.addEventListener("pointerup", onUp);
+  stack.addEventListener("pointercancel", onUp);
+
+  /* ── Keyboard ──────────────────────────────────────────── */
   window.addEventListener("keydown", (e) => {
     if (e.target.closest("input, textarea, select")) return;
     if (!document.querySelector(".page--home")) return;
@@ -149,8 +277,7 @@ document.addEventListener("DOMContentLoaded", () => {
     else if (e.key === "ArrowUp" || e.key === "ArrowLeft") { e.preventDefault(); prev(); }
   });
 
-  /* ── Dots ────────────────────────────────────────────────── */
-
+  /* ── Dots ──────────────────────────────────────────────── */
   dots.forEach((dot) => {
     dot.addEventListener("click", () => {
       const idx = Number(dot.getAttribute("data-dot"));
@@ -158,6 +285,6 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   });
 
-  /* ── Init ────────────────────────────────────────────────── */
+  /* ── Init ──────────────────────────────────────────────── */
   renderAll();
 });

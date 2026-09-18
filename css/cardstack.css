@@ -158,9 +158,11 @@
   background: var(--color-ink-soft);
 }
 
-.card-stack__dot:hover:not(.is-active) {
-  background: rgba(15, 15, 15, 0.4);
-  transform: scale(1.2);
+@media (hover: hover) {
+  .card-stack__dot:hover:not(.is-active) {
+    background: rgba(15, 15, 15, 0.4);
+    transform: scale(1.2);
+  }
 }
 
 /* ── Home hero adjustments inside card ────────────────────── */
@@ -424,8 +426,13 @@
   transition: transform 0.32s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.28s ease;
 }
 
-.radio-cover:hover {
-  transform: translateY(-4px) scale(1.02);
+@media (hover: hover) {
+  .radio-cover:hover {
+    transform: translateY(-4px) scale(1.02);
+  }
+}
+.radio-cover:active {
+  transform: translateY(-2px) scale(0.98);
 }
 
 .radio-cover.is-active {
@@ -533,8 +540,14 @@
   transition: transform 0.2s ease, color 0.2s ease;
 }
 
-.radio-hero__play:hover {
-  transform: scale(1.08);
+@media (hover: hover) {
+  .radio-hero__play:hover {
+    transform: scale(1.08);
+    color: var(--color-dot, #7cff6b);
+  }
+}
+.radio-hero__play:active {
+  transform: scale(0.94);
   color: var(--color-dot, #7cff6b);
 }
 

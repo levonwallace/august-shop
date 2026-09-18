@@ -8,24 +8,35 @@
 }
 
 @media (max-width: 900px) {
+  :root {
+    /* Distance from viewport bottom to the TOP of the floating dock.
+       Everything that stacks above the dock offsets from this. */
+    --tabbar-top: calc(56px + 12px + var(--safe-bottom));
+  }
+
+  /* Floating glass dock (Instagram-style). Never touches the browser chrome:
+     Safari's bottom URL bar shrinks the dynamic viewport (100dvh) and the
+     home indicator is covered by --safe-bottom, so the pill always floats
+     clear of both — no browser detection needed. */
   .tabbar {
     position: absolute;
-    left: 0;
-    right: 0;
-    bottom: 0;
+    left: 16px;
+    right: 16px;
+    bottom: calc(12px + var(--safe-bottom));
+    margin: 0 auto;
+    max-width: 420px;
     z-index: 40;
     display: flex;
     align-items: stretch;
     justify-content: space-around;
-    height: calc(56px + var(--safe-bottom));
-    padding: 6px 4px calc(6px + var(--safe-bottom));
-    background: rgba(255, 255, 255, 0.94);
+    height: 56px;
+    padding: 4px 6px;
+    border-radius: var(--radius-pill);
+    background: var(--color-island);
+    border: 1px solid var(--color-island-border);
     backdrop-filter: blur(24px) saturate(160%);
     -webkit-backdrop-filter: blur(24px) saturate(160%);
-    border-top: 1px solid rgba(15, 15, 15, 0.06);
-    /* Hairline shadow for depth */
-    box-shadow: 0 -1px 0 rgba(15, 15, 15, 0.03),
-                0 -8px 24px -8px rgba(15, 15, 15, 0.08);
+    box-shadow: var(--shadow-island), 0 12px 32px -8px rgba(15, 15, 15, 0.18);
     pointer-events: auto;
   }
 
@@ -104,36 +115,34 @@
     display: none;
   }
 
-  /* Audio player sits above the tab bar with an 8px gap */
+  /* Audio player floats above the dock */
   .site-player {
-    bottom: calc(56px + 10px + var(--safe-bottom));
+    bottom: calc(var(--tabbar-top) + 10px);
   }
 
-  /* Player chip (dismissed state) also above tab bar */
+  /* Player chip (dismissed state) also above the dock */
   .site-player.is-dismissed {
-    bottom: calc(56px + 12px + var(--safe-bottom));
+    bottom: calc(var(--tabbar-top) + 12px);
   }
 
   /* Reserve enough scroll clearance under content so bottom items aren't
-     hidden by tab bar + player + a small gap. */
+     hidden by the dock + a small gap. */
   :root {
-    --chrome-bottom: calc(
-      56px + 16px + 8px + var(--safe-bottom)
-    );
+    --chrome-bottom: calc(var(--tabbar-top) + 16px);
   }
 
-  /* Card-stack pagination dots — above the tab bar; Radio card adds player height */
+  /* Card-stack pagination dots — above the dock; Radio card adds player height */
   .card-stack__dots {
-    bottom: calc(56px + 12px + var(--safe-bottom));
+    bottom: calc(var(--tabbar-top) + 12px);
   }
 
   .page--home.is-radio-card .card-stack__dots {
-    bottom: calc(56px + 12px + var(--player-h) + 12px + var(--safe-bottom));
+    bottom: calc(var(--tabbar-top) + var(--player-h) + 24px);
   }
 
-  /* Brand-banner content inside card stack — lift above tab bar */
+  /* Brand-banner content inside card stack — lift above the dock */
   .brand-banner--full .brand-banner__content {
-    bottom: calc(56px + 24px + var(--safe-bottom));
+    bottom: calc(var(--tabbar-top) + 24px);
   }
 }
 

@@ -174,9 +174,6 @@
   box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
 }
 
-.page--home.is-radio-card .card-stack__dots {
-  bottom: calc(var(--footer-inset, 24px) + var(--footer-h, 48px) + var(--player-gap, 12px) + var(--player-h, 40px) + 12px);
-}
 
 .card-stack__dot {
   width: 8px;
@@ -589,7 +586,7 @@
 .radio-card__inner {
   max-width: 860px;
   margin: 0 auto;
-  padding: 120px 48px calc(var(--footer-inset, 24px) + var(--footer-h, 48px) + var(--player-gap, 12px) + var(--player-h, 40px) + 64px);
+  padding: 120px 48px calc(var(--chrome-bottom, 88px) + 32px);
   display: flex;
   flex-direction: column;
   gap: 48px;
@@ -639,6 +636,25 @@
   color: rgba(255,255,255,0.45);
   font-weight: 400;
   margin: 0;
+  max-width: 560px;
+}
+
+.radio-hero__submit {
+  font-size: 12px;
+  color: rgba(255,255,255,0.35);
+  margin: 0;
+}
+
+.radio-hero__submit a {
+  color: var(--color-dot, #7cff6b);
+  opacity: 0.85;
+}
+
+@media (hover: hover) {
+  .radio-hero__submit a:hover {
+    opacity: 1;
+    text-decoration: underline;
+  }
 }
 
 /* ── Cover Art Grid ───────────────────────────────────────── */
@@ -672,7 +688,7 @@
 
 .radio-cover__art {
   aspect-ratio: 1;
-  border-radius: 12px;
+  border-radius: 0;
   display: flex;
   flex-direction: column;
   justify-content: flex-end;
@@ -685,7 +701,7 @@
   content: "";
   position: absolute;
   inset: 0;
-  border-radius: 12px;
+  border-radius: 0;
   border: 1px solid rgba(255,255,255,0.08);
   pointer-events: none;
   z-index: 1;
@@ -704,6 +720,15 @@
 }
 .radio-cover__art--vol16 {
   background: linear-gradient(145deg, #2d1b2e 0%, #1a1023 40%, #3d1c47 100%);
+}
+.radio-cover__art--g4 {
+  background: linear-gradient(145deg, #2e1f0f 0%, #3f2a10 40%, #7a4a1f 100%);
+}
+.radio-cover__art--g5 {
+  background: linear-gradient(145deg, #2b0f14 0%, #3d1119 40%, #6e1f2e 100%);
+}
+.radio-cover__art--g6 {
+  background: linear-gradient(145deg, #0f2226 0%, #123a3d 40%, #1f6e66 100%);
 }
 
 .radio-cover__vol {
@@ -727,11 +752,159 @@
 .radio-hero__now-playing {
   display: flex;
   align-items: center;
-  gap: 20px;
+  flex-wrap: wrap;
+  gap: 16px 20px;
   padding: 18px 24px;
   background: rgba(255,255,255,0.04);
   border-radius: 14px;
   border: 1px solid rgba(255,255,255,0.06);
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+
+@media (hover: hover) {
+  .radio-hero__now-playing:hover {
+    background: rgba(255,255,255,0.06);
+  }
+}
+
+.radio-hero__now-playing.is-expanded {
+  cursor: default;
+}
+
+/* Chevron toggle */
+.radio-hero__expand {
+  flex-shrink: 0;
+  width: 32px;
+  height: 32px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 0;
+  background: none;
+  color: rgba(255,255,255,0.45);
+  cursor: pointer;
+  transition: color 0.16s ease, transform 0.24s var(--ease-swipe, ease);
+}
+
+.radio-hero__expand svg {
+  width: 12px;
+  height: 12px;
+  transform: rotate(180deg); /* points up when collapsed = "expand" */
+  transition: transform 0.24s var(--ease-swipe, ease);
+}
+
+.radio-hero__now-playing.is-expanded .radio-hero__expand svg {
+  transform: rotate(0deg);
+}
+
+@media (hover: hover) {
+  .radio-hero__expand:hover {
+    color: #fff;
+  }
+}
+
+/* Expanded drawer — grid-rows trick for smooth height animation */
+.radio-hero__extra {
+  flex: 1 1 100%;
+  display: grid;
+  grid-template-rows: 0fr;
+  opacity: 0;
+  transition: grid-template-rows 0.32s var(--ease-swipe, ease), opacity 0.2s ease;
+}
+
+.radio-hero__now-playing.is-expanded .radio-hero__extra {
+  grid-template-rows: 1fr;
+  opacity: 1;
+}
+
+.radio-hero__extra-inner {
+  overflow: hidden;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+/* Seek — 4px track inside a 32px touch band */
+.radio-seek {
+  display: flex;
+  align-items: center;
+  height: 32px;
+  cursor: pointer;
+  touch-action: none;
+  outline: none;
+}
+
+.radio-seek:focus-visible .radio-seek__track {
+  box-shadow: 0 0 0 2px rgba(124, 255, 107, 0.35);
+}
+
+.radio-seek__track {
+  width: 100%;
+  height: 4px;
+  border-radius: 2px;
+  background: rgba(255,255,255,0.12);
+  overflow: hidden;
+}
+
+.radio-seek__fill {
+  width: 0%;
+  height: 100%;
+  border-radius: 2px;
+  background: var(--color-dot, #7cff6b);
+  transition: width 0.1s linear;
+}
+
+.radio-hero__extra-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.radio-hero__time {
+  font-size: 12px;
+  letter-spacing: 0.04em;
+  font-variant-numeric: tabular-nums;
+  color: rgba(255,255,255,0.45);
+}
+
+.radio-hero__transport {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.radio-hero__skip-btn {
+  width: 44px;
+  height: 44px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 0;
+  background: none;
+  color: rgba(255,255,255,0.65);
+  cursor: pointer;
+  border-radius: 50%;
+  transition: color 0.16s ease, background 0.16s ease, transform 0.12s ease;
+}
+
+.radio-hero__skip-btn svg {
+  width: 18px;
+  height: 18px;
+}
+
+@media (hover: hover) {
+  .radio-hero__skip-btn:hover {
+    color: #fff;
+    background: rgba(255,255,255,0.06);
+  }
+}
+
+.radio-hero__skip-btn:active {
+  transform: scale(0.9);
+  color: var(--color-dot, #7cff6b);
 }
 
 .radio-hero__track-info {
@@ -861,6 +1034,257 @@
   margin: 0;
 }
 
+/* ── Mix Archive grid (AUGUST AUX, 3×3 + pagination) ──────── */
+
+.aux-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 16px;
+}
+
+/* Grid tiles reuse .radio-cover but stay in-plane so the lift on
+   selection doesn't overlap neighbors. */
+.aux-tile.is-active {
+  transform: none;
+}
+
+@media (hover: hover) {
+  .aux-tile:hover {
+    transform: translateY(-3px) scale(1.015);
+  }
+}
+
+.aux-tile__genre {
+  font-size: 9px;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: rgba(255,255,255,0.4);
+  margin-top: 6px;
+}
+
+.aux-pages-wrap {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  margin-top: 4px;
+}
+
+.aux-pages {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.aux-page {
+  min-width: 34px;
+  height: 34px;
+  padding: 0 6px;
+  border-radius: 999px;
+  border: 1px solid rgba(255,255,255,0.12);
+  background: rgba(255,255,255,0.04);
+  color: rgba(255,255,255,0.55);
+  font-size: 12px;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  cursor: pointer;
+  transition: background 0.16s ease, color 0.16s ease, border-color 0.16s ease;
+}
+
+@media (hover: hover) {
+  .aux-page:hover:not(.is-active):not(:disabled) {
+    color: #fff;
+    border-color: rgba(255,255,255,0.3);
+  }
+}
+
+.aux-page.is-active {
+  background: #f0f0ec;
+  border-color: transparent;
+  color: #0a0a0a;
+  cursor: default;
+}
+
+.aux-page--nav {
+  border: 0;
+  background: none;
+  font-size: 18px;
+  line-height: 1;
+}
+
+.aux-page:disabled {
+  opacity: 0.25;
+  cursor: default;
+}
+
+.aux-archive__all {
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: rgba(255,255,255,0.4);
+  white-space: nowrap;
+  transition: color 0.16s ease;
+}
+
+@media (hover: hover) {
+  .aux-archive__all:hover {
+    color: #fff;
+  }
+}
+
+.aux-archive__list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.aux-row {
+  display: grid;
+  grid-template-columns: 44px minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 16px;
+  width: 100%;
+  padding: 14px 6px;
+  border: 0;
+  border-top: 1px solid rgba(255,255,255,0.06);
+  background: none;
+  text-align: left;
+  color: #f0f0ec;
+  cursor: pointer;
+  border-radius: 10px;
+  transition: background 0.16s ease;
+}
+
+.aux-archive__list li:last-child .aux-row {
+  border-bottom: 1px solid rgba(255,255,255,0.06);
+}
+
+@media (hover: hover) {
+  .aux-row:hover {
+    background: rgba(255,255,255,0.04);
+  }
+}
+
+.aux-row:active {
+  background: rgba(255,255,255,0.06);
+}
+
+.aux-row.is-active {
+  background: rgba(124, 255, 107, 0.06);
+}
+
+.aux-row__no {
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  font-variant-numeric: tabular-nums;
+  color: rgba(255,255,255,0.35);
+}
+
+.aux-row.is-active .aux-row__no {
+  color: var(--color-dot, #7cff6b);
+}
+
+.aux-row__name {
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 1.35;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.aux-row__tag {
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: rgba(255,255,255,0.5);
+  border: 1px solid rgba(255,255,255,0.14);
+  border-radius: 999px;
+  padding: 4px 10px;
+  white-space: nowrap;
+}
+
+/* ── Newsletter signup (AUX page pattern) ─────────────────── */
+
+.aux-newsletter {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.aux-newsletter__sub {
+  font-size: 14px;
+  line-height: 1.5;
+  color: rgba(255,255,255,0.4);
+  margin: 0;
+  max-width: 480px;
+}
+
+.aux-newsletter__form {
+  display: flex;
+  gap: 10px;
+  max-width: 480px;
+}
+
+.aux-newsletter__form input {
+  flex: 1 1 auto;
+  min-width: 0;
+  height: 44px;
+  padding: 0 18px;
+  border-radius: 999px;
+  border: 1px solid rgba(255,255,255,0.14);
+  background: rgba(255,255,255,0.05);
+  color: #f0f0ec;
+  font-size: 14px;
+  outline: none;
+  transition: border-color 0.16s ease, background 0.16s ease;
+}
+
+.aux-newsletter__form input::placeholder {
+  color: rgba(255,255,255,0.3);
+}
+
+.aux-newsletter__form input:focus {
+  border-color: rgba(255,255,255,0.35);
+  background: rgba(255,255,255,0.08);
+}
+
+.aux-newsletter__form button {
+  flex-shrink: 0;
+  height: 44px;
+  padding: 0 24px;
+  border: 0;
+  border-radius: 999px;
+  background: #f0f0ec;
+  color: #0a0a0a;
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  cursor: pointer;
+  transition: background 0.16s ease, transform 0.16s ease;
+}
+
+@media (hover: hover) {
+  .aux-newsletter__form button:hover {
+    background: #fff;
+  }
+}
+
+.aux-newsletter__form button:active {
+  transform: scale(0.97);
+}
+
+.aux-newsletter__form button:disabled {
+  background: rgba(124, 255, 107, 0.85);
+  cursor: default;
+}
+
 /* ── Newsletter Section ───────────────────────────────────── */
 
 .radio-newsletter {
@@ -942,11 +1366,11 @@
 
 @media (max-width: 900px) {
   .radio-card__inner {
-    padding: 100px 28px calc(var(--footer-inset, 12px) + var(--footer-h, 48px) + var(--player-gap, 10px) + var(--player-h, 59px) + 80px);
+    padding: 100px 28px calc(var(--chrome-bottom, 88px) + 40px);
   }
 
-  .radio-hero__covers {
-    gap: 14px;
+  .aux-grid {
+    gap: 12px;
   }
 
   .radio-cover__art {
@@ -960,7 +1384,7 @@
 
 @media (max-width: 560px) {
   .radio-card__inner {
-    padding: 88px 20px calc(var(--footer-inset, 12px) + var(--footer-h, 48px) + var(--player-gap, 10px) + var(--player-h, 59px) + 80px);
+    padding: 88px 20px calc(var(--chrome-bottom, 88px) + 40px);
     gap: 36px;
   }
 
@@ -968,13 +1392,27 @@
     gap: 28px;
   }
 
-  .radio-hero__covers {
-    gap: 10px;
+  .aux-grid {
+    gap: 8px;
+  }
+
+  /* Keep pagination tappable — 36px pills with row spacing ≈ HIG target */
+  .aux-page {
+    min-width: 36px;
+    height: 36px;
+    font-size: 11px;
+  }
+
+  .aux-pages {
+    gap: 6px;
+  }
+
+  .aux-tile__genre {
+    font-size: 8px;
   }
 
   .radio-cover__art {
     padding: 10px;
-    border-radius: 8px;
   }
 
   .radio-cover__vol {
@@ -987,14 +1425,22 @@
 
   .radio-hero__now-playing {
     padding: 14px 16px;
-    gap: 14px;
+    gap: 12px;
     flex-wrap: wrap;
   }
 
+  /* Wave becomes a compact inline accent — hide half the bars so the
+     title + play + chevron fit one row on a 390px screen */
   .radio-wave {
-    order: 3;
-    width: 100%;
-    justify-content: center;
+    gap: 2px;
+  }
+
+  .radio-wave span:nth-child(n+16) {
+    display: none;
+  }
+
+  .radio-hero__track-info {
+    min-width: 0;
   }
 
   .radio-hero__play {
@@ -1005,6 +1451,15 @@
   .radio-hero__play svg {
     width: 42px;
     height: 42px;
+  }
+
+  .radio-hero__expand {
+    width: 28px;
+    height: 28px;
+  }
+
+  .radio-hero__extra-row {
+    gap: 10px;
   }
 
   .radio-newsletter__title {

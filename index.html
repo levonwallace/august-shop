@@ -343,7 +343,9 @@
           </a>
         </div>
 
-        <!-- Card 4: August Radio + Newsletter -->
+        <!-- Card 4: AUGUST AUX — mixes, archive, newsletter
+             (mirrors august-shop.com/blogs/august-aux so real SoundCloud /
+             Spotify embeds can swap in at port time) -->
         <div class="card-stack__card card-stack__card--radio" data-card="4">
           <div class="radio-card" data-card-scroll>
             <div class="radio-card__inner">
@@ -351,32 +353,20 @@
               <!-- ── Audio Player Section ── -->
               <section class="radio-hero">
                 <div class="radio-hero__header">
-                  <span class="radio-hero__badge"><span class="radio-hero__live-dot"></span>August Radio</span>
-                  <p class="radio-hero__tagline">Curated sounds from the shop floor.</p>
+                  <span class="radio-hero__badge"><span class="radio-hero__live-dot"></span>August AUX</span>
+                  <p class="radio-hero__tagline">SoundCloud mixes and Spotify playlists curated by our staff and DJs from Madison and around the world.</p>
+                  <p class="radio-hero__submit">Want to be featured? <a href="mailto:info@august-shop.com">info@august-shop.com</a></p>
                 </div>
 
-                <div class="radio-hero__covers">
-                  <button class="radio-cover" data-radio-vol="0" aria-label="Play VOL. 14 — Madison After Hours">
-                    <div class="radio-cover__art radio-cover__art--vol14">
-                      <span class="radio-cover__vol">VOL. 14</span>
-                      <span class="radio-cover__name">Madison<br/>After Hours</span>
-                    </div>
-                  </button>
-                  <button class="radio-cover" data-radio-vol="1" aria-label="Play VOL. 15 — State Street Mix">
-                    <div class="radio-cover__art radio-cover__art--vol15">
-                      <span class="radio-cover__vol">VOL. 15</span>
-                      <span class="radio-cover__name">State Street<br/>Mix</span>
-                    </div>
-                  </button>
-                  <button class="radio-cover" data-radio-vol="2" aria-label="Play VOL. 16 — Late Light">
-                    <div class="radio-cover__art radio-cover__art--vol16">
-                      <span class="radio-cover__vol">VOL. 16</span>
-                      <span class="radio-cover__name">Late<br/>Light</span>
-                    </div>
-                  </button>
-                </div>
+                <!-- 3×3 mix grid + pagination — rendered by radiocard.js from
+                     the archive data (7 pages, mirrors the live AUX blog) -->
+                <div class="aux-grid" data-aux-grid></div>
+                <nav class="aux-pages-wrap" aria-label="Archive pages">
+                  <div class="aux-pages" data-aux-pages></div>
+                  <a class="aux-archive__all" href="https://august-shop.com/blogs/august-aux" target="_blank" rel="noopener">Full archive ↗</a>
+                </nav>
 
-                <div class="radio-hero__now-playing">
+                <div class="radio-hero__now-playing" data-radio-bar>
                   <div class="radio-wave" aria-hidden="true">
                     <span></span><span></span><span></span><span></span><span></span>
                     <span></span><span></span><span></span><span></span><span></span>
@@ -386,39 +376,50 @@
                     <span></span><span></span><span></span><span></span><span></span>
                   </div>
                   <div class="radio-hero__track-info">
-                    <span class="radio-hero__track-title" data-radio-title>AUGUST RADIO — VOL. 14</span>
+                    <span class="radio-hero__track-title" data-radio-title>AUGUST AUX :: 078</span>
                     <span class="radio-hero__track-sub" data-radio-sub>Madison After Hours</span>
                   </div>
                   <button class="radio-hero__play" type="button" aria-label="Play" data-radio-play>
                     <svg class="radio-hero__play-icon" viewBox="0 0 48 48" fill="none"><circle cx="24" cy="24" r="23" stroke="currentColor" stroke-width="1.5"/><path d="M19 15.5L33 24L19 32.5V15.5Z" fill="currentColor"/></svg>
                     <svg class="radio-hero__pause-icon" viewBox="0 0 48 48" fill="none" hidden><circle cx="24" cy="24" r="23" stroke="currentColor" stroke-width="1.5"/><rect x="17" y="15" width="4.5" height="18" rx="1.2" fill="currentColor"/><rect x="26.5" y="15" width="4.5" height="18" rx="1.2" fill="currentColor"/></svg>
                   </button>
+                  <button class="radio-hero__expand" type="button" aria-label="Expand player" aria-expanded="false" data-radio-expand>
+                    <svg viewBox="0 0 12 12" fill="none" aria-hidden="true"><path d="M2 4.5l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                  </button>
+
+                  <!-- Expanded controls: seek, time, prev/next -->
+                  <div class="radio-hero__extra">
+                    <div class="radio-hero__extra-inner">
+                      <div class="radio-seek" data-radio-seek role="slider" aria-label="Seek" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" tabindex="0">
+                        <div class="radio-seek__track"><div class="radio-seek__fill" data-radio-seek-fill></div></div>
+                      </div>
+                      <div class="radio-hero__extra-row">
+                        <span class="radio-hero__time" data-radio-time>0:00 / 0:00</span>
+                        <div class="radio-hero__transport">
+                          <button class="radio-hero__skip-btn" type="button" aria-label="Previous mix" data-radio-prev>
+                            <svg viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M10.5 3.5L5.5 8l5 4.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                          </button>
+                          <button class="radio-hero__skip-btn" type="button" aria-label="Next mix" data-radio-next>
+                            <svg viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M5.5 3.5L10.5 8l-5 4.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
                 </div>
               </section>
 
               <!-- ── Divider ── -->
               <hr class="radio-card__divider" />
 
-              <!-- ── Newsletter Section ── -->
-              <section class="radio-newsletter">
-                <h2 class="radio-newsletter__heading">From the Shop</h2>
-                <ul class="radio-newsletter__list">
-                  <li class="radio-newsletter__item">
-                    <time class="radio-newsletter__date">Sep 14, 2026</time>
-                    <h3 class="radio-newsletter__title">New Drop: Vans Souvenir Collection</h3>
-                    <p class="radio-newsletter__excerpt">Six colorways built on the Old Skool 36 silhouette — premium suede, vintage foxing tape, and our exclusive embroidered heel tab. In-store &amp; online now.</p>
-                  </li>
-                  <li class="radio-newsletter__item">
-                    <time class="radio-newsletter__date">Sep 10, 2026</time>
-                    <h3 class="radio-newsletter__title">Store Hours Update — Fall Schedule</h3>
-                    <p class="radio-newsletter__excerpt">Starting October 1 we're shifting to fall hours: Mon–Sat 11 AM – 7 PM, Sun 12 – 5 PM. Same vibes, shorter days.</p>
-                  </li>
-                  <li class="radio-newsletter__item">
-                    <time class="radio-newsletter__date">Sep 6, 2026</time>
-                    <h3 class="radio-newsletter__title">August Radio VOL. 16 is Live</h3>
-                    <p class="radio-newsletter__excerpt">Late Light — a slow-burn mix for golden hour. Soul samples, lo-fi breaks, and deep cuts from the crate. Hit play above.</p>
-                  </li>
-                </ul>
+              <!-- ── Newsletter (mirrors the AUX page signup) ── -->
+              <section class="aux-newsletter">
+                <h2 class="radio-newsletter__heading">Newsletter</h2>
+                <p class="aux-newsletter__sub">Join to get special offers, free giveaways, and exclusive drops.</p>
+                <form class="aux-newsletter__form" data-aux-newsletter>
+                  <input type="email" name="email" placeholder="Email" aria-label="Email" autocomplete="email" required />
+                  <button type="submit">Join</button>
+                </form>
               </section>
 
             </div>
@@ -433,56 +434,8 @@
         <button class="card-stack__dot" data-dot="1" aria-label="Vans"></button>
         <button class="card-stack__dot" data-dot="2" aria-label="Square Trade Goods"></button>
         <button class="card-stack__dot" data-dot="3" aria-label="Dr. Martens"></button>
-        <button class="card-stack__dot" data-dot="4" aria-label="August Radio"></button>
+        <button class="card-stack__dot" data-dot="4" aria-label="August AUX"></button>
       </div>
-
-      <aside class="site-player" data-player>
-        <audio data-player-audio preload="metadata"></audio>
-        <div class="audio-player" data-player-shell role="group" aria-label="August Radio" tabindex="0">
-          <div class="audio-player__meta">
-            <div class="audio-player__title" data-player-title>VOL. 14</div>
-            <div class="audio-player__sub" data-player-sub>Madison After Hours</div>
-          </div>
-          <div class="audio-player__controls">
-            <button class="audio-player__skip" type="button" aria-label="Previous track" data-player-prev>
-              <img src="assets/btn-prev.svg" alt="" width="14" height="9" />
-            </button>
-            <button class="audio-player__play" type="button" aria-label="Play" aria-pressed="false" data-player-play>
-              <svg data-icon-play viewBox="0 0 24 24" width="12" height="12" aria-hidden="true"><path d="M9 6.8v10.4L18.2 12 9 6.8z" fill="currentColor"/></svg>
-              <svg data-icon-pause hidden viewBox="0 0 24 24" width="12" height="12" aria-hidden="true"><rect x="7.25" y="6.5" width="3.1" height="11" rx="1" fill="currentColor"/><rect x="13.65" y="6.5" width="3.1" height="11" rx="1" fill="currentColor"/></svg>
-            </button>
-            <button class="audio-player__skip" type="button" aria-label="Next track" data-player-next>
-              <img src="assets/btn-next.svg" alt="" width="14" height="9" />
-            </button>
-          </div>
-          <div class="audio-player__time" data-player-time>0:00 / 0:00</div>
-          <div class="audio-player__volume">
-            <button class="audio-player__tool" type="button" aria-label="Mute" data-player-mute>
-              <img src="assets/volume.svg" alt="" width="15" height="12" />
-            </button>
-            <input class="volume-range" type="range" min="0" max="1" step="0.01" value="0.7" aria-label="Volume" data-player-volume />
-          </div>
-          <div class="waveform" data-player-wave role="slider" aria-label="Seek"></div>
-          <div class="audio-player__tools">
-            <button class="audio-player__tool" type="button" aria-label="Expand player" aria-expanded="false" data-player-expand>
-              <svg width="12" height="12" viewBox="0 0 12 12" fill="none" aria-hidden="true"><path d="M2 8l4-4 4 4" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
-            </button>
-            <button class="audio-player__tool" type="button" aria-label="Dismiss player" data-player-dismiss>
-              <svg width="10" height="10" viewBox="0 0 10 10" fill="none" aria-hidden="true"><path d="M1 1l8 8M9 1L1 9" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>
-            </button>
-          </div>
-          <div class="audio-player__extra">
-            <div class="audio-player__extra-inner">
-              <div class="waveform waveform--lg" data-player-wave-lg role="slider" aria-label="Seek waveform"></div>
-              <div class="audio-player__queue" data-player-queue></div>
-            </div>
-          </div>
-        </div>
-        <button class="player-chip" type="button" hidden data-player-restore aria-label="Show August Radio">
-          <span class="player-chip__dot" aria-hidden="true"></span>
-          August Radio
-        </button>
-      </aside>
 
       <footer class="site-footer">
         <div class="footer-brand">
@@ -522,7 +475,6 @@
     <script src="js/main.js"></script>
     <script src="js/sheet.js"></script>
     <script src="js/segmented.js"></script>
-    <script src="js/player.js"></script>
     <script src="js/profile.js"></script>
     <script src="js/cardstack.js"></script>
     <script src="js/radiocard.js"></script>

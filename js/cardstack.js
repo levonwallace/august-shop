@@ -48,21 +48,10 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   };
 
-  const page = document.querySelector(".page--home");
-
-  const syncRadioChrome = () => {
-    const onRadio = Boolean(cards[active]?.classList.contains("card-stack__card--radio"));
-    page?.classList.toggle("is-radio-card", onRadio);
-    document.dispatchEvent(
-      new CustomEvent("august:radio-card", { detail: { active: onRadio } })
-    );
-  };
-
   const renderAll = () => {
     clearInlineTransforms();
     cards.forEach((c, i) => applyState(c, stateForOffset(offsetOf(i, active))));
     dots.forEach((d, i) => d.classList.toggle("is-active", i === active));
-    syncRadioChrome();
   };
 
   const goTo = (idx, dir) => {

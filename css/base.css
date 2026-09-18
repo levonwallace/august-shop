@@ -113,17 +113,42 @@ p {
   overscroll-behavior: contain;
 }
 
+/* Text selection — faded madder from the rug */
+::selection {
+  background: rgba(168, 67, 46, 0.26);
+}
+
+/* Page washes — light through the storefront glass. Radial tints at 4–6%
+   opacity echo the rug's sun-faded reds/greens and the maple's warmth
+   without ever reading as "a colored background". */
 .page--home {
-  background: #fff;
+  background:
+    radial-gradient(1200px 800px at 88% -12%, var(--tint-cognac), transparent 62%),
+    radial-gradient(1000px 720px at -8% 32%, var(--tint-verdigris), transparent 56%),
+    radial-gradient(920px 880px at 72% 112%, var(--tint-madder), transparent 60%),
+    radial-gradient(700px 560px at 40% 55%, var(--tint-ochre), transparent 58%),
+    #fff;
 }
 
 .page--plp {
-  background: linear-gradient(90deg, var(--color-page-plp), var(--color-page-plp-end));
+  background:
+    radial-gradient(1100px 700px at 92% -8%, var(--tint-cognac), transparent 60%),
+    radial-gradient(900px 720px at 4% 108%, var(--tint-cobalt), transparent 55%),
+    linear-gradient(90deg, var(--color-page-plp), var(--color-page-plp-end));
 }
 
-.page--pdp,
+.page--pdp {
+  background:
+    radial-gradient(1100px 760px at 86% -10%, var(--tint-verdigris), transparent 60%),
+    radial-gradient(940px 700px at -6% 106%, var(--tint-cognac), transparent 56%),
+    var(--color-page);
+}
+
 .page--cart {
-  background: var(--color-page);
+  background:
+    radial-gradient(1000px 720px at 90% -8%, var(--tint-madder), transparent 58%),
+    radial-gradient(940px 720px at -4% 104%, var(--tint-verdigris), transparent 56%),
+    var(--color-page);
 }
 
 /* ── Skip-to-content link (visually hidden until focused) ─── */

@@ -93,18 +93,18 @@
 }
 
 .profile-drop__btn--primary {
-  background: var(--color-ink);
+  background: var(--color-ink-verdigris);
   color: #fff;
   margin-bottom: 8px;
 }
 
 @media (hover: hover) {
   .profile-drop__btn--primary:hover {
-    background: #2a2a2a;
+    background: var(--color-ink-verdigris-hover);
   }
 }
 .profile-drop__btn--primary:active {
-  background: #2a2a2a;
+  background: var(--color-ink-verdigris-hover);
   transform: scale(0.98);
 }
 
@@ -143,6 +143,12 @@
   color: #fff;
   background: var(--color-ink-soft);
   flex-shrink: 0;
+  object-fit: cover;
+}
+
+/* Demo pfp atop the signed-out dropdown */
+.profile-drop__signed-out .profile-drop__avatar-lg {
+  margin: 0 auto 10px;
 }
 
 .profile-drop__name {
@@ -392,9 +398,9 @@
 }
 
 .pref-chip.is-active {
-  background: var(--color-ink);
+  background: var(--color-ink-verdigris);
   color: #fff;
-  border-color: var(--color-ink);
+  border-color: var(--color-ink-verdigris);
 }
 
 /* ── Toggle switch ────────────────────────────────────────── */

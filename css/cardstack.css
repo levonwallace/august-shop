@@ -24,9 +24,41 @@
     filter var(--dur-fast) var(--ease-out);
 }
 
-/* Hero card gets its own background */
+/* Hero card background — storefront washes turned up a notch: still soft,
+   but clearly colorful rather than plain cream. */
 .card-stack__card:first-child {
-  background: #fff;
+  background:
+    radial-gradient(1100px 720px at 90% -10%, rgba(217, 163, 38, 0.2), transparent 62%),
+    radial-gradient(950px 720px at -10% 24%, rgba(74, 111, 94, 0.18), transparent 56%),
+    radial-gradient(880px 840px at 74% 110%, rgba(168, 67, 46, 0.15), transparent 60%),
+    radial-gradient(720px 560px at 38% 58%, rgba(43, 85, 168, 0.08), transparent 58%),
+    linear-gradient(180deg, #fdfbf5, #f7f2e8);
+}
+
+/* Warm glow drifting in from the top-right corner (replaces the checkerboard) */
+.card-stack__card:first-child::after {
+  content: "";
+  position: absolute;
+  top: -160px;
+  right: -140px;
+  width: 560px;
+  height: 560px;
+  background: radial-gradient(closest-side, rgba(176, 112, 58, 0.3), rgba(217, 163, 38, 0.14) 55%, transparent 74%);
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* Cool counter-glow rising from the bottom-left */
+.card-stack__card:first-child::before {
+  content: "";
+  position: absolute;
+  bottom: -180px;
+  left: -160px;
+  width: 620px;
+  height: 620px;
+  background: radial-gradient(closest-side, rgba(74, 111, 94, 0.26), rgba(43, 85, 168, 0.1) 58%, transparent 76%);
+  pointer-events: none;
+  z-index: 0;
 }
 
 /* Brand cards fill fully */
@@ -160,7 +192,25 @@
 .card-stack__dot.is-active {
   width: 22px;
   border-radius: 4px;
-  background: var(--color-ink-soft);
+  background: var(--color-cognac); /* leather-chair cognac */
+}
+
+/* Active dot color shifts per card — transitions via the dot's
+   existing background transition as you move through the stack. */
+.card-stack__dot[data-dot="1"].is-active {
+  background: var(--color-madder);
+}
+
+.card-stack__dot[data-dot="2"].is-active {
+  background: var(--color-verdigris);
+}
+
+.card-stack__dot[data-dot="3"].is-active {
+  background: var(--color-cobalt);
+}
+
+.card-stack__dot[data-dot="4"].is-active {
+  background: var(--color-ochre);
 }
 
 @media (hover: hover) {
@@ -180,11 +230,24 @@
   height: 100%;
   min-height: 0;
   padding-bottom: calc(var(--footer-inset, 24px) + var(--footer-h, 48px) + 32px);
-  overflow: hidden;
+  /* Hero card scrolls internally (statement + more products below the fold)
+     before the card stack advances to the next card. */
+  overflow-y: auto;
+  overflow-x: hidden;
+  overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
 }
 
+.card-stack .home-hero::-webkit-scrollbar {
+  display: none;
+}
+
+/* First screen of the hero fills the card exactly — the statement
+   section starts on the "next page" of the scroll. */
 .card-stack .home-layout {
-  flex: 1 1 0;
+  flex: 0 0 auto;
+  height: 100%;
   align-items: stretch;
   grid-template-columns: minmax(280px, 520px) minmax(320px, 668px);
   justify-content: space-between;
@@ -199,14 +262,6 @@
   flex-direction: column;
   justify-content: flex-start;
   min-height: 0;
-}
-
-.card-stack .bts-banner {
-  width: 100%;
-  height: auto;
-  aspect-ratio: 520 / 196;
-  margin-bottom: 48px;
-  flex-shrink: 0;
 }
 
 .card-stack .home-grid {
@@ -230,6 +285,105 @@
   object-fit: contain;
 }
 
+/* ── Statement + more products (below the hero fold) ──────── */
+.card-stack .home-statement {
+  flex: 0 0 auto;
+  padding-top: 48px;
+}
+
+.card-stack .home-statement__text {
+  margin: 0 0 32px;
+  max-width: 560px;
+  font-size: clamp(17px, 2.4vw, 22px);
+  font-weight: 300;
+  line-height: 1.45;
+  color: var(--color-ink);
+}
+
+.card-stack .home-statement__title {
+  margin: 0 0 16px;
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: 1.32px;
+  text-transform: lowercase;
+  color: var(--color-ink);
+}
+
+.card-stack .home-statement__grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 20px;
+}
+
+/* Space between stacked product sections */
+.card-stack .home-statement__grid + .home-statement__title {
+  margin-top: 44px;
+}
+
+/* ── "About to advance" note at the end of the scroll ──────── */
+.card-stack .home-scroll-note {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  padding: 44px 0 8px;
+  color: var(--color-muted);
+}
+
+.card-stack .home-scroll-note__label {
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 1.32px;
+  text-transform: lowercase;
+}
+
+.card-stack .home-scroll-note__arrow {
+  width: 12px;
+  height: 12px;
+  animation: scroll-note-bob 1.6s ease-in-out infinite;
+}
+
+@keyframes scroll-note-bob {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(4px);
+  }
+}
+
+@media (max-width: 900px) {
+  .card-stack .home-statement {
+    padding-top: 32px;
+  }
+
+  /* Same horizontal swipe treatment as the footwear carousel */
+  .card-stack .home-statement__grid {
+    display: flex;
+    gap: 12px;
+    overflow-x: auto;
+    overflow-y: hidden;
+    scroll-snap-type: x mandatory;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+  }
+
+  .card-stack .home-statement__grid::-webkit-scrollbar {
+    display: none;
+  }
+
+  .card-stack .home-statement__grid .product-card {
+    flex: 0 0 68%;
+    max-width: 300px;
+    scroll-snap-align: center;
+  }
+
+  .card-stack .home-statement__grid + .home-statement__title {
+    margin-top: 36px;
+  }
+}
+
 /* ── Responsive ───────────────────────────────────────────── */
 
 /* Mid-desktop (~1024–1280px) — tighter gaps, smaller banner.
@@ -243,12 +397,6 @@
   .card-stack .home-layout {
     gap: 20px 24px;
     grid-template-columns: minmax(240px, 520px) minmax(280px, 668px);
-  }
-
-  .card-stack .bts-banner {
-    height: auto;
-    aspect-ratio: 520 / 166;
-    margin-bottom: 24px;
   }
 
   .card-stack .home-copy h1 {
@@ -268,6 +416,29 @@
 @media (max-width: 900px) {
   .card-stack {
     perspective: 900px;
+  }
+
+  /* Keep the mosaic motif a corner detail on small screens */
+  .card-stack__card:first-child::after {
+    width: 340px;
+    height: 340px;
+    top: -80px;
+    right: -80px;
+  }
+
+  .card-stack__card:first-child::before {
+    width: 380px;
+    height: 380px;
+    bottom: -100px;
+    left: -100px;
+  }
+
+  .card-stack__card--radio::before {
+    width: 240px;
+    height: 240px;
+    bottom: -50px;
+    left: -50px;
+    background-size: 22px 22px;
   }
 
   .card-stack__card[data-state="stack-1"] {
@@ -297,7 +468,7 @@
 
   .card-stack .home-layout {
     grid-template-columns: 1fr;
-    grid-template-rows: auto 1fr;
+    grid-template-rows: auto auto 1fr auto;
     gap: 16px;
   }
 
@@ -305,16 +476,48 @@
     justify-content: flex-start;
   }
 
-  .card-stack .bts-banner {
-    /* Full Figma art ratio — 520/153 cropped the bottom line off the art */
-    aspect-ratio: 520 / 196;
-    margin-bottom: 12px;
+  .card-stack .home-copy h1 {
+    margin-bottom: 0;
   }
 
+  /* "new footwear" carousel heading */
+  .card-stack .home-grid__title {
+    display: block;
+    margin: 0 0 -6px;
+    font-size: 12px;
+    font-weight: 500;
+    letter-spacing: 1.32px;
+    text-transform: lowercase;
+    color: var(--color-ink);
+  }
+
+  /* Horizontal swipe carousel of portrait product cards */
   .card-stack .home-grid {
-    grid-template-columns: 1fr 1fr;
-    grid-template-rows: 1fr 1fr;
-    gap: 10px;
+    display: flex;
+    gap: 12px;
+    height: 100%;
+    min-height: 0;
+    overflow-x: auto;
+    overflow-y: hidden;
+    scroll-snap-type: x mandatory;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+  }
+
+  .card-stack .home-grid::-webkit-scrollbar {
+    display: none;
+  }
+
+  .card-stack .home-grid .home-tile,
+  .card-stack .home-grid .home-tile--tall {
+    flex: 0 0 auto;
+    height: 100%;
+    aspect-ratio: 3 / 4;
+    scroll-snap-align: center;
+  }
+
+  .card-stack .home-grid .home-tile--extra {
+    display: block;
   }
 }
 
@@ -339,8 +542,7 @@
   }
 
   .card-stack .home-grid {
-    grid-template-columns: 1fr 1fr;
-    gap: 8px;
+    gap: 10px;
   }
 }
 
@@ -349,8 +551,29 @@
    ══════════════════════════════════════════════════════════════ */
 
 .card-stack__card--radio {
-  background: #0a0a0a;
+  /* Near-black with a breath of verdigris, like the shop at closing time */
+  background:
+    radial-gradient(1000px 700px at 85% -10%, rgba(74, 111, 94, 0.2), transparent 60%),
+    radial-gradient(900px 700px at -6% 108%, rgba(43, 85, 168, 0.14), transparent 55%),
+    radial-gradient(700px 500px at 30% 40%, rgba(176, 112, 58, 0.07), transparent 58%),
+    #0a0d0b;
   color: #f0f0ec;
+}
+
+/* Sidewalk checker echo — paper-white this time, barely there */
+.card-stack__card--radio::before {
+  content: "";
+  position: absolute;
+  bottom: -80px;
+  left: -80px;
+  width: 420px;
+  height: 420px;
+  background: repeating-conic-gradient(var(--checker-paper) 0% 25%, transparent 0% 50%);
+  background-size: 26px 26px;
+  transform: rotate(-7deg);
+  -webkit-mask-image: radial-gradient(closest-side, #000, transparent 76%);
+  mask-image: radial-gradient(closest-side, #000, transparent 76%);
+  pointer-events: none;
 }
 
 .radio-card {
@@ -395,14 +618,14 @@
   font-weight: 600;
   letter-spacing: 0.12em;
   text-transform: uppercase;
-  color: var(--color-dot, #7cff6b);
+  color: var(--color-dot, #4fbf7a);
 }
 
 .radio-hero__live-dot {
   width: 6px;
   height: 6px;
   border-radius: 50%;
-  background: var(--color-dot, #7cff6b);
+  background: var(--color-dot, #4fbf7a);
   animation: radio-pulse 1.6s ease-in-out infinite;
 }
 
@@ -469,8 +692,8 @@
 }
 
 .radio-cover.is-active .radio-cover__art::before {
-  border-color: var(--color-dot, #7cff6b);
-  box-shadow: 0 0 24px rgba(124, 255, 107, 0.15);
+  border-color: var(--color-dot, #4fbf7a);
+  box-shadow: 0 0 24px rgba(79, 191, 122, 0.18);
 }
 
 .radio-cover__art--vol14 {
@@ -551,12 +774,12 @@
 @media (hover: hover) {
   .radio-hero__play:hover {
     transform: scale(1.08);
-    color: var(--color-dot, #7cff6b);
+    color: var(--color-dot, #4fbf7a);
   }
 }
 .radio-hero__play:active {
   transform: scale(0.94);
-  color: var(--color-dot, #7cff6b);
+  color: var(--color-dot, #4fbf7a);
 }
 
 .radio-hero__play svg {
@@ -582,7 +805,7 @@
   display: block;
   width: 2.5px;
   border-radius: 2px;
-  background: var(--color-dot, #7cff6b);
+  background: var(--color-dot, #4fbf7a);
   opacity: 0.35;
   height: 6px;
   transition: height 0.15s ease;
@@ -651,8 +874,25 @@
   font-weight: 600;
   letter-spacing: 0.14em;
   text-transform: uppercase;
-  color: rgba(255,255,255,0.35);
+  color: rgba(255,255,255,0.45);
   margin: 0;
+}
+
+/* Painter's edge echo on the dark card */
+.radio-newsletter__heading::after {
+  content: "";
+  display: block;
+  width: 64px;
+  height: 4px;
+  margin-top: 12px;
+  border-radius: 2px;
+  background: linear-gradient(
+    90deg,
+    var(--color-madder) 0% 25%,
+    var(--color-ochre) 25% 50%,
+    var(--color-verdigris) 50% 75%,
+    var(--color-cobalt) 75% 100%
+  );
 }
 
 .radio-newsletter__list {

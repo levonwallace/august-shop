@@ -7,19 +7,43 @@
   --color-body: #404540;
   --color-placeholder: #9ea199;
   --color-surface: #ffffff;
-  --color-page: #f4f4f1;
-  --color-page-plp: #edf0e8;
-  --color-page-plp-end: #f4f4f1;
-  --color-chip: #f5f5f2;
+  --color-page: #f5f3ee;
+  --color-page-plp: #e8eddf;
+  --color-page-plp-end: #f5f3ee;
+  --color-chip: #f4f2ec;
   --color-border: rgba(0, 0, 0, 0.18);
   --color-border-soft: rgba(0, 0, 0, 0.06);
   --color-border-mid: rgba(0, 0, 0, 0.14);
-  --color-link: #264d8c;
+  --color-link: #2b55a8;
   --color-island: rgba(255, 255, 255, 0.86);
   --color-island-border: rgba(255, 255, 255, 0.9);
   --color-glass: rgba(255, 255, 255, 0.88);
   --color-footer: rgba(0, 0, 0, 0.4);
-  --color-dot: #7cff6b;
+  --color-dot: #4fbf7a;
+
+  /* ─── Storefront palette — lifted from the shop itself ───
+     madder    → the vintage rug + painting reds, sun-faded
+     verdigris → oxidized copper trim above the August sign
+     cobalt    → the painting's blue linework
+     cognac    → leather chair, maple shelving, cedar fascia
+     ochre     → the painting's yellow fragment
+     Solids are for small accents only; tints are ambient washes. */
+  --color-madder: #a8432e;
+  --color-verdigris: #4a6f5e;
+  --color-cobalt: #2b55a8;
+  --color-cognac: #b0703a;
+  --color-ochre: #d9a326;
+  /* Deep verdigris ink — primary action color (the sign trim, near-dark) */
+  --color-ink-verdigris: #24382d;
+  --color-ink-verdigris-hover: #2f4a3b;
+  --tint-madder: rgba(168, 67, 46, 0.1);
+  --tint-verdigris: rgba(74, 111, 94, 0.12);
+  --tint-cobalt: rgba(43, 85, 168, 0.09);
+  --tint-cognac: rgba(176, 112, 58, 0.12);
+  --tint-ochre: rgba(217, 163, 38, 0.09);
+  /* Mosaic checker — the black & white sidewalk tile */
+  --checker-ink: rgba(46, 50, 56, 0.1);
+  --checker-paper: rgba(255, 255, 255, 0.055);
 
   --font: "Geist", "Helvetica Neue", Helvetica, Arial, sans-serif;
   --shadow-island: 0 4px 10.6px rgba(0, 0, 0, 0.07);

@@ -170,13 +170,14 @@ document.addEventListener("DOMContentLoaded", () => {
 
   const skipDrag = (el) =>
     el.closest(
-      "button, a, input, select, textarea, .waveform, .audio-player__queue, .profile-drop, .profile-modal, [data-card-scroll], .sheet, .tabbar"
+      "button, a, input, select, textarea, .waveform, .audio-player__queue, .profile-drop, .profile-modal, .sheet, .tabbar"
     );
 
   let startY = 0;
   let startX = 0;
   let dy = 0;
   let dragging = false;
+  let dragScroller = null;
   let horizontal = false;
   let startTime = 0;
   let activePointerId = null;
@@ -266,6 +267,7 @@ document.addEventListener("DOMContentLoaded", () => {
     horizontal = false;
     startTime = performance.now();
     activePointerId = e.pointerId;
+    dragScroller = e.target.closest("[data-card-scroll]");
   }, { passive: true });
 
   stack.addEventListener("pointermove", (e) => {
@@ -282,6 +284,21 @@ document.addEventListener("DOMContentLoaded", () => {
       return;
     }
     if (Math.abs(rawDy) < 6) return; // small threshold before starting drag visuals
+
+    // Inside a scrollable card region: let native scroll run until the
+    // scroller hits its edge in the gesture's direction, then card-drag.
+    if (dragScroller && !cards[active].classList.contains("is-dragging")) {
+      const atTop = dragScroller.scrollTop <= 1;
+      const atBottom =
+        dragScroller.scrollTop + dragScroller.clientHeight >= dragScroller.scrollHeight - 2;
+      // rawDy < 0 = finger moving up = advancing; needs scroller at bottom.
+      if ((rawDy < 0 && !atBottom) || (rawDy > 0 && !atTop)) {
+        dragging = false;
+        clearInlineTransforms();
+        renderAll();
+        return;
+      }
+    }
 
     // First frame of confirmed drag — mark cards as is-dragging so transitions off
     if (!cards[active].classList.contains("is-dragging")) {

@@ -3,7 +3,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-    <meta name="theme-color" content="#f4f4f1" />
+    <meta name="theme-color" content="#f5f3ee" />
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-status-bar-style" content="default" />
@@ -43,13 +43,11 @@
     <div class="page page--home">
       <header class="site-header">
         <div class="header-mobile">
-          <button class="nav-toggle" type="button" aria-label="Open menu" aria-expanded="false" aria-controls="mobile-nav" data-nav-toggle>
-            <span></span><span></span><span></span>
-          </button>
+          <button class="nav-toggle" type="button" aria-label="Open menu" aria-expanded="false" aria-controls="mobile-nav" data-nav-toggle>menu</button>
           <a class="wordmark" href="index.html">August</a>
           <div class="header-mobile__actions">
+            <img class="avatar" src="assets/avatar-demo.jpg" width="33" height="33" alt="" />
             <a href="cart.html" aria-label="Bag"><img class="icon-bag" src="assets/icon-bag.svg" alt="" /></a>
-            <img class="avatar" src="assets/avatar.svg" width="33" height="33" alt="" />
           </div>
         </div>
 
@@ -73,7 +71,7 @@
             </label>
             <div class="util-actions">
               <a href="cart.html" aria-label="Bag"><img class="icon-bag" src="assets/icon-bag.svg" alt="" /></a>
-              <img class="avatar" src="assets/avatar.svg" width="33" height="33" alt="" />
+              <img class="avatar" src="assets/avatar-demo.jpg" width="33" height="33" alt="" />
             </div>
           </div>
         </div>
@@ -157,29 +155,155 @@
       <div class="card-stack" id="main" data-card-stack>
         <!-- Card 0: Hero -->
         <div class="card-stack__card" data-card="0">
-          <main class="home-hero">
-            <div class="home-watermark" aria-hidden="true">
-              <img src="assets/logo-august-outline.svg" alt="" width="508" height="146" />
-            </div>
+          <main class="home-hero" data-card-scroll>
             <div class="home-layout">
               <div class="home-copy">
-                <div class="bts-banner">
-                  <img src="assets/home-bts.png" alt="Back to School — 15% off storewide" />
-                </div>
-                <h1>Streetwear,<br />sneakers, art, music.</h1>
-                <p>An amalgamation of streetwear, sneakers, art, and music — new arrivals dropping weekly.</p>
-                <div class="cta-row">
-                  <a class="btn btn--home-primary" href="collection.html">Shop All Products</a>
-                  <a class="btn btn--ghost" href="collection.html">Learn Our Standards</a>
-                </div>
+                <div class="announce-chip announce-chip--hero"><span class="dot" aria-hidden="true"></span>Back to School Sale</div>
+                <h1><span class="ink-leather">Streetwear,</span><br /><span class="ink-slate">sneakers,</span> <span class="ink-madder">art</span>, <span class="ink-cobalt">music</span>.</h1>
               </div>
+              <h2 class="home-grid__title">New Footwear</h2>
               <div class="home-grid">
                 <a class="home-tile" href="product.html"><img src="assets/home-1.png" alt="Premium Old Skool 36 Souvenir" /></a>
                 <a class="home-tile" href="product.html"><img src="assets/home-2.png" alt="Ora Primo EXT" /></a>
                 <a class="home-tile home-tile--tall" href="product.html"><img src="assets/home-3.png" alt="Mafate 2 OG" /></a>
                 <a class="home-tile home-tile--tall" href="product.html"><img src="assets/home-4.png" alt="Speedgoat 2" /></a>
+                <a class="home-tile home-tile--extra" href="product.html"><img src="assets/mega-1.png" alt="Souvenir Navy" /></a>
+                <a class="home-tile home-tile--extra" href="product.html"><img src="assets/mega-2.png" alt="Ora Primo EXT (Black/Frost)" /></a>
+                <a class="home-tile home-tile--extra" href="product.html"><img src="assets/mega-4.png" alt="Puma Basket (White/Gum)" /></a>
+              </div>
+              <div class="cta-row">
+                <a class="btn btn--home-primary" href="collection.html">Shop All Products</a>
+                <a class="btn btn--ghost" href="collection.html">Learn Our Standards</a>
               </div>
             </div>
+            <section class="home-statement" aria-label="About August">
+              <p class="home-statement__text">An amalgamation of streetwear, sneakers, art, and music — new arrivals dropping weekly.</p>
+              <h2 class="home-statement__title">Apparel &amp; Accessories</h2>
+              <div class="home-statement__grid">
+                <a class="product-card" href="product.html">
+                  <div class="product-card__media"><img src="assets/plp-5.png" alt="" loading="lazy" /></div>
+                  <div class="product-card__meta">
+                    <div class="product-card__brand">Lady White Co.</div>
+                    <div class="product-card__title">Mini Hoodie (Pigment Elm)</div>
+                    <div class="product-card__price">$230.00</div>
+                  </div>
+                </a>
+                <a class="product-card" href="product.html">
+                  <div class="product-card__media"><img src="assets/plp-6.png" alt="" loading="lazy" /></div>
+                  <div class="product-card__meta">
+                    <div class="product-card__brand">Lady White Co.</div>
+                    <div class="product-card__title">Mini Hoodie (Charcoal)</div>
+                    <div class="product-card__price">$230.00</div>
+                  </div>
+                </a>
+                <a class="product-card" href="product.html">
+                  <div class="product-card__media"><img src="assets/plp-7.png" alt="" loading="lazy" /></div>
+                  <div class="product-card__meta">
+                    <div class="product-card__brand">Lady White Co.</div>
+                    <div class="product-card__title">L/S Pima Lock Tee (Granite)</div>
+                    <div class="product-card__price">$150.00</div>
+                  </div>
+                </a>
+                <a class="product-card" href="product.html">
+                  <div class="product-card__media"><img src="assets/plp-8.png" alt="" loading="lazy" /></div>
+                  <div class="product-card__meta">
+                    <div class="product-card__brand">Lady White Co.</div>
+                    <div class="product-card__title">Municipal Pocket Tee</div>
+                    <div class="product-card__price">$85.00</div>
+                  </div>
+                </a>
+                <a class="product-card" href="product.html">
+                  <div class="product-card__media"><img src="assets/plp-tote.jpg" alt="" loading="lazy" /></div>
+                  <div class="product-card__meta">
+                    <div class="product-card__brand">Square Trade Goods</div>
+                    <div class="product-card__title">Canvas Tote (Natural)</div>
+                    <div class="product-card__price">$45.00</div>
+                  </div>
+                </a>
+                <a class="product-card" href="product.html">
+                  <div class="product-card__media"><img src="assets/plp-cap.jpg" alt="" loading="lazy" /></div>
+                  <div class="product-card__meta">
+                    <div class="product-card__brand">August</div>
+                    <div class="product-card__title">Corduroy Cap (Forest)</div>
+                    <div class="product-card__price">$60.00</div>
+                  </div>
+                </a>
+              </div>
+              <h2 class="home-statement__title">Best Sellers</h2>
+              <div class="home-statement__grid">
+                <a class="product-card" href="product.html">
+                  <div class="product-card__media"><img src="assets/plp-1.png" alt="" loading="lazy" /></div>
+                  <div class="product-card__meta">
+                    <div class="product-card__brand">Vans</div>
+                    <div class="product-card__title">Premium Old Skool 36 Souvenir</div>
+                    <div class="product-card__price">$125.00</div>
+                  </div>
+                </a>
+                <a class="product-card" href="product.html">
+                  <div class="product-card__media"><img src="assets/plp-2.png" alt="" loading="lazy" /></div>
+                  <div class="product-card__meta">
+                    <div class="product-card__brand">Hoka</div>
+                    <div class="product-card__title">Ora Primo EXT (Black/Frost)</div>
+                    <div class="product-card__price">$130.00</div>
+                  </div>
+                </a>
+                <a class="product-card" href="product.html">
+                  <div class="product-card__media"><img src="assets/plp-3.png" alt="" loading="lazy" /></div>
+                  <div class="product-card__meta">
+                    <div class="product-card__brand">Hoka</div>
+                    <div class="product-card__title">Mafate 2 OG (Citrus/Black)</div>
+                    <div class="product-card__price">$190.00</div>
+                  </div>
+                </a>
+                <a class="product-card" href="product.html">
+                  <div class="product-card__media"><img src="assets/plp-4.png" alt="" loading="lazy" /></div>
+                  <div class="product-card__meta">
+                    <div class="product-card__brand">Hoka</div>
+                    <div class="product-card__title">Speedgoat 2 (Pebble Grey)</div>
+                    <div class="product-card__price">$160.00</div>
+                  </div>
+                </a>
+              </div>
+              <h2 class="home-statement__title">Back in Stock</h2>
+              <div class="home-statement__grid">
+                <a class="product-card" href="product.html">
+                  <div class="product-card__media"><img src="assets/mega-1.png" alt="" loading="lazy" /></div>
+                  <div class="product-card__meta">
+                    <div class="product-card__brand">Vans</div>
+                    <div class="product-card__title">Souvenir Navy</div>
+                    <div class="product-card__price">$125.00</div>
+                  </div>
+                </a>
+                <a class="product-card" href="product.html">
+                  <div class="product-card__media"><img src="assets/mega-2.png" alt="" loading="lazy" /></div>
+                  <div class="product-card__meta">
+                    <div class="product-card__brand">Hoka</div>
+                    <div class="product-card__title">Ora Primo EXT (Black/Frost)</div>
+                    <div class="product-card__price">$130.00</div>
+                  </div>
+                </a>
+                <a class="product-card" href="product.html">
+                  <div class="product-card__media"><img src="assets/mega-3.png" alt="" loading="lazy" /></div>
+                  <div class="product-card__meta">
+                    <div class="product-card__brand">Lady White Co.</div>
+                    <div class="product-card__title">Mini Hoodie (Pigment Elm)</div>
+                    <div class="product-card__price">$230.00</div>
+                  </div>
+                </a>
+                <a class="product-card" href="product.html">
+                  <div class="product-card__media"><img src="assets/mega-4.png" alt="" loading="lazy" /></div>
+                  <div class="product-card__meta">
+                    <div class="product-card__brand">Puma</div>
+                    <div class="product-card__title">Basket (White/Gum)</div>
+                    <div class="product-card__price">$100.00</div>
+                  </div>
+                </a>
+              </div>
+              <div class="home-scroll-note" aria-hidden="true">
+                <span class="home-scroll-note__label">keep scrolling — up next: vans</span>
+                <svg class="home-scroll-note__arrow" viewBox="0 0 12 12" fill="none"><path d="M2 4.5l4 4 4-4" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              </div>
+            </section>
           </main>
         </div>
 

@@ -54,6 +54,7 @@ document.addEventListener("DOMContentLoaded", () => {
       <!-- Profile dropdown -->
       <div class="profile-drop" data-profile-drop hidden>
         <div class="profile-drop__signed-out" data-profile-signed-out>
+          <img class="profile-drop__avatar-lg" src="assets/avatar-demo.jpg" alt="" />
           <p class="profile-drop__greeting">Welcome to August</p>
           <p class="profile-drop__sub">Sign in or create an account to personalize your experience.</p>
           <button class="profile-drop__btn profile-drop__btn--primary" type="button" data-profile-action="create">Create Account</button>
@@ -61,7 +62,7 @@ document.addEventListener("DOMContentLoaded", () => {
         </div>
         <div class="profile-drop__signed-in" data-profile-signed-in hidden>
           <div class="profile-drop__user">
-            <span class="profile-drop__avatar-lg" data-profile-initials></span>
+            <img class="profile-drop__avatar-lg" src="assets/avatar-demo.jpg" alt="" />
             <div>
               <p class="profile-drop__name" data-profile-display-name></p>
               <p class="profile-drop__email" data-profile-display-email></p>
@@ -262,7 +263,7 @@ document.addEventListener("DOMContentLoaded", () => {
     if (user && user.name) {
       profileSheetBody.innerHTML = `
         <div class="profile-sheet__user">
-          <span class="profile-sheet__avatar-lg">${initials(user.name)}</span>
+          <img class="profile-sheet__avatar-lg" src="assets/avatar-demo.jpg" alt="" />
           <div class="profile-sheet__user-meta">
             <p class="profile-sheet__name">${user.name}</p>
             <p class="profile-sheet__email">${user.email}</p>
@@ -291,9 +292,7 @@ document.addEventListener("DOMContentLoaded", () => {
     } else {
       profileSheetBody.innerHTML = `
         <div class="profile-sheet__hero">
-          <div class="profile-sheet__hero-icon" aria-hidden="true">
-            <svg width="40" height="40" viewBox="0 0 32 32" fill="none"><circle cx="16" cy="12" r="5" stroke="currentColor" stroke-width="1.6"/><path d="M6 28c0-5.5 4.5-10 10-10s10 4.5 10 10" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
-          </div>
+          <img class="profile-sheet__hero-pfp" src="assets/avatar-demo.jpg" alt="" />
           <h3 class="profile-sheet__hero-title">Welcome to August</h3>
           <p class="profile-sheet__hero-sub">Sign in or create an account to personalize your experience.</p>
         </div>
@@ -324,23 +323,12 @@ document.addEventListener("DOMContentLoaded", () => {
     const user = load();
     const triggers = $$("[data-avatar-trigger]");
 
+    // Header always shows the profile photo (signed in or out).
     triggers.forEach((btn) => {
       const img = btn.querySelector(".avatar");
-      if (user && user.name) {
-        if (img) img.hidden = true;
-        let badge = btn.querySelector(".avatar-initials");
-        if (!badge) {
-          badge = document.createElement("span");
-          badge.className = "avatar-initials";
-          btn.appendChild(badge);
-        }
-        badge.textContent = initials(user.name);
-        badge.hidden = false;
-      } else {
-        if (img) img.hidden = false;
-        const badge = btn.querySelector(".avatar-initials");
-        if (badge) badge.hidden = true;
-      }
+      if (img) img.hidden = false;
+      const badge = btn.querySelector(".avatar-initials");
+      if (badge) badge.hidden = true;
     });
 
     if (user) {

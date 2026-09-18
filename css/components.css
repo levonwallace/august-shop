@@ -30,7 +30,7 @@
 
 .header-island {
   height: 57px;
-  border-radius: var(--radius-pill);
+  border-radius: 8px;
   background: var(--color-island);
   border: 1px solid var(--color-island-border);
   box-shadow: var(--shadow-island);
@@ -105,7 +105,8 @@
   display: inline-flex;
   align-items: center;
   gap: 10px;
-  background: var(--color-ink);
+  /* The sign's verdigris patina, deepened to chip-black */
+  background: linear-gradient(135deg, #2c4335 0%, #101712 100%);
   color: #fff;
   border-radius: var(--radius-chip);
   padding: 8px 14px;
@@ -113,6 +114,14 @@
   font-weight: 500;
   letter-spacing: 0.22px;
   white-space: nowrap;
+}
+
+.announce-chip--hero {
+  align-self: center;
+  margin: 0 auto 20px;
+  padding: 5px 10px;
+  font-size: 10px;
+  gap: 8px;
 }
 
 .announce-chip .dot {
@@ -174,8 +183,8 @@
 }
 
 .icon-bag {
-  width: 15px;
-  height: 23px;
+  width: 18px;
+  height: 20px;
   display: block;
 }
 
@@ -188,35 +197,24 @@
 
 /* Mobile nav chrome */
 .nav-toggle {
-  width: 40px;
   height: 40px;
-  border-radius: 50%;
   display: inline-flex;
-  flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 5px;
   background: transparent;
+  border: 0;
+  padding: 0;
+  font: inherit;
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 1.32px;
+  text-transform: lowercase;
+  color: var(--color-ink);
+  cursor: pointer;
 }
 
-.nav-toggle span {
-  display: block;
-  width: 18px;
-  height: 1.5px;
-  background: var(--color-ink);
-  transition: transform 0.2s ease, opacity 0.2s ease;
-}
-
-.nav-toggle[aria-expanded="true"] span:nth-child(1) {
-  transform: translateY(6.5px) rotate(45deg);
-}
-
-.nav-toggle[aria-expanded="true"] span:nth-child(2) {
-  opacity: 0;
-}
-
-.nav-toggle[aria-expanded="true"] span:nth-child(3) {
-  transform: translateY(-6.5px) rotate(-45deg);
+.nav-toggle[aria-expanded="true"] {
+  opacity: 0.6;
 }
 
 .mobile-nav {
@@ -498,7 +496,8 @@ body.mega-open .mega-backdrop {
   min-height: 0;
   padding: 16px;
   border-radius: 12px;
-  background: linear-gradient(180deg, #2e3833 0%, #141714 100%);
+  /* Verdigris-leaning dark, like the copper trim above the door */
+  background: linear-gradient(180deg, #3d5747 0%, #131a15 100%);
   color: #fff;
   text-decoration: none;
 }
@@ -547,18 +546,18 @@ body.mega-open .mega-backdrop {
 }
 
 .btn--primary {
-  background: var(--color-ink);
+  background: var(--color-ink-verdigris);
   color: #fff;
 }
 
 @media (hover: hover) {
   .btn--primary:hover {
-    background: #2a2a2a;
+    background: var(--color-ink-verdigris-hover);
   }
 }
 /* Touch feedback for primary buttons — momentary press */
 .btn--primary:active {
-  background: #2a2a2a;
+  background: var(--color-ink-verdigris-hover);
   transform: scale(0.98);
 }
 
@@ -570,11 +569,11 @@ body.mega-open .mega-backdrop {
 
 @media (hover: hover) {
   .btn--ghost:hover {
-    background: #f0f0f0;
+    background: #f0ede5; /* warm plaster, not gray */
   }
 }
 .btn--ghost:active {
-  background: #ececea;
+  background: #eae7dd;
   transform: scale(0.98);
 }
 
@@ -583,17 +582,17 @@ body.mega-open .mega-backdrop {
 }
 
 .btn--home-primary {
-  background: var(--color-ink);
+  background: var(--color-ink-verdigris);
   color: #fff;
 }
 
 @media (hover: hover) {
   .btn--home-primary:hover {
-    background: #2a2a2a;
+    background: var(--color-ink-verdigris-hover);
   }
 }
 .btn--home-primary:active {
-  background: #2a2a2a;
+  background: var(--color-ink-verdigris-hover);
   transform: scale(0.98);
 }
 
@@ -611,7 +610,7 @@ body.mega-open .mega-backdrop {
   aspect-ratio: 310 / 340;
   border-radius: var(--radius-card);
   border: 1px solid var(--color-border);
-  background: #fff;
+  background: #fff; /* product photos have baked-in white — keep media white */
   overflow: hidden;
   box-shadow: var(--shadow-product);
 }
@@ -627,6 +626,22 @@ body.mega-open .mega-backdrop {
   font-weight: 500;
   letter-spacing: 0.66px;
   color: var(--color-muted);
+}
+
+/* Grid rhythm — brand labels rotate through the storefront hues
+   (cognac / verdigris / cobalt / madder) so the grid reads like the
+   painting: same voice, shifting color. */
+.product-grid .product-card:nth-child(4n + 1) .product-card__brand {
+  color: #9c6631;
+}
+.product-grid .product-card:nth-child(4n + 2) .product-card__brand {
+  color: #47705d;
+}
+.product-grid .product-card:nth-child(4n + 3) .product-card__brand {
+  color: #3d5da1;
+}
+.product-grid .product-card:nth-child(4n) .product-card__brand {
+  color: #a3472f;
 }
 
 .product-card__title {
@@ -847,7 +862,7 @@ body.mega-open .mega-backdrop {
 }
 
 .audio-player.is-playing .audio-player__play {
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.12), 0 0 0 2px rgba(124, 255, 107, 0.28);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.12), 0 0 0 2px rgba(79, 191, 122, 0.32);
 }
 
 .audio-player__play svg {
@@ -994,7 +1009,7 @@ body.mega-open .mega-backdrop {
 }
 
 .waveform i.is-played {
-  background: var(--color-ink-soft);
+  background: #3f6152; /* played progress in verdigris ink */
 }
 
 @media (hover: hover) {
@@ -1143,10 +1158,10 @@ body.mega-open .mega-backdrop {
 
 @keyframes player-pulse {
   0% {
-    box-shadow: 0 0 0 0 rgba(124, 255, 107, 0.7);
+    box-shadow: 0 0 0 0 rgba(79, 191, 122, 0.6);
   }
   100% {
-    box-shadow: 0 0 0 8px rgba(124, 255, 107, 0);
+    box-shadow: 0 0 0 8px rgba(79, 191, 122, 0);
   }
 }
 

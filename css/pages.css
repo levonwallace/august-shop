@@ -8,22 +8,6 @@
   overflow: visible;
 }
 
-.home-watermark {
-  position: absolute;
-  left: 16%;
-  top: 28%;
-  width: min(72%, 980px);
-  z-index: 0;
-  pointer-events: none;
-  opacity: 0.11;
-}
-
-.home-watermark img {
-  width: 100%;
-  height: auto;
-  display: block;
-}
-
 .home-layout {
   position: relative;
   z-index: 1;
@@ -40,21 +24,6 @@
   margin: 0 auto;
 }
 
-.bts-banner {
-  width: 100%;
-  height: 196px;
-  border-radius: var(--radius-panel);
-  overflow: hidden;
-  box-shadow: var(--shadow-banner);
-  margin-bottom: 48px;
-}
-
-.bts-banner img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-}
-
 .home-copy h1 {
   margin: 0 0 24px;
   font-size: 38px;
@@ -63,6 +32,27 @@
   line-height: 1.08;
 }
 
+/* Accent words — colors sampled from the product photography:
+   citrus from the Speedgoat, denim navy from the Vans Souvenir,
+   plus near-ink tints of the Mafate leather and Vans shadow */
+.ink-madder {
+  color: #b0c030;
+}
+
+.ink-cobalt {
+  color: #104060;
+}
+
+.ink-leather {
+  color: #4a3a2c;
+}
+
+.ink-slate {
+  color: #2e3c48;
+}
+
+/* Painter's edge — a small four-hue stripe under the headline, straight
+   off the canvas: madder → ochre → verdigris → cobalt */
 .home-copy p {
   color: var(--color-muted);
   font-size: 14px;
@@ -77,16 +67,38 @@
   align-items: center;
 }
 
+/* CTA row lives below the product grid — span both hero columns */
+.home-layout > .cta-row {
+  grid-column: 1 / -1;
+  justify-content: center;
+}
+
+/* 50% thinner CTA buttons */
+.cta-row .btn {
+  padding-top: 3px;
+  padding-bottom: 3px;
+}
+
+/* Mobile-only carousel heading — hidden on desktop */
+.home-grid__title {
+  display: none;
+}
+
 .home-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 24px 44px;
 }
 
+/* Extra carousel products — mobile only; desktop keeps the 2×2 mosaic */
+.home-grid .home-tile--extra {
+  display: none;
+}
+
 .home-tile {
   border: 1px solid var(--color-border);
   border-radius: var(--radius-card);
-  background: #fff;
+  background: #fff; /* product photos have baked-in white — keep tiles white */
   overflow: hidden;
   aspect-ratio: 311 / 207;
   box-shadow: var(--shadow-product);
@@ -179,7 +191,7 @@
 
 @media (hover: hover) {
   .brand-banner:hover .brand-banner__cta {
-    background: #f4f4f1;
+    background: #f5f3ee;
   }
 }
 
@@ -257,7 +269,7 @@
   height: 18px;
   padding: 0 5px;
   border-radius: 100px;
-  background: var(--color-ink);
+  background: var(--color-madder); /* rug red — a single warm signal */
   color: #fff;
   font-size: 10px;
   font-weight: 600;
@@ -318,7 +330,7 @@
 }
 
 .pdp-thumbs button.is-active {
-  border-color: var(--color-ink);
+  border-color: var(--color-cognac); /* leather-chair cognac */
   background: #e0e3db;
 }
 
@@ -378,7 +390,7 @@
 }
 
 .size-selector button.is-active {
-  background: var(--color-ink);
+  background: var(--color-ink-verdigris);
   color: #fff;
 }
 
@@ -515,6 +527,23 @@
   padding-left: 32px;
 }
 
+/* Painter's edge echo under the cart title */
+.cart-page h1::after {
+  content: "";
+  display: block;
+  width: 72px;
+  height: 4px;
+  margin-top: 14px;
+  border-radius: 2px;
+  background: linear-gradient(
+    90deg,
+    var(--color-madder) 0% 25%,
+    var(--color-ochre) 25% 50%,
+    var(--color-verdigris) 50% 75%,
+    var(--color-cobalt) 75% 100%
+  );
+}
+
 .cart-page__count {
   color: var(--color-muted);
   font-size: 14px;
@@ -614,7 +643,7 @@
 }
 
 .cart-swipe__action--save {
-  background: #5856d6; /* iOS purple — bookmark / save */
+  background: var(--color-cobalt); /* painting cobalt — bookmark / save */
 }
 
 .cart-swipe__action--delete {
@@ -657,7 +686,7 @@
 
 @keyframes cart-saved {
   0%   { background: #fff; }
-  25%  { background: rgba(124, 255, 107, 0.18); }
+  25%  { background: rgba(79, 191, 122, 0.16); }
   100% { background: #fff; }
 }
 
@@ -783,12 +812,6 @@
     gap: 20px 24px;
   }
 
-  .bts-banner {
-    height: auto;
-    aspect-ratio: 520 / 196;
-    margin-bottom: 28px;
-  }
-
   .home-grid {
     gap: 16px 24px;
   }
@@ -886,8 +909,8 @@
     justify-content: space-between;
     gap: 12px;
     height: 52px;
-    padding: 0 10px 0 6px;
-    border-radius: var(--radius-pill);
+    padding: 0 10px 0 16px;
+    border-radius: 8px;
     background: var(--color-island);
     border: 1px solid var(--color-island-border);
     box-shadow: var(--shadow-island);
@@ -1017,21 +1040,9 @@
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
-  .home-watermark {
-    left: 6%;
-    top: 22%;
-    width: min(88%, 640px);
-  }
-
   .home-copy h1 {
     font-size: clamp(28px, 7vw, 34px);
     letter-spacing: -0.5px;
-  }
-
-  .bts-banner {
-    height: auto;
-    aspect-ratio: 520 / 250;
-    margin-bottom: 28px;
   }
 
   .cta-row {
@@ -1233,9 +1244,5 @@
 @media (max-width: 380px) {
   .product-grid {
     grid-template-columns: 1fr;
-  }
-
-  .header-mobile .avatar {
-    display: none;
   }
 }

@@ -307,8 +307,8 @@ body.sheet-open .page-scroll {
 }
 
 .sheet-chip.is-selected {
-  background: var(--color-ink);
-  border-color: var(--color-ink);
+  background: var(--color-ink-verdigris);
+  border-color: var(--color-ink-verdigris);
   color: #fff;
 }
 
@@ -417,8 +417,8 @@ body.sheet-open .page-scroll {
   gap: 6px;
   padding: 5px 10px;
   border-radius: var(--radius-chip);
-  background: rgba(124, 255, 107, 0.14);
-  color: #1f7a13;
+  background: rgba(79, 191, 122, 0.15);
+  color: #256e46;
   font-size: 10px;
   font-weight: 600;
   letter-spacing: 0.6px;
@@ -430,7 +430,7 @@ body.sheet-open .page-scroll {
   width: 6px;
   height: 6px;
   border-radius: 50%;
-  background: #1f7a13;
+  background: #256e46;
 }
 
 /* Two buttons side by side in a sheet footer */
@@ -464,6 +464,15 @@ body.sheet-open .page-scroll {
   font-weight: 600;
   letter-spacing: 0.6px;
   flex-shrink: 0;
+  object-fit: cover;
+}
+
+/* Demo pfp in the signed-out sheet hero */
+.profile-sheet__hero-pfp {
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  object-fit: cover;
 }
 
 .profile-sheet__user-meta {

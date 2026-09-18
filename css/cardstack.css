@@ -19,9 +19,40 @@
   border-radius: 0;
   overflow: hidden;
   transition:
-    transform 0.38s cubic-bezier(0.22, 1, 0.36, 1),
-    opacity 0.3s ease,
-    filter 0.3s ease;
+    transform var(--dur-swipe) var(--ease-swipe),
+    opacity var(--dur-fast) var(--ease-out),
+    filter var(--dur-fast) var(--ease-out);
+}
+
+/* On desktop, inset the card stack and round cards for iOS Wallet feel.
+   Mobile stays full-bleed (matches the iOS Home Screen widget aesthetic). */
+@media (min-width: 900px) {
+  .card-stack {
+    /* Card stops above the audio-player + footer chrome, leaves room for
+       pagination dots to sit in the gap. */
+    inset:
+      0
+      24px
+      calc(var(--footer-inset) + var(--footer-h) + var(--player-gap) + var(--player-h) + 20px)
+      24px;
+    perspective: 1400px;
+  }
+
+  .card-stack__card {
+    border-radius: 24px;
+  }
+
+  .card-stack__card[data-state="active"] {
+    box-shadow:
+      0 24px 60px -18px rgba(0, 0, 0, 0.28),
+      0 0 0 0.5px rgba(0, 0, 0, 0.04);
+  }
+
+  /* Brand banner CTAs sit inside a card that no longer touches the footer,
+     so lift them off the bottom edge of the card, not of the viewport. */
+  .card-stack__card--brand .brand-banner--full .brand-banner__content {
+    bottom: 56px;
+  }
 }
 
 /* Hero card gets its own background */
@@ -106,8 +137,8 @@
   z-index: 5;
   pointer-events: none;
   transition:
-    transform 0.36s cubic-bezier(0.22, 1, 0.36, 1),
-    opacity 0.24s ease;
+    transform var(--dur-swipe) var(--ease-swipe),
+    opacity var(--dur-fast) var(--ease-out);
 }
 
 /* Hidden (wrapped around, waiting below stack) */

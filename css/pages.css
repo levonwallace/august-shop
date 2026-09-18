@@ -180,15 +180,14 @@
 
 /* —— PLP —— */
 .plp-intro {
-  position: absolute;
-  top: var(--chrome-top);
-  left: var(--gutter);
-  z-index: 30;
-  padding: 0;
+  /* In-flow row that sits above the product grid — reserves its own space */
+  position: relative;
+  z-index: 5;
+  padding: var(--chrome-top) var(--gutter) 12px;
   display: flex;
   align-items: center;
   gap: 8px;
-  pointer-events: none;
+  flex-wrap: wrap;
 }
 
 .plp-intro__island {
@@ -261,8 +260,9 @@
 }
 
 .plp-grid-wrap {
-  background: #fff;
-  padding: var(--chrome-top) var(--gutter) var(--chrome-bottom);
+  /* No opaque bg — let the page gradient continue behind the grid so there's
+     no hard boundary between intro row and product grid. */
+  padding: 8px var(--gutter) var(--chrome-bottom);
 }
 
 .product-grid {
@@ -556,10 +556,11 @@
 .cart-swipe {
   position: relative;
   overflow: hidden;
-  transition: max-height 0.32s cubic-bezier(0.22, 1, 0.36, 1),
-              opacity 0.24s ease,
-              margin 0.32s cubic-bezier(0.22, 1, 0.36, 1);
-  max-height: 200px;
+  transition:
+    max-height var(--dur-swipe) var(--ease-swipe),
+    opacity var(--dur-fast) var(--ease-out),
+    margin var(--dur-swipe) var(--ease-swipe);
+  max-height: 240px;
 }
 
 .cart-swipe.is-removing {
@@ -615,8 +616,8 @@
   position: relative;
   z-index: 1;
   background: #fff;
-  transform: translateX(0);
-  transition: transform 0.32s cubic-bezier(0.22, 1, 0.36, 1);
+  transform: translate3d(0, 0, 0);
+  transition: transform var(--dur-swipe) var(--ease-swipe);
   will-change: transform;
   touch-action: pan-y; /* let vertical scroll pass through */
 }
@@ -626,7 +627,7 @@
 }
 
 .cart-swipe.is-open .cart-swipe__row {
-  transform: translateX(-168px); /* reveals both action buttons */
+  transform: translate3d(-168px, 0, 0); /* reveals both action buttons */
 }
 
 .cart-swipe.is-open .cart-swipe__row::after {
@@ -1053,25 +1054,22 @@
   }
 
   .plp-intro {
-    top: 80px;
-    left: 16px;
+    padding: var(--chrome-top) 16px 8px;
+    gap: 0;
   }
 
+  /* Fix 5: the island is empty on mobile (its only child, the <p>, is hidden).
+     Hide it entirely instead of showing an empty pill next to Filter & Sort. */
   .plp-intro__island {
-    gap: 8px;
-    padding: 7px 14px;
-  }
-
-  .plp-intro__island h1 {
-    font-size: 12px;
-  }
-
-  .plp-intro__island p {
     display: none;
   }
 
+  .plp-filter-btn {
+    margin-left: 0;
+  }
+
   .plp-grid-wrap {
-    padding: 12px var(--gutter) var(--chrome-bottom);
+    padding: 8px var(--gutter) var(--chrome-bottom);
   }
 
   .product-grid {

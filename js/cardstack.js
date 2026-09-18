@@ -166,44 +166,60 @@ document.addEventListener("DOMContentLoaded", () => {
     const progress = Math.min(1, Math.abs(delta) / COMMIT_DIST);
     const dir = Math.sign(delta); // positive = drag up (swipe next), negative = drag down (swipe prev)
 
-    // Active card: translate + slight scale
+    // Active card: translate + slight scale. translate3d promotes to a GPU
+    // layer, keeps drag at 60fps on lower-end devices.
     const activeCard = cards[active];
     const scaleActive = 1 - 0.04 * progress;
-    activeCard.style.transform = `translateY(${-delta}px) scale(${scaleActive})`;
+    activeCard.style.transform = `translate3d(0, ${-delta}px, 0) scale(${scaleActive})`;
     activeCard.style.opacity = String(1 - 0.12 * progress);
 
     // Peek card behind — nudges up toward active state as user commits
     if (dir > 0) {
-      // Dragging up (revealing next card behind — that's stack-1)
       const nextIdx = (active + 1) % total;
       const nextCard = cards[nextIdx];
-      const t = -14 * (1 - progress); // stack-1 sits +14y; approaches 0 as progress→1
+      const t = -14 * (1 - progress);
       const s = 0.965 + 0.035 * progress;
-      nextCard.style.transform = `translateZ(-50px) translateY(${t}px) scale(${s})`;
+      nextCard.style.transform = `translate3d(0, ${t}px, -50px) scale(${s})`;
     } else if (dir < 0) {
-      // Dragging down — bring the previous card back on top from off-top
       const prevIdx = (active - 1 + total) % total;
       const prevCard = cards[prevIdx];
-      const t = -110 * (1 - progress); // slides down from -110% to 0
+      const t = -110 * (1 - progress);
       const s = 1 + 0.02 * (1 - progress);
-      prevCard.style.transform = `translateY(${t}%) scale(${s})`;
+      prevCard.style.transform = `translate3d(0, ${t}%, 0) scale(${s})`;
       prevCard.style.opacity = "1";
     }
   };
 
-  const releaseDrag = (commit) => {
-    // Remove is-dragging so transitions kick in
+  /* Momentum-scale the release transition duration.
+     Fast flicks → snap fast (200ms). Slow releases → settle (420ms). */
+  const releaseDuration = (velocity) => {
+    const speed = Math.min(2.0, Math.abs(velocity)); // px/ms, cap at 2
+    // Linear map: v=0 → 420ms, v=2 → 200ms
+    return Math.max(200, 420 - speed * 110);
+  };
+
+  const releaseDrag = (commit, velocity = 0) => {
     cards.forEach((c) => c.classList.remove("is-dragging"));
 
-    if (commit === "next") {
-      next();
-    } else if (commit === "prev") {
-      prev();
-    } else {
-      // Spring back to current state
+    // Set a temporary transition duration on all cards based on velocity.
+    // Removing it in a rAF after the class change keeps future default
+    // transitions intact.
+    const dur = releaseDuration(velocity);
+    cards.forEach((c) => {
+      c.style.setProperty("transition-duration", `${dur}ms`);
+    });
+
+    if (commit === "next") next();
+    else if (commit === "prev") prev();
+    else {
       clearInlineTransforms();
       renderAll();
     }
+
+    // Restore default transitions after the animation completes.
+    setTimeout(() => {
+      cards.forEach((c) => c.style.removeProperty("transition-duration"));
+    }, dur + 60);
   };
 
   stack.addEventListener("pointerdown", (e) => {
@@ -262,7 +278,7 @@ document.addEventListener("DOMContentLoaded", () => {
     if (delta > COMMIT_DIST || velocity > COMMIT_VEL) commit = "next";
     else if (delta < -COMMIT_DIST || velocity < -COMMIT_VEL) commit = "prev";
 
-    releaseDrag(commit);
+    releaseDrag(commit, velocity);
     activePointerId = null;
   };
 

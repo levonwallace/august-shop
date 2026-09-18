@@ -15,6 +15,12 @@
 
   let openSwipe = null;
 
+  const haptic = (ms = 8) => {
+    if (typeof navigator !== "undefined" && typeof navigator.vibrate === "function") {
+      try { navigator.vibrate(ms); } catch {}
+    }
+  };
+
   const closeAll = (except = null) => {
     document.querySelectorAll(".cart-swipe.is-open").forEach((sw) => {
       if (sw !== except) {
@@ -50,7 +56,9 @@
     };
 
     const setOffset = (x) => {
-      row.style.transform = `translateX(${x}px)`;
+      // translate3d promotes to a compositor layer — keeps drag at 60fps
+      // even during momentum-scroll on a real device.
+      row.style.transform = `translate3d(${x}px, 0, 0)`;
     };
 
     const onDown = (e) => {
@@ -118,17 +126,31 @@
         removeItem(swipe);
         return;
       }
+
+      // Momentum-scaled release: fast flick → snap fast, slow drag → gentle
+      const speed = Math.min(2.0, Math.abs(velocity));
+      const dur = Math.max(200, 380 - speed * 100);
+      row.style.setProperty("transition-duration", `${dur}ms`);
+
+      const wasOpen = swipe.classList.contains("is-open");
       if (finalX < -OPEN_THRESHOLD) {
         // Snap open
         swipe.classList.add("is-open");
-        row.style.transform = ""; // let CSS drive translation
+        row.style.transform = "";
         openSwipe = swipe;
+        if (!wasOpen) haptic(6); // soft tick on open
       } else {
         // Snap closed
         swipe.classList.remove("is-open");
         row.style.transform = "";
         if (openSwipe === swipe) openSwipe = null;
+        if (wasOpen) haptic(4); // even softer on close
       }
+
+      // Restore default duration after the animation
+      setTimeout(() => {
+        row.style.removeProperty("transition-duration");
+      }, dur + 60);
     };
 
     row.addEventListener("pointerdown", onDown);
@@ -148,22 +170,27 @@
   };
 
   const removeItem = (swipe) => {
-    if (window.navigator && typeof navigator.vibrate === "function") {
-      try { navigator.vibrate(12); } catch {}
+    haptic(14);
+    // Two-stage animation: first slide the row off left, then collapse height.
+    // Feels closer to iOS Mail delete than a simultaneous height+opacity collapse.
+    const row = swipe.querySelector(".cart-swipe__row");
+    if (row) {
+      row.style.transition = "transform 260ms var(--ease-swipe)";
+      row.style.transform = "translate3d(-105%, 0, 0)";
     }
-    swipe.classList.add("is-removing");
-    // Also remove the trailing divider so we don't leave floating hairlines
     const nextDivider =
       swipe.nextElementSibling && swipe.nextElementSibling.classList.contains("cart-divider")
         ? swipe.nextElementSibling
         : swipe.previousElementSibling && swipe.previousElementSibling.classList.contains("cart-divider")
         ? swipe.previousElementSibling
         : null;
+    // Trigger the collapse a beat after the slide starts
+    setTimeout(() => swipe.classList.add("is-removing"), 140);
     setTimeout(() => {
       swipe.remove();
       if (nextDivider) nextDivider.remove();
       updateCount();
-    }, 340);
+    }, 460);
   };
 
   const saveItem = (swipe) => {

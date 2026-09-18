@@ -583,8 +583,18 @@ body.mega-open .mega-backdrop {
 }
 
 .btn--home-primary {
-  background: #fff;
-  color: #000;
+  background: var(--color-ink);
+  color: #fff;
+}
+
+@media (hover: hover) {
+  .btn--home-primary:hover {
+    background: #2a2a2a;
+  }
+}
+.btn--home-primary:active {
+  background: #2a2a2a;
+  transform: scale(0.98);
 }
 
 /* —— Product card —— */
@@ -638,6 +648,8 @@ body.mega-open .mega-backdrop {
 }
 
 /* —— Footer —— */
+/* iOS glass pill, mirrors the header island. Was murky rgba(0,0,0,0.4)
+   which read as a dirty gray blob over content. */
 .site-footer {
   position: absolute;
   left: var(--footer-inset);
@@ -645,13 +657,16 @@ body.mega-open .mega-backdrop {
   bottom: var(--footer-inset);
   height: var(--footer-h);
   border-radius: 50px;
-  background: var(--color-footer);
+  background: var(--color-island);
+  border: 1px solid var(--color-island-border);
+  box-shadow: var(--shadow-island);
+  backdrop-filter: blur(14px) saturate(160%);
+  -webkit-backdrop-filter: blur(14px) saturate(160%);
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 0 30px;
-  color: #fff;
-  backdrop-filter: blur(8px);
+  padding: 0 24px;
+  color: var(--color-ink);
   z-index: 40;
 }
 
@@ -664,29 +679,39 @@ body.mega-open .mega-backdrop {
 .footer-brand__logo {
   height: 11px;
   width: auto;
+  /* SVG is originally white — invert to dark since bg is now light glass */
+  filter: invert(1);
+  opacity: 0.85;
 }
 
 .footer-brand__tag {
   font-size: 11px;
-  opacity: 0.85;
+  color: var(--color-muted);
   white-space: nowrap;
 }
 
 .footer-links {
   display: flex;
   align-items: center;
-  gap: 50px;
+  gap: 40px;
 }
 
 .footer-links a {
   font-size: 11px;
-  color: #fff;
+  font-weight: 500;
+  letter-spacing: 0.2px;
+  color: var(--color-ink);
+  opacity: 0.75;
+  transition: opacity 0.16s ease;
 }
 
 @media (hover: hover) {
   .footer-links a:hover {
-    opacity: 0.75;
+    opacity: 1;
   }
+}
+.footer-links a:active {
+  opacity: 1;
 }
 
 /* —— Audio player (persistent chrome) —— */

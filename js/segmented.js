@@ -40,13 +40,13 @@
       if (!animated) {
         const prev = thumb.style.transition;
         thumb.style.transition = "none";
-        thumb.style.transform = `translateX(${x}px)`;
+        thumb.style.transform = `translate3d(${x}px, 0, 0)`;
         thumb.style.width = `${w}px`;
         // force reflow, then restore
         void thumb.offsetHeight;
         thumb.style.transition = prev;
       } else {
-        thumb.style.transform = `translateX(${x}px)`;
+        thumb.style.transform = `translate3d(${x}px, 0, 0)`;
         thumb.style.width = `${w}px`;
       }
     };
@@ -82,6 +82,10 @@
 
       if (!silent) {
         const seg = segments[idx];
+        // Subtle tick on segment change — Android fires; iOS no-op but harmless.
+        if (typeof navigator !== "undefined" && typeof navigator.vibrate === "function") {
+          try { navigator.vibrate(4); } catch {}
+        }
         root.dispatchEvent(
           new CustomEvent("segmented:change", {
             bubbles: true,

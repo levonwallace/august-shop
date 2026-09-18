@@ -58,4 +58,21 @@
   /* space reserved under scroll content so last items clear chrome */
   --chrome-bottom: calc(var(--footer-inset) + var(--footer-h) + var(--player-gap) + var(--player-h) + 16px);
   --chrome-top: calc(var(--header-top) + var(--header-h) + 24px);
+
+  /* ─── Motion tokens (shared across swipe surfaces) ───
+     Read this like: named curves + duration presets so card stack, cart
+     swipe, and sheet all feel like the same product. */
+  /* iOS "spring-out" — Apple's UISegmentedControl / SwiftUI default. Best for
+     content that "clicks" into place after a swipe or tap. */
+  --ease-swipe: cubic-bezier(0.32, 0.72, 0, 1);
+  /* Soft settle — for content that lands gently (sheet close, snap-back). */
+  --ease-spring: cubic-bezier(0.22, 1, 0.36, 1);
+  /* Ease-out for opacity/color transitions where a spring feels weird. */
+  --ease-out: cubic-bezier(0.25, 1, 0.5, 1);
+
+  /* Duration presets */
+  --dur-fast: 220ms;
+  --dur-swipe: 320ms;
+  --dur-med: 420ms;
+  --dur-slow: 520ms;
 }

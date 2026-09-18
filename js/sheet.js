@@ -131,7 +131,7 @@
       const dy = e.clientY - startY;
       // Rubber-band on upward drag (past open state)
       currentY = dy < 0 ? dy * 0.22 : dy;
-      panel.style.transform = `translateY(${currentY}px)`;
+      panel.style.transform = `translate3d(0, ${currentY}px, 0)`;
     };
 
     const onUp = (e) => {
@@ -143,6 +143,11 @@
       const velocity = currentY / dt; // px/ms, positive = downward
       const shouldClose = currentY > 120 || velocity > 0.6;
 
+      // Momentum-scaled duration: throw-to-dismiss closes fast, slow drag settles.
+      const speed = Math.min(2.0, Math.abs(velocity));
+      const dur = Math.max(220, 420 - speed * 110);
+      panel.style.setProperty("transition-duration", `${dur}ms`);
+
       // Clear inline transform so CSS takes over the animation.
       panel.style.transform = "";
       try {
@@ -152,6 +157,10 @@
       activeZone = null;
 
       if (shouldClose) close(id);
+
+      setTimeout(() => {
+        panel.style.removeProperty("transition-duration");
+      }, dur + 60);
     };
 
     zones.forEach((zone) => {

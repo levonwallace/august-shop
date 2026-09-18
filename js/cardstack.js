@@ -93,7 +93,6 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     dots.forEach((d, i) => d.classList.toggle("is-active", i === active));
-    syncRadioChrome();
 
     setTimeout(() => {
       renderAll();

@@ -40,6 +40,10 @@
   --page-max: 1440px;
   --gutter: 64px;
 
+  /* Desktop "resolution" scale — 0.75 = 25% smaller, like browser zoom.
+     Applied via html { zoom } so type, chrome, cards, and sheets all move together. */
+  --ui-scale: 0.75;
+
   /* iOS safe-area insets — read from viewport-fit=cover.
      Fallback to 0 for non-iOS / older browsers. */
   --safe-top: env(safe-area-inset-top, 0px);
@@ -53,10 +57,10 @@
   --header-h: 57px;
   --footer-h: 48px;
   --footer-inset: calc(24px + var(--safe-bottom));
-  --player-h: 59px;
+  --player-h: 40px;
   --player-gap: 12px;
   /* space reserved under scroll content so last items clear chrome */
-  --chrome-bottom: calc(var(--footer-inset) + var(--footer-h) + var(--player-gap) + var(--player-h) + 16px);
+  --chrome-bottom: calc(var(--footer-inset) + var(--footer-h) + 16px);
   --chrome-top: calc(var(--header-top) + var(--header-h) + 24px);
 
   /* ─── Motion tokens (shared across swipe surfaces) ───

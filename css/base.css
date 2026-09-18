@@ -78,6 +78,30 @@ p {
   overflow: hidden;
 }
 
+/* Desktop: render at 75% (25% smaller) without rewriting every px token.
+   zoom scales layout + paint + hit-testing together. Media query uses the
+   unzoomed viewport, so a narrow window does not flip into desktop layout.
+   100dvh is the *visual* viewport, so divide by --ui-scale or the stage only
+   fills the top ~75% and chrome sits mid-screen. */
+@media (min-width: 900px) {
+  html {
+    zoom: var(--ui-scale);
+    height: calc(100dvh / var(--ui-scale));
+  }
+
+  body {
+    height: calc(100dvh / var(--ui-scale));
+  }
+
+  .page {
+    width: 100%;
+    /* 1920 layout px = 1440 physical at 0.75 zoom. Ultra-wide monitors get a
+       centered stage instead of chrome stretched across the whole screen. */
+    max-width: 1920px;
+    height: calc(100dvh / var(--ui-scale));
+  }
+}
+
 /* Scrollable stage — content moves behind fixed chrome */
 .page-scroll {
   position: absolute;

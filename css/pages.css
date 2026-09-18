@@ -28,8 +28,13 @@
   position: relative;
   z-index: 1;
   display: grid;
-  grid-template-columns: minmax(220px, 520px) minmax(0, 1fr);
-  gap: 48px;
+  /* Figma 1440: 520 banner column + 668 tile pair with a wide middle gutter.
+     minmax caps keep Figma sizes at 1440 but let both columns shrink at
+     narrower windows instead of overflowing; space-between recreates the
+     Figma gutter and keeps the composition spanning the full row. */
+  grid-template-columns: minmax(280px, 520px) minmax(320px, 668px);
+  justify-content: space-between;
+  gap: 24px 32px;
   align-items: start;
   max-width: 1376px;
   margin: 0 auto;
@@ -37,7 +42,7 @@
 
 .bts-banner {
   width: 100%;
-  height: 250px;
+  height: 196px;
   border-radius: var(--radius-panel);
   overflow: hidden;
   box-shadow: var(--shadow-banner);
@@ -169,7 +174,7 @@
   font-size: 12px;
   font-weight: 500;
   letter-spacing: 0.72px;
-  border-radius: 0;
+  border-radius: var(--radius-pill);
 }
 
 @media (hover: hover) {
@@ -578,6 +583,14 @@
   display: flex;
   align-items: stretch;
   pointer-events: auto;
+  /* Hidden at rest so the red action can't bleed out as a hairline at
+     subpixel row widths; revealed the moment a drag starts. */
+  visibility: hidden;
+}
+
+.cart-swipe.is-dragging .cart-swipe__actions,
+.cart-swipe.is-open .cart-swipe__actions {
+  visibility: visible;
 }
 
 .cart-swipe__action {
@@ -733,14 +746,8 @@
 
 /* Mid desktop — keep 2-col / 4-col, scale images down */
 @media (max-width: 1280px) {
-  :root {
-    /* Header is inset 16px on this range (not 39px), so token should follow */
-    --header-top: calc(16px + var(--safe-top));
-    --footer-inset: calc(16px + var(--safe-bottom));
-  }
-
   .site-header {
-    top: var(--header-top);
+    top: calc(16px + var(--safe-top));
     right: calc(16px + var(--safe-right));
     left: calc(16px + var(--safe-left));
     bottom: auto;
@@ -748,7 +755,8 @@
 
   .site-player {
     left: calc(16px + var(--safe-left));
-    width: min(936px, calc(100% - 32px - var(--safe-left) - var(--safe-right)));
+    width: max-content;
+    max-width: min(420px, calc(100% - 32px - var(--safe-left) - var(--safe-right)));
   }
 
   .header-desktop {
@@ -757,12 +765,12 @@
   }
 
   .header-nav {
-    gap: 16px;
-    padding-left: 18px;
+    gap: 24px;
+    padding: 0 20px 0 22px;
   }
 
   .nav-links {
-    gap: 12px;
+    gap: 18px;
   }
 
   .nav-links a,
@@ -771,22 +779,18 @@
   }
 
   .home-layout {
-    grid-template-columns: minmax(200px, 0.78fr) minmax(0, 1fr);
-    gap: 24px;
+    grid-template-columns: minmax(240px, 520px) minmax(280px, 668px);
+    gap: 20px 24px;
   }
 
   .bts-banner {
     height: auto;
-    aspect-ratio: 520 / 250;
+    aspect-ratio: 520 / 196;
     margin-bottom: 28px;
   }
 
-  .home-copy h1 {
-    font-size: clamp(26px, 2.8vw, 36px);
-  }
-
   .home-grid {
-    gap: 12px 16px;
+    gap: 16px 24px;
   }
 
   .pdp-main {
@@ -965,10 +969,10 @@
 
   .audio-player {
     width: 100%;
-    height: auto;
-    min-height: 56px;
-    padding: 10px 12px;
-    border-radius: 20px;
+    height: var(--player-h);
+    min-height: var(--player-h);
+    padding: 0 8px 0 4px;
+    border-radius: 22px;
   }
 
   .audio-player__meta {

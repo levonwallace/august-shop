@@ -236,54 +236,6 @@
       </main>
       </div>
 
-      <aside class="site-player" data-player>
-        <audio data-player-audio preload="metadata"></audio>
-        <div class="audio-player" data-player-shell role="group" aria-label="August Radio" tabindex="0">
-          <div class="audio-player__meta">
-            <div class="audio-player__title" data-player-title>AUGUST RADIO — VOL. 14</div>
-            <div class="audio-player__sub" data-player-sub>Madison After Hours</div>
-          </div>
-          <div class="audio-player__controls">
-            <button class="audio-player__skip" type="button" aria-label="Previous track" data-player-prev>
-              <img src="assets/btn-prev.svg" alt="" width="14" height="9" />
-            </button>
-            <button class="audio-player__play" type="button" aria-label="Play" aria-pressed="false" data-player-play>
-              <svg data-icon-play width="39" height="39" viewBox="0 0 39 39" aria-hidden="true"><path d="M15 24.491V14.509L24.94 19.493L15 24.491Z" fill="currentColor"/></svg>
-              <svg data-icon-pause hidden width="39" height="39" viewBox="0 0 39 39" aria-hidden="true"><rect x="14" y="13" width="3.5" height="13" rx="1" fill="currentColor"/><rect x="21.5" y="13" width="3.5" height="13" rx="1" fill="currentColor"/></svg>
-            </button>
-            <button class="audio-player__skip" type="button" aria-label="Next track" data-player-next>
-              <img src="assets/btn-next.svg" alt="" width="14" height="9" />
-            </button>
-          </div>
-          <div class="audio-player__time" data-player-time>0:00 / 0:00</div>
-          <div class="audio-player__volume">
-            <button class="audio-player__tool" type="button" aria-label="Mute" data-player-mute>
-              <img src="assets/volume.svg" alt="" width="15" height="12" />
-            </button>
-            <input class="volume-range" type="range" min="0" max="1" step="0.01" value="0.7" aria-label="Volume" data-player-volume />
-          </div>
-          <div class="waveform" data-player-wave role="slider" aria-label="Seek"></div>
-          <div class="audio-player__tools">
-            <button class="audio-player__tool" type="button" aria-label="Expand player" aria-expanded="false" data-player-expand>
-              <svg width="12" height="12" viewBox="0 0 12 12" fill="none" aria-hidden="true"><path d="M2 8l4-4 4 4" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
-            </button>
-            <button class="audio-player__tool" type="button" aria-label="Dismiss player" data-player-dismiss>
-              <svg width="10" height="10" viewBox="0 0 10 10" fill="none" aria-hidden="true"><path d="M1 1l8 8M9 1L1 9" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>
-            </button>
-          </div>
-          <div class="audio-player__extra">
-            <div class="audio-player__extra-inner">
-              <div class="waveform waveform--lg" data-player-wave-lg role="slider" aria-label="Seek waveform"></div>
-              <div class="audio-player__queue" data-player-queue></div>
-            </div>
-          </div>
-        </div>
-        <button class="player-chip" type="button" hidden data-player-restore aria-label="Show August Radio">
-          <span class="player-chip__dot" aria-hidden="true"></span>
-          August Radio
-        </button>
-      </aside>
-
       <footer class="site-footer">
         <div class="footer-brand">
           <img class="footer-brand__logo" src="assets/footer-logo.svg" alt="august" />
@@ -357,7 +309,6 @@
     <script src="js/main.js"></script>
     <script src="js/sheet.js"></script>
     <script src="js/segmented.js"></script>
-    <script src="js/player.js"></script>
     <script src="js/profile.js"></script>
   </body>
 </html>

@@ -24,38 +24,6 @@
     filter var(--dur-fast) var(--ease-out);
 }
 
-/* On desktop, inset the card stack and round cards for iOS Wallet feel.
-   Mobile stays full-bleed (matches the iOS Home Screen widget aesthetic). */
-@media (min-width: 900px) {
-  .card-stack {
-    /* Card stops above the audio-player + footer chrome, leaves room for
-       pagination dots to sit in the gap. */
-    inset:
-      0
-      24px
-      calc(var(--footer-inset) + var(--footer-h) + var(--player-gap) + var(--player-h) + 20px)
-      24px;
-    perspective: 1400px;
-  }
-
-  .card-stack__card {
-    border-radius: 24px;
-  }
-
-  .card-stack__card[data-state="active"] {
-    box-shadow:
-      0 24px 60px -18px rgba(0, 0, 0, 0.28),
-      0 0 0 0.5px rgba(0, 0, 0, 0.04);
-  }
-
-  /* Brand banner CTAs sit inside a card that no longer touches the footer,
-     so lift them off the bottom edge of the card, not of the viewport. */
-  .card-stack__card--brand .brand-banner--full .brand-banner__content {
-    bottom: 56px;
-  }
-
-}
-
 /* Hero card gets its own background */
 .card-stack__card:first-child {
   background: #fff;
@@ -88,7 +56,7 @@
 .brand-banner--full .brand-banner__content {
   position: absolute;
   left: 72px;
-  bottom: calc(var(--footer-inset, 24px) + var(--footer-h, 48px) + var(--player-gap, 12px) + var(--player-h, 59px) + 48px);
+  bottom: calc(var(--footer-inset, 24px) + var(--footer-h, 48px) + 32px);
   top: auto;
   transform: none;
 }
@@ -158,8 +126,8 @@
 /* ── Pagination dots ──────────────────────────────────────── */
 .card-stack__dots {
   position: absolute;
-  /* Mobile default: sit above the audio player + footer chrome */
-  bottom: calc(var(--footer-inset, 24px) + var(--footer-h, 48px) + var(--player-gap, 12px) + var(--player-h, 59px) + 16px);
+  /* Sit above the footer; Radio card lifts this further when the player is on. */
+  bottom: calc(var(--footer-inset, 24px) + var(--footer-h, 48px) + 12px);
   left: 50%;
   transform: translateX(-50%);
   z-index: 50;
@@ -172,6 +140,10 @@
   backdrop-filter: blur(10px);
   border: 1px solid rgba(255, 255, 255, 0.5);
   box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+}
+
+.page--home.is-radio-card .card-stack__dots {
+  bottom: calc(var(--footer-inset, 24px) + var(--footer-h, 48px) + var(--player-gap, 12px) + var(--player-h, 40px) + 12px);
 }
 
 .card-stack__dot {
@@ -198,64 +170,57 @@
   }
 }
 
-/* Desktop: dots sit BELOW the (inset) card in the gap above the audio player.
-   Dots are now positioned relative to .page (viewport), so bottom values
-   are viewport-relative. Base rule already positions them 151px above the
-   viewport bottom, which puts them in the desktop gap correctly. */
+/* ── Home hero inside card — fill the stage height ──────────
+   Banner/type stay Figma-sized; the product grid stretches so the
+   composition uses the full space above the player. */
 
-/* ── Home hero adjustments inside card ────────────────────── */
-
-/* Hero stretches to fill the entire card height */
 .card-stack .home-hero {
   display: flex;
   flex-direction: column;
   height: 100%;
   min-height: 0;
-  padding-bottom: calc(var(--footer-inset, 24px) + var(--footer-h, 48px) + var(--player-gap, 12px) + var(--player-h, 59px) + 48px);
+  padding-bottom: calc(var(--footer-inset, 24px) + var(--footer-h, 48px) + 32px);
   overflow: hidden;
 }
 
-/* Layout grid fills remaining vertical space */
 .card-stack .home-layout {
   flex: 1 1 0;
-  align-items: stretch !important;
+  align-items: stretch;
+  grid-template-columns: minmax(280px, 520px) minmax(320px, 668px);
+  justify-content: space-between;
+  gap: 24px 48px;
   min-height: 0;
-  gap: 28px;
+  max-width: none;
+  width: 100%;
 }
 
-/* Copy column centers its text block vertically */
 .card-stack .home-copy {
   display: flex;
   flex-direction: column;
-  justify-content: center;
+  justify-content: flex-start;
   min-height: 0;
 }
 
-/* Scale down the banner so it doesn't eat vertical space.
-   flex-shrink: 0 keeps aspect-ratio honored inside the flex column parent
-   (otherwise the banner gets crushed vertically if content ~= container). */
 .card-stack .bts-banner {
+  width: 100%;
   height: auto;
-  aspect-ratio: 520 / 192;
-  margin-bottom: 24px;
+  aspect-ratio: 520 / 196;
+  margin-bottom: 48px;
   flex-shrink: 0;
 }
 
-/* Product grid fills the full height of its cell */
 .card-stack .home-grid {
   grid-template-rows: 1fr 1fr;
-  align-content: stretch;
-  gap: 16px 28px;
-  min-height: 0;
+  gap: 24px 44px;
   height: 100%;
+  min-height: 0;
 }
 
-/* Tiles stretch to fill grid rows instead of using fixed aspect ratios */
 .card-stack .home-tile,
 .card-stack .home-tile--tall {
   aspect-ratio: auto;
-  min-height: 0;
   height: 100%;
+  min-height: 0;
 }
 
 .card-stack .home-tile img,
@@ -267,83 +232,35 @@
 
 /* ── Responsive ───────────────────────────────────────────── */
 
-/* Mid-desktop (~900–1280px) — tighter gaps + top-aligned content so nothing
-   clips inside the fixed-height card. This range is between mobile and full
-   desktop and needs its own tuning. */
+/* Mid-desktop (~1024–1280px) — tighter gaps, smaller banner.
+   Type stays Figma-sized (38px / 14px); only spacing compresses. */
 @media (max-width: 1280px) {
   .card-stack .home-hero {
-    padding: var(--chrome-top) 28px 40px;
-    padding-bottom: calc(var(--footer-inset, 24px) + var(--footer-h, 48px) + var(--player-gap, 12px) + var(--player-h, 59px) + 32px);
-    overflow: hidden;
-  }
-
-  /* Anchor content to the top of the copy column so the BTS banner is
-     always visible (was center-aligned → top-clipped when card was short). */
-  .card-stack .home-copy {
-    justify-content: flex-start;
+    padding: var(--chrome-top) 24px 48px;
+    padding-bottom: calc(var(--footer-inset, 24px) + var(--footer-h, 48px) + 32px);
   }
 
   .card-stack .home-layout {
-    gap: 20px;
-    grid-template-columns: minmax(200px, 0.7fr) minmax(0, 1fr);
+    gap: 20px 24px;
+    grid-template-columns: minmax(240px, 520px) minmax(280px, 668px);
   }
 
   .card-stack .bts-banner {
+    height: auto;
     aspect-ratio: 520 / 166;
-    margin-bottom: 14px;
+    margin-bottom: 24px;
   }
 
   .card-stack .home-copy h1 {
-    font-size: clamp(24px, 2.6vw, 32px);
-    margin-bottom: 12px;
+    margin-bottom: 16px;
   }
 
   .card-stack .home-copy p {
-    font-size: 13px;
-    margin-bottom: 14px;
+    margin-bottom: 16px;
   }
 
   .card-stack .home-grid {
-    gap: 12px 16px;
-  }
-
-  /* Radio card: shrink inner max-width + padding so covers scale down
-     proportionally to the smaller viewport. */
-  .card-stack__card--radio .radio-card__inner {
-    max-width: 680px;
-    padding: var(--chrome-top) 32px calc(var(--footer-inset, 24px) + var(--footer-h, 48px) + var(--player-gap, 12px) + var(--player-h, 59px) + 40px);
-    gap: 28px;
-  }
-
-  .card-stack__card--radio .radio-hero {
-    gap: 24px;
-  }
-
-  .card-stack__card--radio .radio-hero__covers {
-    gap: 14px;
-  }
-
-  .card-stack__card--radio .radio-cover__art {
-    padding: 14px;
-  }
-
-  .card-stack__card--radio .radio-cover__name {
-    font-size: 13px;
-  }
-
-  .card-stack__card--radio .radio-hero__tagline {
-    font-size: 13px;
-  }
-
-  /* Brand banner CTA sits above player, not deep inside the card */
-  .card-stack__card--brand .brand-banner--full .brand-banner__content {
-    left: 40px;
-    bottom: 36px;
-    gap: 18px;
-  }
-
-  .card-stack__card--brand .brand-banner__title {
-    font-size: clamp(28px, 4vw, 40px);
+    gap: 16px 24px;
   }
 }
 
@@ -375,7 +292,7 @@
   }
 
   .card-stack .home-hero {
-    padding: 80px 16px calc(var(--footer-inset, 12px) + var(--footer-h, 48px) + var(--player-gap, 10px) + var(--player-h, 59px) + 48px);
+    padding: 80px 16px calc(var(--footer-inset, 12px) + var(--footer-h, 48px) + 48px);
   }
 
   .card-stack .home-layout {
@@ -389,7 +306,8 @@
   }
 
   .card-stack .bts-banner {
-    aspect-ratio: 520 / 153;
+    /* Full Figma art ratio — 520/153 cropped the bottom line off the art */
+    aspect-ratio: 520 / 196;
     margin-bottom: 12px;
   }
 
@@ -448,7 +366,7 @@
 .radio-card__inner {
   max-width: 860px;
   margin: 0 auto;
-  padding: 120px 48px calc(var(--footer-inset, 24px) + var(--footer-h, 48px) + var(--player-gap, 12px) + var(--player-h, 59px) + 64px);
+  padding: 120px 48px calc(var(--footer-inset, 24px) + var(--footer-h, 48px) + var(--player-gap, 12px) + var(--player-h, 40px) + 64px);
   display: flex;
   flex-direction: column;
   gap: 48px;

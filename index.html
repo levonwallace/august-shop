@@ -302,8 +302,8 @@
         </div>
 
       </div>
-      <!-- Pagination dots — outside .card-stack so they can render in the
-           gap between the (inset) card and the audio player on desktop. -->
+      <!-- Pagination dots — outside .card-stack (overflow:hidden) so they
+           sit above the player without being clipped. -->
       <div class="card-stack__dots" data-card-dots>
         <button class="card-stack__dot is-active" data-dot="0" aria-label="Home"></button>
         <button class="card-stack__dot" data-dot="1" aria-label="Vans"></button>
@@ -316,7 +316,7 @@
         <audio data-player-audio preload="metadata"></audio>
         <div class="audio-player" data-player-shell role="group" aria-label="August Radio" tabindex="0">
           <div class="audio-player__meta">
-            <div class="audio-player__title" data-player-title>AUGUST RADIO — VOL. 14</div>
+            <div class="audio-player__title" data-player-title>VOL. 14</div>
             <div class="audio-player__sub" data-player-sub>Madison After Hours</div>
           </div>
           <div class="audio-player__controls">
@@ -324,8 +324,8 @@
               <img src="assets/btn-prev.svg" alt="" width="14" height="9" />
             </button>
             <button class="audio-player__play" type="button" aria-label="Play" aria-pressed="false" data-player-play>
-              <svg data-icon-play width="39" height="39" viewBox="0 0 39 39" aria-hidden="true"><path d="M15 24.491V14.509L24.94 19.493L15 24.491Z" fill="currentColor"/></svg>
-              <svg data-icon-pause hidden width="39" height="39" viewBox="0 0 39 39" aria-hidden="true"><rect x="14" y="13" width="3.5" height="13" rx="1" fill="currentColor"/><rect x="21.5" y="13" width="3.5" height="13" rx="1" fill="currentColor"/></svg>
+              <svg data-icon-play viewBox="0 0 24 24" width="12" height="12" aria-hidden="true"><path d="M9 6.8v10.4L18.2 12 9 6.8z" fill="currentColor"/></svg>
+              <svg data-icon-pause hidden viewBox="0 0 24 24" width="12" height="12" aria-hidden="true"><rect x="7.25" y="6.5" width="3.1" height="11" rx="1" fill="currentColor"/><rect x="13.65" y="6.5" width="3.1" height="11" rx="1" fill="currentColor"/></svg>
             </button>
             <button class="audio-player__skip" type="button" aria-label="Next track" data-player-next>
               <img src="assets/btn-next.svg" alt="" width="14" height="9" />

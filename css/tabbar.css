@@ -118,18 +118,22 @@
      hidden by tab bar + player + a small gap. */
   :root {
     --chrome-bottom: calc(
-      56px + 10px + var(--player-h) + 12px + 8px + var(--safe-bottom)
+      56px + 16px + 8px + var(--safe-bottom)
     );
   }
 
-  /* Card-stack pagination dots — above the tab bar too */
+  /* Card-stack pagination dots — above the tab bar; Radio card adds player height */
   .card-stack__dots {
+    bottom: calc(56px + 12px + var(--safe-bottom));
+  }
+
+  .page--home.is-radio-card .card-stack__dots {
     bottom: calc(56px + 12px + var(--player-h) + 12px + var(--safe-bottom));
   }
 
   /* Brand-banner content inside card stack — lift above tab bar */
   .brand-banner--full .brand-banner__content {
-    bottom: calc(56px + 12px + var(--player-h) + 24px + var(--safe-bottom));
+    bottom: calc(56px + 24px + var(--safe-bottom));
   }
 }
 

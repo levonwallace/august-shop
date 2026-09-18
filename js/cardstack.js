@@ -48,10 +48,21 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   };
 
+  const page = document.querySelector(".page--home");
+
+  const syncRadioChrome = () => {
+    const onRadio = Boolean(cards[active]?.classList.contains("card-stack__card--radio"));
+    page?.classList.toggle("is-radio-card", onRadio);
+    document.dispatchEvent(
+      new CustomEvent("august:radio-card", { detail: { active: onRadio } })
+    );
+  };
+
   const renderAll = () => {
     clearInlineTransforms();
     cards.forEach((c, i) => applyState(c, stateForOffset(offsetOf(i, active))));
     dots.forEach((d, i) => d.classList.toggle("is-active", i === active));
+    syncRadioChrome();
   };
 
   const goTo = (idx, dir) => {
@@ -93,6 +104,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     dots.forEach((d, i) => d.classList.toggle("is-active", i === active));
+    syncRadioChrome();
 
     setTimeout(() => {
       renderAll();
@@ -109,10 +121,23 @@ document.addEventListener("DOMContentLoaded", () => {
   const next = () => goTo(active + 1, 1);
   const prev = () => goTo(active - 1, -1);
 
-  /* ── Wheel (unchanged) ─────────────────────────────────── */
+  /* ── Wheel: one gesture → one card ───────────────────────
+     Trackpads emit a burst of pixel deltas for a single flick.
+     Hitting the threshold, resetting, then hitting it again in the
+     same burst used to queue a second goTo (felt like a double scroll). */
   let wheelAccum = 0;
-  let wheelTimer = null;
-  const WHEEL_THRESHOLD = 55;
+  let wheelLocked = false;
+  let wheelIdleTimer = null;
+  const WHEEL_THRESHOLD = 80;
+  const WHEEL_IDLE_MS = 280;
+
+  const armWheelUnlock = () => {
+    clearTimeout(wheelIdleTimer);
+    wheelIdleTimer = setTimeout(() => {
+      wheelLocked = false;
+      wheelAccum = 0;
+    }, WHEEL_IDLE_MS);
+  };
 
   stack.addEventListener("wheel", (e) => {
     const scroller = e.target.closest("[data-card-scroll]");
@@ -123,16 +148,22 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     e.preventDefault();
+
+    if (animating || wheelLocked) {
+      armWheelUnlock();
+      return;
+    }
+
     wheelAccum += e.deltaY;
 
-    clearTimeout(wheelTimer);
-    wheelTimer = setTimeout(() => { wheelAccum = 0; }, 200);
+    if (Math.abs(wheelAccum) < WHEEL_THRESHOLD) return;
 
-    if (Math.abs(wheelAccum) >= WHEEL_THRESHOLD) {
-      if (wheelAccum > 0) next();
-      else prev();
-      wheelAccum = 0;
-    }
+    const dir = wheelAccum;
+    wheelLocked = true;
+    wheelAccum = 0;
+    if (dir > 0) next();
+    else prev();
+    armWheelUnlock();
   }, { passive: false });
 
   /* ── Pointer drag (touch + mouse unified) ──────────────── */

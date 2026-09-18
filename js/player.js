@@ -23,12 +23,12 @@ document.addEventListener("DOMContentLoaded", () => {
   const iconPause = playBtn.querySelector("[data-icon-pause]");
 
   const playlist = [
-    { title: "AUGUST RADIO — VOL. 14", sub: "Madison After Hours", src: "assets/radio-vol-14.wav" },
-    { title: "AUGUST RADIO — VOL. 15", sub: "State Street Mix", src: "assets/radio-vol-15.wav" },
-    { title: "AUGUST RADIO — VOL. 16", sub: "Late Light", src: "assets/radio-vol-16.wav" },
+    { title: "VOL. 14", sub: "Madison After Hours", src: "assets/radio-vol-14.wav" },
+    { title: "VOL. 15", sub: "State Street Mix", src: "assets/radio-vol-15.wav" },
+    { title: "VOL. 16", sub: "Late Light", src: "assets/radio-vol-16.wav" },
   ];
 
-  const BAR_MINI = 42;
+  const BAR_MINI = 20;
   const BAR_LG = 96;
   const peakCache = new Map();
   let index = 0;
@@ -61,7 +61,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const tall = el.classList.contains("waveform--lg");
     const html = peaks
       .map((p, i) => {
-        const h = Math.max(3, Math.round(p * (tall ? 50 : 24)));
+        const h = Math.max(3, Math.round(p * (tall ? 50 : 12)));
         const on = i / count <= played;
         return `<i class="${on ? "is-played" : ""}" style="height:${h}px"></i>`;
       })
@@ -125,7 +125,7 @@ document.addEventListener("DOMContentLoaded", () => {
       .map(
         (t, i) =>
           `<button type="button" class="audio-player__track${i === index ? " is-active" : ""}" data-track="${i}">
-            <span>${t.title.replace("AUGUST RADIO — ", "")}</span>
+            <span>${t.title}</span>
             <span>${t.sub}</span>
           </button>`
       )
@@ -302,4 +302,8 @@ document.addEventListener("DOMContentLoaded", () => {
   vol.value = "0.7";
   loadTrack(0, false);
   setDismissed(true);
+
+  document.addEventListener("august:radio-card", (e) => {
+    if (e.detail?.active) setDismissed(false);
+  });
 });

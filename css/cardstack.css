@@ -27,15 +27,41 @@
 /* Hero card background — storefront washes turned up a notch: still soft,
    but clearly colorful rather than plain cream. */
 .card-stack__card:first-child {
+  background: linear-gradient(180deg, #fdfbf5, #f7f2e8);
+}
+
+/* Ambient tint field — carries all the color washes on one layer so the
+   whole background can slowly drift through hues. */
+.card-stack__card:first-child::before {
+  content: "";
+  position: absolute;
+  inset: -6%;
   background:
     radial-gradient(1100px 720px at 90% -10%, rgba(217, 163, 38, 0.2), transparent 62%),
     radial-gradient(950px 720px at -10% 24%, rgba(74, 111, 94, 0.18), transparent 56%),
     radial-gradient(880px 840px at 74% 110%, rgba(168, 67, 46, 0.15), transparent 60%),
     radial-gradient(720px 560px at 38% 58%, rgba(43, 85, 168, 0.08), transparent 58%),
-    linear-gradient(180deg, #fdfbf5, #f7f2e8);
+    radial-gradient(620px 620px at -4% 106%, rgba(74, 111, 94, 0.26), rgba(43, 85, 168, 0.1) 58%, transparent 76%);
+  pointer-events: none;
+  z-index: 0;
+  will-change: filter;
+  animation: hero-hue-drift 38s ease-in-out infinite;
 }
 
-/* Warm glow drifting in from the top-right corner (replaces the checkerboard) */
+@keyframes hero-hue-drift {
+  0%,
+  100% {
+    filter: hue-rotate(0deg) saturate(1);
+  }
+  33% {
+    filter: hue-rotate(24deg) saturate(1.12);
+  }
+  66% {
+    filter: hue-rotate(-18deg) saturate(1.04);
+  }
+}
+
+/* Warm glow — starts top-right, then slowly wanders around the card */
 .card-stack__card:first-child::after {
   content: "";
   position: absolute;
@@ -46,19 +72,31 @@
   background: radial-gradient(closest-side, rgba(176, 112, 58, 0.3), rgba(217, 163, 38, 0.14) 55%, transparent 74%);
   pointer-events: none;
   z-index: 0;
+  will-change: transform;
+  animation: hero-blob-roam 46s ease-in-out infinite;
 }
 
-/* Cool counter-glow rising from the bottom-left */
-.card-stack__card:first-child::before {
-  content: "";
-  position: absolute;
-  bottom: -180px;
-  left: -160px;
-  width: 620px;
-  height: 620px;
-  background: radial-gradient(closest-side, rgba(74, 111, 94, 0.26), rgba(43, 85, 168, 0.1) 58%, transparent 76%);
-  pointer-events: none;
-  z-index: 0;
+@keyframes hero-blob-roam {
+  0%,
+  100% {
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+  24% {
+    transform: translate3d(-56vw, 32vh, 0) scale(1.14);
+  }
+  48% {
+    transform: translate3d(-16vw, 68vh, 0) scale(0.9);
+  }
+  74% {
+    transform: translate3d(-46vw, 10vh, 0) scale(1.08);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .card-stack__card:first-child::before,
+  .card-stack__card:first-child::after {
+    animation: none;
+  }
 }
 
 /* Brand cards fill fully */
@@ -421,13 +459,6 @@
     height: 340px;
     top: -80px;
     right: -80px;
-  }
-
-  .card-stack__card:first-child::before {
-    width: 380px;
-    height: 380px;
-    bottom: -100px;
-    left: -100px;
   }
 
   .card-stack__card--radio::before {

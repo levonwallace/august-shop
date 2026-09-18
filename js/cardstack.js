@@ -48,10 +48,22 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   };
 
+  /* Tab bar reflects the active card: Radio lights up on the AUX card,
+     Shop on everything else. */
+  const tabRadio = document.querySelector('.tabbar [data-card-jump="4"]');
+  const tabShop = document.querySelector('.tabbar a[href="index.html"]');
+  const syncTabs = () => {
+    if (!tabRadio) return;
+    const onAux = active === total - 1;
+    tabRadio.classList.toggle("is-active", onAux);
+    tabShop?.classList.toggle("is-active", !onAux);
+  };
+
   const renderAll = () => {
     clearInlineTransforms();
     cards.forEach((c, i) => applyState(c, stateForOffset(offsetOf(i, active))));
     dots.forEach((d, i) => d.classList.toggle("is-active", i === active));
+    syncTabs();
   };
 
   const goTo = (idx, dir) => {
@@ -93,6 +105,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     dots.forEach((d, i) => d.classList.toggle("is-active", i === active));
+    syncTabs();
 
     setTimeout(() => {
       renderAll();
@@ -340,6 +353,17 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   });
 
+  /* ── Tab bar jumps (Radio → AUX card, Shop → home card) ── */
+  document.querySelectorAll(".tabbar [data-card-jump]").forEach((el) => {
+    el.addEventListener("click", (e) => {
+      e.preventDefault();
+      const idx = Number(el.getAttribute("data-card-jump"));
+      goTo(idx, idx > active ? 1 : -1);
+    });
+  });
+
   /* ── Init ──────────────────────────────────────────────── */
+  // Arriving via index.html#radio (Radio tab on other pages) → open AUX directly
+  if (location.hash === "#radio") active = total - 1;
   renderAll();
 });

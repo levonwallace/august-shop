@@ -115,29 +115,15 @@
     display: none;
   }
 
-  /* Audio player floats above the dock */
-  .site-player {
-    bottom: calc(var(--tabbar-top) + 10px);
-  }
-
-  /* Player chip (dismissed state) also above the dock */
-  .site-player.is-dismissed {
-    bottom: calc(var(--tabbar-top) + 12px);
-  }
-
   /* Reserve enough scroll clearance under content so bottom items aren't
      hidden by the dock + a small gap. */
   :root {
     --chrome-bottom: calc(var(--tabbar-top) + 16px);
   }
 
-  /* Card-stack pagination dots — above the dock; Radio card adds player height */
+  /* Card-stack pagination dots — above the dock */
   .card-stack__dots {
     bottom: calc(var(--tabbar-top) + 12px);
-  }
-
-  .page--home.is-radio-card .card-stack__dots {
-    bottom: calc(var(--tabbar-top) + var(--player-h) + 24px);
   }
 
   /* Brand-banner content inside card stack — lift above the dock */

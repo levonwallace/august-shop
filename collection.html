@@ -9,7 +9,20 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="default" />
     <meta name="apple-mobile-web-app-title" content="August" />
     <meta name="format-detection" content="telephone=no" />
-    <title>August — New Arrivals</title>
+    <title>New Arrivals — August</title>
+    <meta name="description" content="Fresh drops from Vans, Hoka, Lady White Co., Puma, Saucony, Velva Sheen, and Dr. Martens. New arrivals every week from August in Madison, WI." />
+    <link rel="canonical" href="https://august-shop.com/collection" />
+    <link rel="icon" type="image/svg+xml" href="assets/favicon.svg" />
+    <link rel="apple-touch-icon" href="assets/favicon.svg" />
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="New Arrivals — August" />
+    <meta property="og:description" content="Fresh drops from Vans, Hoka, Lady White Co., Dr. Martens, and more." />
+    <meta property="og:url" content="https://august-shop.com/collection" />
+    <meta property="og:site_name" content="August" />
+    <meta property="og:image" content="https://august-shop.com/assets/plp-1.png" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="New Arrivals — August" />
+    <meta name="twitter:description" content="Fresh drops from Vans, Hoka, Lady White Co., Dr. Martens, and more." />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600&display=swap" rel="stylesheet" />
@@ -23,6 +36,7 @@
     <link rel="stylesheet" href="css/segmented.css" />
   </head>
   <body>
+    <a class="skip-link" href="#main">Skip to content</a>
     <div class="mega-backdrop" data-mega-backdrop hidden></div>
     <div class="page page--plp">
       <header class="site-header">
@@ -139,18 +153,21 @@
       </header>
 
       <div class="page-scroll">
-      <section class="plp-intro">
-        <div class="plp-intro__island">
-          <p>Fresh drops from Vans, Hoka, Lady White Co., and more — 24 products</p>
-        </div>
-        <button class="plp-filter-btn" type="button" data-sheet-open="filter-sheet" aria-label="Filter and sort">
-          <svg viewBox="0 0 14 14" fill="none" aria-hidden="true"><path d="M2 4h10M4 7h6M6 10h2" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>
-          <span>Filter &amp; Sort</span>
-          <span class="plp-filter-btn__count" data-filter-count hidden>0</span>
-        </button>
-      </section>
+      <main class="plp-main" id="main">
+        <h1 class="sr-only">New Arrivals</h1>
+        <section class="plp-intro" aria-labelledby="plp-intro-heading">
+          <h2 id="plp-intro-heading" class="sr-only">Collection intro</h2>
+          <div class="plp-intro__island">
+            <p>Fresh drops from Vans, Hoka, Lady White Co., and more — 24 products</p>
+          </div>
+          <button class="plp-filter-btn" type="button" data-sheet-open="filter-sheet" aria-label="Filter and sort">
+            <svg viewBox="0 0 14 14" fill="none" aria-hidden="true"><path d="M2 4h10M4 7h6M6 10h2" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>
+            <span>Filter &amp; Sort</span>
+            <span class="plp-filter-btn__count" data-filter-count hidden>0</span>
+          </button>
+        </section>
 
-      <section class="plp-grid-wrap">
+        <section class="plp-grid-wrap" aria-label="Products">
         <div class="product-grid">
           <a class="product-card" href="product.html">
             <div class="product-card__media"><img src="assets/plp-1.png" alt="" /></div>
@@ -218,6 +235,7 @@
           </a>
         </div>
       </section>
+      </main>
       </div>
 
       <aside class="site-player" data-player>

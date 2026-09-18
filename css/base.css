@@ -101,3 +101,37 @@ p {
 .page--cart {
   background: var(--color-page);
 }
+
+/* ── Skip-to-content link (visually hidden until focused) ─── */
+.skip-link {
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 500;
+  padding: 12px 20px;
+  background: var(--color-ink);
+  color: #fff;
+  font-size: 13px;
+  font-weight: 500;
+  border-radius: 0 0 12px 0;
+  transform: translateY(-120%);
+  transition: transform 0.16s ease;
+}
+.skip-link:focus {
+  transform: translateY(0);
+  outline: 2px solid var(--color-dot);
+  outline-offset: 2px;
+}
+
+/* Screen-reader-only utility (for labels we don't want visible) */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}

@@ -9,7 +9,21 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="default" />
     <meta name="apple-mobile-web-app-title" content="August" />
     <meta name="format-detection" content="telephone=no" />
-    <title>August — Home</title>
+    <title>August — Streetwear, sneakers, art & music · Madison, WI</title>
+    <meta name="description" content="An amalgamation of streetwear, sneakers, art, and music. New arrivals dropping weekly from Vans, Hoka, Lady White Co., Dr. Martens, and more — curated in Madison, WI." />
+    <link rel="canonical" href="https://august-shop.com/" />
+    <link rel="icon" type="image/svg+xml" href="assets/favicon.svg" />
+    <link rel="apple-touch-icon" href="assets/favicon.svg" />
+    <!-- Open Graph / social -->
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="August — Streetwear, sneakers, art & music" />
+    <meta property="og:description" content="New arrivals dropping weekly from Vans, Hoka, Lady White Co., Dr. Martens, and more — curated in Madison, WI." />
+    <meta property="og:url" content="https://august-shop.com/" />
+    <meta property="og:site_name" content="August" />
+    <meta property="og:image" content="https://august-shop.com/assets/home-bts.png" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="August — Streetwear, sneakers, art & music" />
+    <meta name="twitter:description" content="New arrivals dropping weekly, curated in Madison, WI." />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
@@ -24,6 +38,7 @@
     <link rel="stylesheet" href="css/segmented.css" />
   </head>
   <body>
+    <a class="skip-link" href="#main">Skip to content</a>
     <div class="mega-backdrop" data-mega-backdrop hidden></div>
     <div class="page page--home">
       <header class="site-header">
@@ -139,7 +154,7 @@
         </div>
       </header>
 
-      <div class="card-stack" data-card-stack>
+      <div class="card-stack" id="main" data-card-stack>
         <!-- Card 0: Hero -->
         <div class="card-stack__card" data-card="0">
           <main class="home-hero">
@@ -286,14 +301,15 @@
           </div>
         </div>
 
-        <!-- Pagination dots -->
-        <div class="card-stack__dots" data-card-dots>
-          <button class="card-stack__dot is-active" data-dot="0" aria-label="Home"></button>
-          <button class="card-stack__dot" data-dot="1" aria-label="Vans"></button>
-          <button class="card-stack__dot" data-dot="2" aria-label="Square Trade Goods"></button>
-          <button class="card-stack__dot" data-dot="3" aria-label="Dr. Martens"></button>
-          <button class="card-stack__dot" data-dot="4" aria-label="August Radio"></button>
-        </div>
+      </div>
+      <!-- Pagination dots — outside .card-stack so they can render in the
+           gap between the (inset) card and the audio player on desktop. -->
+      <div class="card-stack__dots" data-card-dots>
+        <button class="card-stack__dot is-active" data-dot="0" aria-label="Home"></button>
+        <button class="card-stack__dot" data-dot="1" aria-label="Vans"></button>
+        <button class="card-stack__dot" data-dot="2" aria-label="Square Trade Goods"></button>
+        <button class="card-stack__dot" data-dot="3" aria-label="Dr. Martens"></button>
+        <button class="card-stack__dot" data-dot="4" aria-label="August Radio"></button>
       </div>
 
       <aside class="site-player" data-player>

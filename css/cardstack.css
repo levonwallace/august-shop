@@ -53,6 +53,7 @@
   .card-stack__card--brand .brand-banner--full .brand-banner__content {
     bottom: 56px;
   }
+
 }
 
 /* Hero card gets its own background */
@@ -157,6 +158,7 @@
 /* ── Pagination dots ──────────────────────────────────────── */
 .card-stack__dots {
   position: absolute;
+  /* Mobile default: sit above the audio player + footer chrome */
   bottom: calc(var(--footer-inset, 24px) + var(--footer-h, 48px) + var(--player-gap, 12px) + var(--player-h, 59px) + 16px);
   left: 50%;
   transform: translateX(-50%);
@@ -196,6 +198,11 @@
   }
 }
 
+/* Desktop: dots sit BELOW the (inset) card in the gap above the audio player.
+   Dots are now positioned relative to .page (viewport), so bottom values
+   are viewport-relative. Base rule already positions them 151px above the
+   viewport bottom, which puts them in the desktop gap correctly. */
+
 /* ── Home hero adjustments inside card ────────────────────── */
 
 /* Hero stretches to fill the entire card height */
@@ -224,11 +231,14 @@
   min-height: 0;
 }
 
-/* Scale down the banner so it doesn't eat vertical space */
+/* Scale down the banner so it doesn't eat vertical space.
+   flex-shrink: 0 keeps aspect-ratio honored inside the flex column parent
+   (otherwise the banner gets crushed vertically if content ~= container). */
 .card-stack .bts-banner {
   height: auto;
   aspect-ratio: 520 / 192;
   margin-bottom: 24px;
+  flex-shrink: 0;
 }
 
 /* Product grid fills the full height of its cell */
@@ -257,11 +267,20 @@
 
 /* ── Responsive ───────────────────────────────────────────── */
 
-/* Mid-desktop (~1024–1280px) — tighter gaps, smaller banner */
+/* Mid-desktop (~900–1280px) — tighter gaps + top-aligned content so nothing
+   clips inside the fixed-height card. This range is between mobile and full
+   desktop and needs its own tuning. */
 @media (max-width: 1280px) {
   .card-stack .home-hero {
-    padding: var(--chrome-top) 24px 48px;
-    padding-bottom: calc(var(--footer-inset, 24px) + var(--footer-h, 48px) + var(--player-gap, 12px) + var(--player-h, 59px) + 48px);
+    padding: var(--chrome-top) 28px 40px;
+    padding-bottom: calc(var(--footer-inset, 24px) + var(--footer-h, 48px) + var(--player-gap, 12px) + var(--player-h, 59px) + 32px);
+    overflow: hidden;
+  }
+
+  /* Anchor content to the top of the copy column so the BTS banner is
+     always visible (was center-aligned → top-clipped when card was short). */
+  .card-stack .home-copy {
+    justify-content: flex-start;
   }
 
   .card-stack .home-layout {
@@ -271,20 +290,60 @@
 
   .card-stack .bts-banner {
     aspect-ratio: 520 / 166;
-    margin-bottom: 16px;
+    margin-bottom: 14px;
   }
 
   .card-stack .home-copy h1 {
-    font-size: clamp(26px, 3.2vw, 36px);
-    margin-bottom: 16px;
+    font-size: clamp(24px, 2.6vw, 32px);
+    margin-bottom: 12px;
   }
 
   .card-stack .home-copy p {
-    margin-bottom: 16px;
+    font-size: 13px;
+    margin-bottom: 14px;
   }
 
   .card-stack .home-grid {
     gap: 12px 16px;
+  }
+
+  /* Radio card: shrink inner max-width + padding so covers scale down
+     proportionally to the smaller viewport. */
+  .card-stack__card--radio .radio-card__inner {
+    max-width: 680px;
+    padding: var(--chrome-top) 32px calc(var(--footer-inset, 24px) + var(--footer-h, 48px) + var(--player-gap, 12px) + var(--player-h, 59px) + 40px);
+    gap: 28px;
+  }
+
+  .card-stack__card--radio .radio-hero {
+    gap: 24px;
+  }
+
+  .card-stack__card--radio .radio-hero__covers {
+    gap: 14px;
+  }
+
+  .card-stack__card--radio .radio-cover__art {
+    padding: 14px;
+  }
+
+  .card-stack__card--radio .radio-cover__name {
+    font-size: 13px;
+  }
+
+  .card-stack__card--radio .radio-hero__tagline {
+    font-size: 13px;
+  }
+
+  /* Brand banner CTA sits above player, not deep inside the card */
+  .card-stack__card--brand .brand-banner--full .brand-banner__content {
+    left: 40px;
+    bottom: 36px;
+    gap: 18px;
+  }
+
+  .card-stack__card--brand .brand-banner__title {
+    font-size: clamp(28px, 4vw, 40px);
   }
 }
 

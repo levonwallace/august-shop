@@ -5,7 +5,10 @@ document.addEventListener("DOMContentLoaded", () => {
   if (!stack) return;
 
   const cards = [...stack.querySelectorAll("[data-card]")];
-  const dots = [...stack.querySelectorAll("[data-dot]")];
+  // Dots live outside .card-stack (which has overflow:hidden) so they can
+  // render in the gap below the card on desktop. Search from .page instead.
+  const dotsContainer = stack.parentElement || document;
+  const dots = [...dotsContainer.querySelectorAll("[data-dot]")];
   const total = cards.length;
   if (!total) return;
 

@@ -733,8 +733,14 @@
 
 /* Mid desktop — keep 2-col / 4-col, scale images down */
 @media (max-width: 1280px) {
+  :root {
+    /* Header is inset 16px on this range (not 39px), so token should follow */
+    --header-top: calc(16px + var(--safe-top));
+    --footer-inset: calc(16px + var(--safe-bottom));
+  }
+
   .site-header {
-    top: calc(16px + var(--safe-top));
+    top: var(--header-top);
     right: calc(16px + var(--safe-right));
     left: calc(16px + var(--safe-left));
     bottom: auto;

@@ -771,6 +771,207 @@
   margin: 8px 0 16px;
 }
 
+/* —— Account —— */
+.account-page {
+  max-width: 1140px;
+  margin: 0 auto;
+  padding: var(--chrome-top) var(--gutter) var(--chrome-bottom);
+}
+
+.account-page h1 {
+  margin: 0 0 4px;
+  font-size: 30px;
+  font-weight: 400;
+  letter-spacing: -0.4px;
+}
+
+.account-sub {
+  margin: 0 0 28px;
+  font-size: 13px;
+  color: var(--color-muted);
+}
+
+/* Signed-out gate */
+.account-gate {
+  display: flex;
+  justify-content: center;
+  padding-top: 6vh;
+}
+
+.account-gate__card {
+  width: 100%;
+  max-width: 380px;
+  padding: 36px 32px;
+  text-align: center;
+}
+
+.account-gate__card h1 {
+  margin: 0 0 6px;
+  font-size: 24px;
+}
+
+.account-gate__card p {
+  margin: 0 0 22px;
+  font-size: 13px;
+  color: var(--color-muted);
+  line-height: 1.5;
+}
+
+.account-gate__card .btn + .btn {
+  margin-top: 8px;
+}
+
+/* Signed-in layout */
+.account-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1.6fr) minmax(260px, 0.9fr);
+  gap: 16px;
+  align-items: start;
+}
+
+.account-orders {
+  padding: 24px;
+}
+
+.account-orders h2,
+.account-card h2 {
+  margin: 0 0 16px;
+  font-size: 16px;
+  font-weight: 500;
+  letter-spacing: -0.15px;
+}
+
+.order-row {
+  display: grid;
+  grid-template-columns: 56px minmax(0, 1fr) auto auto;
+  align-items: center;
+  gap: 14px;
+  padding: 14px 4px;
+  border-radius: 12px;
+  transition: background 0.14s ease;
+}
+
+@media (hover: hover) {
+  .order-row:hover {
+    background: rgba(15, 15, 15, 0.03);
+  }
+}
+
+.order-row__thumb {
+  width: 56px;
+  height: 56px;
+  border-radius: 12px;
+  background: #f6f6f4;
+  overflow: hidden;
+  box-shadow: var(--shadow-product);
+}
+
+.order-row__thumb img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+.order-row__info {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  min-width: 0;
+}
+
+.order-row__title {
+  font-size: 14px;
+  font-weight: 500;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.order-row__meta {
+  font-size: 11px;
+  color: var(--color-muted);
+  letter-spacing: 0.02em;
+  font-variant-numeric: tabular-nums;
+}
+
+.order-status {
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  padding: 5px 10px;
+  border-radius: 999px;
+  white-space: nowrap;
+}
+
+.order-status--done {
+  color: #2a7a33;
+  background: rgba(58, 160, 70, 0.1);
+}
+
+.order-status--transit {
+  color: #8a6116;
+  background: rgba(196, 148, 43, 0.12);
+}
+
+.order-row__price {
+  font-size: 14px;
+  font-weight: 500;
+  font-variant-numeric: tabular-nums;
+}
+
+/* Side cards */
+.account-side {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.account-card {
+  padding: 24px;
+}
+
+.account-detail {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 12px 0;
+  font-size: 13px;
+}
+
+.account-detail span:first-child {
+  color: var(--color-muted);
+}
+
+.account-detail span:last-child {
+  font-weight: 500;
+  text-align: right;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.account-card__btn {
+  margin-top: 14px;
+}
+
+.account-card__text {
+  margin: 0;
+  font-size: 13px;
+  line-height: 1.6;
+}
+
+.account-card__text--muted {
+  margin-top: 8px;
+  font-size: 11px;
+  color: var(--color-muted);
+}
+
+.account-signout {
+  color: #b3392e;
+  border-color: rgba(179, 57, 46, 0.25);
+}
+
 /* ========== Responsive ========== */
 
 /* Mid desktop — keep 2-col / 4-col, scale images down */
@@ -865,6 +1066,14 @@
     --footer-inset: calc(12px + var(--safe-bottom));
     --chrome-top: calc(80px + var(--safe-top));
     --chrome-bottom: calc(200px + var(--safe-bottom));
+  }
+
+  .account-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .account-page h1 {
+    font-size: 24px;
   }
 
   .site-header {
@@ -1149,6 +1358,27 @@
 @media (max-width: 560px) {
   :root {
     --gutter: 16px;
+  }
+
+  /* Compact order rows — title truncates, everything stays on one line */
+  .order-row {
+    grid-template-columns: 48px minmax(0, 1fr) auto auto;
+    gap: 10px;
+  }
+
+  .order-row__thumb {
+    width: 48px;
+    height: 48px;
+  }
+
+  .order-row__price {
+    font-size: 13px;
+  }
+
+  .order-status {
+    font-size: 9px;
+    padding: 4px 8px;
+    letter-spacing: 0.05em;
   }
 
   .product-grid {

@@ -93,18 +93,18 @@
 }
 
 .profile-drop__btn--primary {
-  background: var(--color-ink-verdigris);
+  background: var(--color-ink);
   color: #fff;
   margin-bottom: 8px;
 }
 
 @media (hover: hover) {
   .profile-drop__btn--primary:hover {
-    background: var(--color-ink-verdigris-hover);
+    background: var(--color-ink-soft);
   }
 }
 .profile-drop__btn--primary:active {
-  background: var(--color-ink-verdigris-hover);
+  background: var(--color-ink-soft);
   transform: scale(0.98);
 }
 
@@ -398,9 +398,9 @@
 }
 
 .pref-chip.is-active {
-  background: var(--color-ink-verdigris);
+  background: var(--color-ink);
   color: #fff;
-  border-color: var(--color-ink-verdigris);
+  border-color: var(--color-ink);
 }
 
 /* ── Toggle switch ────────────────────────────────────────── */
@@ -472,18 +472,67 @@
   }
 }
 
-/* ── Step transitions ─────────────────────────────────────── */
-.profile-step {
-  animation: stepIn 0.32s cubic-bezier(0.22, 1, 0.36, 1);
+/* ── Auth modal (single card, two modes) ──────────────────── */
+.profile-modal__card--auth {
+  max-width: 400px;
+  padding: 36px 32px 28px;
 }
 
-@keyframes stepIn {
-  from {
-    opacity: 0;
-    transform: translateY(8px);
-  }
-  to {
-    opacity: 1;
-    transform: none;
-  }
+.auth-wordmark {
+  margin: 0 0 18px;
+  font-size: 21px;
+  font-weight: 500;
+  letter-spacing: -0.3px;
+  color: var(--color-ink);
+}
+
+.auth-tabs {
+  display: flex;
+  padding: 3px;
+  margin-bottom: 22px;
+  background: rgba(15, 15, 15, 0.06);
+  border-radius: 100px;
+}
+
+.auth-tab {
+  flex: 1 1 0;
+  height: 36px;
+  border-radius: 100px;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--color-muted-2);
+  background: none;
+  cursor: pointer;
+  transition: color 0.15s ease, background 0.15s ease, box-shadow 0.15s ease;
+}
+
+.auth-tab.is-active {
+  background: #fff;
+  color: var(--color-ink);
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
+}
+
+/* Sign-in mode: no name field */
+.profile-modal--auth.is-signin .profile-field--name {
+  display: none;
+}
+
+.auth-footnote {
+  margin: 18px 0 0;
+  font-size: 11px;
+  line-height: 1.55;
+  color: var(--color-muted-2);
+}
+
+.auth-footnote a {
+  color: inherit;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+/* Signed-out sheet hint (mobile) */
+.profile-sheet__hint {
+  margin: 0 0 14px;
+  font-size: 13px;
+  color: var(--color-muted-2);
 }

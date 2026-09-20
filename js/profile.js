@@ -54,11 +54,10 @@ document.addEventListener("DOMContentLoaded", () => {
       <!-- Profile dropdown -->
       <div class="profile-drop" data-profile-drop hidden>
         <div class="profile-drop__signed-out" data-profile-signed-out>
-          <img class="profile-drop__avatar-lg" src="assets/avatar-demo.jpg" alt="" />
-          <p class="profile-drop__greeting">Welcome to August</p>
-          <p class="profile-drop__sub">Sign in or create an account to personalize your experience.</p>
-          <button class="profile-drop__btn profile-drop__btn--primary" type="button" data-profile-action="create">Create Account</button>
-          <button class="profile-drop__btn" type="button" data-profile-action="signin">Sign In</button>
+          <p class="profile-drop__greeting">Account</p>
+          <p class="profile-drop__sub">Orders, saved items, faster checkout.</p>
+          <button class="profile-drop__btn profile-drop__btn--primary" type="button" data-profile-action="signin">Sign in</button>
+          <button class="profile-drop__btn" type="button" data-profile-action="create">Create account</button>
         </div>
         <div class="profile-drop__signed-in" data-profile-signed-in hidden>
           <div class="profile-drop__user">
@@ -69,9 +68,13 @@ document.addEventListener("DOMContentLoaded", () => {
             </div>
           </div>
           <div class="profile-drop__divider"></div>
+          <a class="profile-drop__link" href="account.html">
+            <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><circle cx="7" cy="5" r="2.6" stroke="currentColor" stroke-width="1.2"/><path d="M2.5 12.5c.6-2.4 2.4-3.8 4.5-3.8s3.9 1.4 4.5 3.8" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg>
+            Account
+          </a>
           <button class="profile-drop__link" type="button" data-profile-action="settings">
             <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M7 9a2 2 0 100-4 2 2 0 000 4z" stroke="currentColor" stroke-width="1.2"/><path d="M11.4 8.6l.8.5a.5.5 0 01.1.6l-.8 1.4a.5.5 0 01-.6.2l-.9-.4a3.6 3.6 0 01-.9.5l-.1 1a.5.5 0 01-.5.4H6.5a.5.5 0 01-.5-.4l-.1-1a3.6 3.6 0 01-.9-.5l-.9.4a.5.5 0 01-.6-.2l-.8-1.4a.5.5 0 01.1-.6l.8-.5a3.5 3.5 0 010-1l-.8-.5a.5.5 0 01-.1-.6l.8-1.4a.5.5 0 01.6-.2l.9.4c.3-.2.6-.4.9-.5l.1-1a.5.5 0 01.5-.4h1.5a.5.5 0 01.5.4l.1 1c.3.1.6.3.9.5l.9-.4a.5.5 0 01.6.2l.8 1.4a.5.5 0 01-.1.6l-.8.5a3.5 3.5 0 010 1z" stroke="currentColor" stroke-width="1.2"/></svg>
-            My Settings
+            Settings
           </button>
           <button class="profile-drop__link" type="button" data-profile-action="signout">
             <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M5 12H3a1 1 0 01-1-1V3a1 1 0 011-1h2M9 10l3-3-3-3M12 7H5" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
@@ -83,89 +86,38 @@ document.addEventListener("DOMContentLoaded", () => {
       <!-- Backdrop for modals -->
       <div class="profile-backdrop" data-profile-backdrop hidden></div>
 
-      <!-- Create Account / Sign In modal -->
-      <div class="profile-modal" data-profile-modal hidden>
-        <div class="profile-modal__card">
+      <!-- Auth modal — one card, two modes. No wizard. -->
+      <div class="profile-modal profile-modal--auth is-signin" data-profile-modal hidden>
+        <div class="profile-modal__card profile-modal__card--auth">
           <button class="profile-modal__close" type="button" data-profile-modal-close aria-label="Close">
             <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M1 1l10 10M11 1L1 11" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>
           </button>
 
-          <!-- Step 1: Credentials -->
-          <div class="profile-step" data-profile-step="1">
-            <div class="profile-modal__icon" aria-hidden="true">
-              <svg width="32" height="32" viewBox="0 0 32 32" fill="none"><circle cx="16" cy="12" r="5" stroke="currentColor" stroke-width="1.8"/><path d="M6 28c0-5.5 4.5-10 10-10s10 4.5 10 10" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
-            </div>
-            <h2 class="profile-modal__title" data-modal-title>Create your account</h2>
-            <p class="profile-modal__sub">Personalize your August experience.</p>
-            <form class="profile-form" data-profile-form autocomplete="off">
-              <label class="profile-field">
-                <span>Full name</span>
-                <input type="text" name="name" required placeholder="Your name" autocomplete="name" />
-              </label>
-              <label class="profile-field">
-                <span>Email</span>
-                <input type="email" name="email" required placeholder="you@example.com" autocomplete="email" />
-              </label>
-              <label class="profile-field">
-                <span>Password</span>
-                <input type="password" name="password" required placeholder="At least 8 characters" minlength="8" autocomplete="new-password" />
-              </label>
-              <p class="profile-form__error" data-profile-error hidden></p>
-              <button class="btn btn--primary btn--block profile-form__submit" type="submit" data-profile-submit>Continue</button>
-            </form>
+          <p class="auth-wordmark">August</p>
+
+          <div class="auth-tabs" role="tablist" aria-label="Sign in or create account">
+            <button type="button" class="auth-tab is-active" role="tab" aria-selected="true" data-auth-mode="signin">Sign in</button>
+            <button type="button" class="auth-tab" role="tab" aria-selected="false" data-auth-mode="create">Create account</button>
           </div>
 
-          <!-- Step 2: Preferences -->
-          <div class="profile-step" data-profile-step="2" hidden>
-            <div class="profile-modal__icon" aria-hidden="true">
-              <svg width="32" height="32" viewBox="0 0 32 32" fill="none"><rect x="4" y="4" width="10" height="10" rx="3" stroke="currentColor" stroke-width="1.8"/><rect x="18" y="4" width="10" height="10" rx="3" stroke="currentColor" stroke-width="1.8"/><rect x="4" y="18" width="10" height="10" rx="3" stroke="currentColor" stroke-width="1.8"/><rect x="18" y="18" width="10" height="10" rx="3" stroke="currentColor" stroke-width="1.8"/></svg>
-            </div>
-            <h2 class="profile-modal__title">Make it yours</h2>
-            <p class="profile-modal__sub">Choose what you'd like to see on your homepage.</p>
-
-            <div class="pref-section">
-              <p class="pref-label">Homepage view</p>
-              <div class="pref-options" data-pref-homepage>
-                <button type="button" class="pref-chip is-active" data-value="default">Default</button>
-                <button type="button" class="pref-chip" data-value="new-arrivals">New Arrivals</button>
-                <button type="button" class="pref-chip" data-value="sale">Sale</button>
-                <button type="button" class="pref-chip" data-value="footwear">Footwear</button>
-                <button type="button" class="pref-chip" data-value="apparel">Apparel</button>
-              </div>
-            </div>
-
-            <div class="pref-section">
-              <p class="pref-label">Favorite brands</p>
-              <div class="pref-options pref-options--wrap" data-pref-brands>
-                <button type="button" class="pref-chip" data-value="vans">Vans</button>
-                <button type="button" class="pref-chip" data-value="hoka">Hoka</button>
-                <button type="button" class="pref-chip" data-value="lady-white">Lady White Co.</button>
-                <button type="button" class="pref-chip" data-value="puma">Puma</button>
-                <button type="button" class="pref-chip" data-value="saucony">Saucony</button>
-                <button type="button" class="pref-chip" data-value="dr-martens">Dr. Martens</button>
-                <button type="button" class="pref-chip" data-value="velva-sheen">Velva Sheen</button>
-              </div>
-            </div>
-
-            <label class="pref-toggle">
-              <input type="checkbox" data-pref-sale-first />
-              <span class="pref-toggle__track"><span class="pref-toggle__thumb"></span></span>
-              Show sale items first
+          <form class="profile-form" data-profile-form>
+            <label class="profile-field profile-field--name">
+              <span>Name</span>
+              <input type="text" name="name" autocomplete="name" />
             </label>
+            <label class="profile-field">
+              <span>Email</span>
+              <input type="email" name="email" required autocomplete="email" />
+            </label>
+            <label class="profile-field">
+              <span>Password</span>
+              <input type="password" name="password" required minlength="8" autocomplete="current-password" />
+            </label>
+            <p class="profile-form__error" data-profile-error hidden></p>
+            <button class="btn btn--primary btn--block profile-form__submit" type="submit" data-profile-submit>Sign in</button>
+          </form>
 
-            <button class="btn btn--primary btn--block profile-form__submit" type="button" data-profile-save-prefs>Save & Continue</button>
-            <button class="profile-skip" type="button" data-profile-skip-prefs>Skip for now</button>
-          </div>
-
-          <!-- Step 3: Welcome -->
-          <div class="profile-step" data-profile-step="3" hidden>
-            <div class="profile-modal__icon profile-modal__icon--done" aria-hidden="true">
-              <svg width="40" height="40" viewBox="0 0 40 40" fill="none"><circle cx="20" cy="20" r="18" stroke="currentColor" stroke-width="2"/><path d="M13 20l5 5 9-9" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
-            </div>
-            <h2 class="profile-modal__title">You're all set, <span data-welcome-name></span></h2>
-            <p class="profile-modal__sub">Your August experience is now personalized. We'll remember your preferences every time you visit.</p>
-            <button class="btn btn--primary btn--block profile-form__submit" type="button" data-profile-done>Start Shopping</button>
-          </div>
+          <p class="auth-footnote">By continuing, you agree to August's <a href="#">Terms</a> and <a href="#">Privacy Policy</a>.</p>
         </div>
       </div>
 
@@ -176,8 +128,7 @@ document.addEventListener("DOMContentLoaded", () => {
             <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M1 1l10 10M11 1L1 11" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>
           </button>
 
-          <h2 class="profile-modal__title">My Settings</h2>
-          <p class="profile-modal__sub">Customize how August works for you.</p>
+          <h2 class="profile-modal__title">Settings</h2>
 
           <div class="pref-section">
             <label class="profile-field">
@@ -271,15 +222,15 @@ document.addEventListener("DOMContentLoaded", () => {
         </div>
         <div class="sheet-list">
           <button class="sheet-list__row" type="button" data-profile-action="settings">
-            <span>My Settings</span>
+            <span>Settings</span>
             <svg width="10" height="10" viewBox="0 0 10 10" fill="none" aria-hidden="true"><path d="M3 1l4 4-4 4" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
           </button>
           <a class="sheet-list__row" href="cart.html">
             <span>Your bag</span>
             <svg width="10" height="10" viewBox="0 0 10 10" fill="none" aria-hidden="true"><path d="M3 1l4 4-4 4" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
           </a>
-          <a class="sheet-list__row" href="#">
-            <span>Order history</span>
+          <a class="sheet-list__row" href="account.html">
+            <span>Orders &amp; account</span>
             <svg width="10" height="10" viewBox="0 0 10 10" fill="none" aria-hidden="true"><path d="M3 1l4 4-4 4" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
           </a>
           <a class="sheet-list__row" href="#">
@@ -291,15 +242,11 @@ document.addEventListener("DOMContentLoaded", () => {
       `;
     } else {
       profileSheetBody.innerHTML = `
-        <div class="profile-sheet__hero">
-          <img class="profile-sheet__hero-pfp" src="assets/avatar-demo.jpg" alt="" />
-          <h3 class="profile-sheet__hero-title">Welcome to August</h3>
-          <p class="profile-sheet__hero-sub">Sign in or create an account to personalize your experience.</p>
-        </div>
-        <button class="btn btn--primary btn--block" type="button" data-profile-action="create">Create Account</button>
-        <button class="btn btn--ghost btn--block" type="button" data-profile-action="signin">Sign In</button>
+        <p class="profile-sheet__hint">Orders, saved items, faster checkout.</p>
+        <button class="btn btn--primary btn--block" type="button" data-profile-action="signin">Sign in</button>
+        <button class="btn btn--ghost btn--block" type="button" data-profile-action="create">Create account</button>
         <div class="sheet-section">
-          <p class="sheet-section__label">Explore without an account</p>
+          <p class="sheet-section__label">Quick links</p>
           <div class="sheet-list">
             <a class="sheet-list__row" href="cart.html">
               <span>Your bag</span>
@@ -425,33 +372,44 @@ document.addEventListener("DOMContentLoaded", () => {
     }, 240);
   };
 
-  const goStep = (n) => {
-    $$("[data-profile-step]").forEach((s) => {
-      s.hidden = s.getAttribute("data-profile-step") !== String(n);
+  /* ── Auth mode (sign in ↔ create) ───────────────────────── */
+
+  const form = $("[data-profile-form]");
+  const nameField = form.querySelector('[name="name"]');
+  const pwField = form.querySelector('[name="password"]');
+  const submitBtn = $("[data-profile-submit]");
+  let authMode = "signin";
+
+  const setAuthMode = (mode) => {
+    authMode = mode;
+    const create = mode === "create";
+    modal.classList.toggle("is-signin", !create);
+    $$("[data-auth-mode]").forEach((tab) => {
+      const active = tab.getAttribute("data-auth-mode") === mode;
+      tab.classList.toggle("is-active", active);
+      tab.setAttribute("aria-selected", String(active));
     });
+    if (nameField) nameField.required = create;
+    if (pwField) pwField.setAttribute("autocomplete", create ? "new-password" : "current-password");
+    if (submitBtn) submitBtn.textContent = create ? "Create account" : "Sign in";
+    const err = $("[data-profile-error]");
+    if (err) err.hidden = true;
   };
 
-  /* ── Actions ────────────────────────────────────────────── */
+  document.addEventListener("click", (e) => {
+    const tab = e.target.closest("[data-auth-mode]");
+    if (tab) setAuthMode(tab.getAttribute("data-auth-mode"));
+  });
 
-  let isSignIn = false;
+  /* ── Actions ────────────────────────────────────────────── */
 
   document.addEventListener("click", (e) => {
     const action = e.target.closest("[data-profile-action]");
     if (!action) return;
     const a = action.getAttribute("data-profile-action");
 
-    if (a === "create") {
-      isSignIn = false;
-      const t = $("[data-modal-title]");
-      if (t) t.textContent = "Create your account";
-      goStep(1);
-      openModal(modal);
-    }
-    if (a === "signin") {
-      isSignIn = true;
-      const t = $("[data-modal-title]");
-      if (t) t.textContent = "Sign in to August";
-      goStep(1);
+    if (a === "create" || a === "signin") {
+      setAuthMode(a === "create" ? "create" : "signin");
       openModal(modal);
     }
     if (a === "settings") {
@@ -465,48 +423,38 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   });
 
-  /* ── Create/Sign-in form ────────────────────────────────── */
-
-  const form = $("[data-profile-form]");
-  let pendingUser = null;
+  /* ── Submit — save and close. No wizard, no fanfare. ────── */
 
   form.addEventListener("submit", (e) => {
     e.preventDefault();
     const fd = new FormData(form);
-    const name = fd.get("name").trim();
-    const email = fd.get("email").trim();
-    const pw = fd.get("password");
+    const name = (fd.get("name") || "").trim();
+    const email = (fd.get("email") || "").trim();
+    const pw = fd.get("password") || "";
 
     const err = $("[data-profile-error]");
+    const fail = (msg) => {
+      err.textContent = msg;
+      err.hidden = false;
+    };
 
-    if (!name || !email) {
-      err.textContent = "Please fill in all fields.";
-      err.hidden = false;
-      return;
-    }
-    if (pw.length < 8) {
-      err.textContent = "Password must be at least 8 characters.";
-      err.hidden = false;
-      return;
-    }
+    if (authMode === "create" && !name) return fail("Enter your name.");
+    if (!email || !email.includes("@")) return fail("Enter a valid email.");
+    if (pw.length < 8) return fail("Password needs at least 8 characters.");
     err.hidden = true;
 
-    if (isSignIn) {
-      const existing = load();
-      if (existing && existing.email === email) {
-        render();
-        closeModal(modal);
-      } else {
-        pendingUser = { ...defaults(), name, email, createdAt: Date.now() };
-        save(pendingUser);
-        render();
-        closeModal(modal);
-      }
-      return;
+    const existing = load();
+    if (authMode === "signin" && existing && existing.email === email) {
+      // Prototype: existing account, keep profile as-is
+    } else {
+      // Prototype: sign-in without an account just creates one quietly
+      const displayName = name || email.split("@")[0].replace(/[._-]+/g, " ");
+      save({ ...defaults(), name: displayName, email, createdAt: Date.now() });
     }
 
-    pendingUser = { ...defaults(), name, email, createdAt: Date.now() };
-    goStep(2);
+    render();
+    closeModal(modal);
+    form.reset();
   });
 
   /* ── Preference chips (shared logic) ────────────────────── */
@@ -525,8 +473,6 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   };
 
-  bindChips($("[data-pref-homepage]"), false);
-  bindChips($("[data-pref-brands]"), true);
   bindChips($("[data-settings-homepage]"), false);
   bindChips($("[data-settings-brands]"), true);
 
@@ -545,61 +491,17 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   };
 
-  /* ── Save prefs (step 2) ────────────────────────────────── */
-
-  const savePrefsAndContinue = () => {
-    if (!pendingUser) return;
-    const homepageChips = readChips($("[data-pref-homepage]"));
-    const brandChips = readChips($("[data-pref-brands]"));
-    const saleFirst = $("[data-pref-sale-first]")?.checked || false;
-
-    pendingUser.homepageView = homepageChips[0] || "default";
-    pendingUser.preferredBrands = brandChips;
-    pendingUser.showSaleFirst = saleFirst;
-
-    save(pendingUser);
-    render();
-
-    const wn = $("[data-welcome-name]");
-    if (wn) wn.textContent = pendingUser.name.split(" ")[0];
-    goStep(3);
-  };
-
-  $("[data-profile-save-prefs]")?.addEventListener("click", savePrefsAndContinue);
-
-  $("[data-profile-skip-prefs]")?.addEventListener("click", () => {
-    if (pendingUser) {
-      save(pendingUser);
-      render();
-    }
-    const wn = $("[data-welcome-name]");
-    if (wn && pendingUser) wn.textContent = pendingUser.name.split(" ")[0];
-    goStep(3);
-  });
-
-  $("[data-profile-done]")?.addEventListener("click", () => {
-    closeModal(modal);
-    form.reset();
-    goStep(1);
-  });
-
   /* ── Close buttons ──────────────────────────────────────── */
 
   $("[data-profile-modal-close]")?.addEventListener("click", () => {
-    if (pendingUser && !load()) {
-      save(pendingUser);
-      render();
-    }
     closeModal(modal);
     form.reset();
-    goStep(1);
   });
 
   backdrop?.addEventListener("click", () => {
     closeModal(modal);
     closeModal(settingsModal);
     form.reset();
-    goStep(1);
   });
 
   /* ── Settings modal ─────────────────────────────────────── */

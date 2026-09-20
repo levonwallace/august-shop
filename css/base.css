@@ -5,6 +5,12 @@
   -webkit-tap-highlight-color: transparent;
 }
 
+/* The hidden attribute always wins — author display rules (flex/grid on a
+   class) must never resurrect an element JS explicitly hid. */
+[hidden] {
+  display: none !important;
+}
+
 html {
   -webkit-font-smoothing: antialiased;
   text-rendering: optimizeLegibility;

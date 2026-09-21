@@ -264,4 +264,32 @@ document.addEventListener("DOMContentLoaded", () => {
       });
     }
   }
+
+  /* ── "Your feed" PLP view ─────────────────────────────────
+     collection.html?feed=1&dept=men&cat=shoes&sale=1 — linked from the
+     personalized home hero. Filters cards by data-cat and rewrites the
+     intro island. Shopify port: this is a filtered collection URL
+     (/collections/mens-shoes?filter.v.availability=sale). */
+  const grid = document.querySelector(".product-grid");
+  const feedParams = new URLSearchParams(location.search);
+  if (grid && feedParams.get("feed")) {
+    const dept = feedParams.get("dept") || "all";
+    const cat = feedParams.get("cat") || "all";
+    const sale = feedParams.get("sale") === "1";
+
+    let shown = 0;
+    grid.querySelectorAll(".product-card").forEach((card) => {
+      const match = cat === "all" || card.getAttribute("data-cat") === cat;
+      card.hidden = !match;
+      if (match) shown++;
+    });
+
+    const island = document.querySelector(".plp-intro__island p");
+    if (island) {
+      const deptLabel = dept === "men" ? "Men's " : dept === "women" ? "Women's " : "";
+      const catLabel = cat === "all" ? "everything" : cat;
+      const saleLabel = sale ? " on sale" : "";
+      island.textContent = `Your feed — ${deptLabel}${catLabel}${saleLabel} · ${shown} product${shown === 1 ? "" : "s"}`;
+    }
+  }
 });

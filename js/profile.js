@@ -1,14 +1,17 @@
 /* August — User Profile & Personalization */
 document.addEventListener("DOMContentLoaded", () => {
   const STORAGE_KEY = "august_user";
+  const SIGNED_OUT_KEY = "august_signed_out";
 
+  /* Shopify port note: this object maps to `customer` + customer metafields
+     (namespace `august.homepage`). The homepage takeover below becomes a
+     Liquid section variant keyed off those metafields. */
   const defaults = () => ({
     name: "",
     email: "",
     avatar: "",
-    homepageView: "default",
+    homepage: { department: "all", category: "all", saleOnly: false },
     preferredBrands: [],
-    showSaleFirst: false,
     createdAt: null,
   });
 
@@ -23,13 +26,50 @@ document.addEventListener("DOMContentLoaded", () => {
 
   const save = (data) => {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+    localStorage.removeItem(SIGNED_OUT_KEY);
     window.dispatchEvent(new CustomEvent("august:profile-changed", { detail: data }));
   };
 
   const logout = () => {
     localStorage.removeItem(STORAGE_KEY);
+    // Remember the explicit sign-out so the demo seed doesn't log back in
+    localStorage.setItem(SIGNED_OUT_KEY, "1");
     window.dispatchEvent(new CustomEvent("august:profile-changed", { detail: null }));
   };
+
+  /* ── Demo seed ────────────────────────────────────────────
+     Prototype ships "already logged in" with the example prefs:
+     homepage set to men's shoes on sale. Sign out to see logged-out. */
+  if (!load() && !localStorage.getItem(SIGNED_OUT_KEY)) {
+    localStorage.setItem(
+      STORAGE_KEY,
+      JSON.stringify({
+        ...defaults(),
+        name: "Levon Wallace",
+        email: "levon@august-shop.com",
+        homepage: { department: "men", category: "shoes", saleOnly: true },
+        preferredBrands: ["vans", "hoka"],
+        createdAt: Date.now() - 1000 * 60 * 60 * 24 * 90,
+      })
+    );
+  }
+
+  /* Human-readable label for a homepage pref, e.g. "Men's shoes on sale" */
+  const feedLabel = (hp) => {
+    if (!hp) return "";
+    const dept = hp.department === "men" ? "men's" : hp.department === "women" ? "women's" : "";
+    const cat = { shoes: "shoes", apparel: "apparel", accessories: "accessories" }[hp.category] || "everything";
+    let label = [dept, cat].filter(Boolean).join(" ");
+    if (hp.saleOnly) label += " on sale";
+    return label.charAt(0).toUpperCase() + label.slice(1);
+  };
+
+  const feedIsDefault = (hp) =>
+    !hp ||
+    ((hp.department || "all") === "all" && (hp.category || "all") === "all" && !hp.saleOnly);
+
+  // Shared with account.js
+  window.AugustProfile = { load, save, feedLabel, feedIsDefault };
 
   const initials = (name) => {
     if (!name) return "?";
@@ -138,17 +178,6 @@ document.addEventListener("DOMContentLoaded", () => {
           </div>
 
           <div class="pref-section">
-            <p class="pref-label">Homepage view</p>
-            <div class="pref-options" data-settings-homepage>
-              <button type="button" class="pref-chip" data-value="default">Default</button>
-              <button type="button" class="pref-chip" data-value="new-arrivals">New Arrivals</button>
-              <button type="button" class="pref-chip" data-value="sale">Sale</button>
-              <button type="button" class="pref-chip" data-value="footwear">Footwear</button>
-              <button type="button" class="pref-chip" data-value="apparel">Apparel</button>
-            </div>
-          </div>
-
-          <div class="pref-section">
             <p class="pref-label">Favorite brands</p>
             <div class="pref-options pref-options--wrap" data-settings-brands>
               <button type="button" class="pref-chip" data-value="vans">Vans</button>
@@ -161,13 +190,9 @@ document.addEventListener("DOMContentLoaded", () => {
             </div>
           </div>
 
-          <label class="pref-toggle">
-            <input type="checkbox" data-settings-sale-first />
-            <span class="pref-toggle__track"><span class="pref-toggle__thumb"></span></span>
-            Show sale items first
-          </label>
+          <p class="profile-modal__note">Homepage preferences live on your <a href="account.html">account page</a>.</p>
 
-          <button class="btn btn--primary btn--block profile-form__submit" type="button" data-settings-save>Save Settings</button>
+          <button class="btn btn--primary btn--block profile-form__submit" type="button" data-settings-save>Save</button>
         </div>
       </div>
     `;
@@ -529,10 +554,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const nameInput = $("[data-settings-name]");
     if (nameInput) user.name = nameInput.value.trim() || user.name;
 
-    const hp = readChips($("[data-settings-homepage]"));
-    user.homepageView = hp[0] || "default";
     user.preferredBrands = readChips($("[data-settings-brands]"));
-    user.showSaleFirst = $("[data-settings-sale-first]")?.checked || false;
 
     save(user);
     render();
@@ -541,53 +563,52 @@ document.addEventListener("DOMContentLoaded", () => {
 
   $("[data-settings-close]")?.addEventListener("click", () => closeModal(settingsModal));
 
-  /* ── Homepage personalization ────────────────────────────── */
+  /* ── Homepage takeover ────────────────────────────────────
+     If the signed-in user set a homepage preference (account page),
+     the home hero opens on their feed. Shopify port: this becomes a
+     Liquid conditional on customer metafields rendering an alternate
+     hero section — same data, server-side. */
 
   const applyHomepagePrefs = () => {
     const user = load();
-    if (!user || !document.querySelector(".page--home")) return;
+    if (!document.querySelector(".page--home")) return;
 
-    const view = user.homepageView;
-    if (view === "default") return;
+    const hp = user?.homepage;
+    if (!user || feedIsDefault(hp)) return;
 
     const heroTitle = document.querySelector(".home-copy h1");
     const heroSub = document.querySelector(".home-copy p");
-    const badge = document.querySelector(".announce-chip");
+    // Prefer the hero's own chip; fall back to the header promo chip
+    const badge =
+      document.querySelector(".announce-chip--hero") || document.querySelector(".announce-chip");
+    const primaryCta = document.querySelector(".btn--home-primary");
 
-    const viewLabels = {
-      "new-arrivals": { title: "New Arrivals", sub: "Your personalized feed — the latest drops curated for you." },
-      sale: { title: "On Sale Now", sub: "Deals picked just for you — your favorites at the best prices." },
-      footwear: { title: "Fresh Kicks", sub: "Your homepage, tuned to footwear. All the latest shoes in one place." },
-      apparel: { title: "Apparel For You", sub: "Tops, hoodies, and more — curated to your taste." },
-    };
+    const label = feedLabel(hp);
+    const labelNoSale = feedLabel({ ...hp, saleOnly: false });
 
-    const label = viewLabels[view];
-    if (label && heroTitle && heroSub) {
-      heroTitle.innerHTML = label.title;
-      heroSub.textContent = label.sub;
+    if (heroTitle) {
+      heroTitle.innerHTML = hp.saleOnly
+        ? `${labelNoSale},<br />on sale.`
+        : `${labelNoSale},<br />new weekly.`;
     }
-
-    if (user.preferredBrands.length) {
-      const brandMap = {
-        vans: "Vans",
-        hoka: "Hoka",
-        "lady-white": "Lady White Co.",
-        puma: "Puma",
-        saucony: "Saucony",
-        "dr-martens": "Dr. Martens",
-        "velva-sheen": "Velva Sheen",
-      };
-      const names = user.preferredBrands.map((b) => brandMap[b] || b).join(", ");
-      if (heroSub) {
-        heroSub.textContent += ` Following: ${names}.`;
-      }
+    if (heroSub) {
+      heroSub.innerHTML = `Your homepage is set to ${label.toLowerCase()} — <a href="account.html">change it</a> anytime.`;
     }
-
-    if (badge && view !== "default") {
+    if (badge) {
       const dot = badge.querySelector(".dot");
       badge.innerHTML = "";
       if (dot) badge.appendChild(dot);
-      badge.append(`Personalized for ${user.name.split(" ")[0]}`);
+      badge.append(`Your feed · ${label}`);
+    }
+    if (primaryCta) {
+      primaryCta.textContent = "Shop your feed";
+      const params = new URLSearchParams({
+        feed: "1",
+        dept: hp.department || "all",
+        cat: hp.category || "all",
+        sale: hp.saleOnly ? "1" : "0",
+      });
+      primaryCta.href = `collection.html?${params}`;
     }
   };
 

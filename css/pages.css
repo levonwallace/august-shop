@@ -920,6 +920,40 @@
   font-variant-numeric: tabular-nums;
 }
 
+/* Left column: homepage customizer + orders */
+.account-main {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  min-width: 0;
+}
+
+.account-card__hint {
+  margin: -8px 0 18px;
+  font-size: 12px;
+  color: var(--color-muted);
+}
+
+.account-homepage .pref-label {
+  margin-top: 4px;
+}
+
+.account-homepage__row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin-top: 4px;
+}
+
+.account-homepage__preview {
+  margin: 0;
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--color-muted);
+  min-width: 0;
+}
+
 /* Side cards */
 .account-side {
   display: flex;

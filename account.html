@@ -161,7 +161,41 @@
           <p class="account-sub" data-account-email></p>
 
           <div class="account-layout">
-            <section class="glass-panel account-orders" aria-labelledby="orders-heading">
+            <div class="account-main">
+              <!-- Homepage customizer — the site opens to this feed.
+                   Shopify port: writes customer metafields (august.homepage). -->
+              <section class="glass-panel account-card account-homepage" aria-labelledby="homepage-heading">
+                <h2 id="homepage-heading">My homepage</h2>
+                <p class="account-card__hint">August opens to this feed every time you visit.</p>
+
+                <p class="pref-label">Department</p>
+                <div class="pref-options" data-home-dept>
+                  <button type="button" class="pref-chip" data-value="all">Everything</button>
+                  <button type="button" class="pref-chip" data-value="men">Men</button>
+                  <button type="button" class="pref-chip" data-value="women">Women</button>
+                </div>
+
+                <p class="pref-label">Category</p>
+                <div class="pref-options" data-home-cat>
+                  <button type="button" class="pref-chip" data-value="all">All</button>
+                  <button type="button" class="pref-chip" data-value="shoes">Shoes</button>
+                  <button type="button" class="pref-chip" data-value="apparel">Apparel</button>
+                  <button type="button" class="pref-chip" data-value="accessories">Accessories</button>
+                </div>
+
+                <label class="pref-toggle">
+                  <input type="checkbox" data-home-sale />
+                  <span class="pref-toggle__track"><span class="pref-toggle__thumb"></span></span>
+                  Sale items only
+                </label>
+
+                <div class="account-homepage__row">
+                  <p class="account-homepage__preview" data-home-preview></p>
+                  <button class="btn btn--primary" type="button" data-home-save>Save</button>
+                </div>
+              </section>
+
+              <section class="glass-panel account-orders" aria-labelledby="orders-heading">
               <h2 id="orders-heading">Orders</h2>
 
               <a class="order-row" href="product.html">
@@ -193,7 +227,8 @@
                 <span class="order-status order-status--done">Delivered</span>
                 <span class="order-row__price">$190.00</span>
               </a>
-            </section>
+              </section>
+            </div>
 
             <aside class="account-side">
               <div class="glass-panel account-card">

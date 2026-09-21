@@ -360,7 +360,11 @@
         <!-- Card 3: Dr Martens -->
         <div class="card-stack__card card-stack__card--brand" data-card="3">
           <a class="brand-banner brand-banner--full" href="collection.html">
-            <img class="brand-banner__media" src="assets/banner-dr-martens.jpg" alt="" width="1312" height="738" />
+            <picture>
+              <!-- Portrait art for the tall mobile card; landscape everywhere else -->
+              <source media="(max-width: 900px)" srcset="assets/banner-dr-martens-mobile.jpg" width="720" height="1280" />
+              <img class="brand-banner__media" src="assets/banner-dr-martens.jpg" alt="" width="1312" height="738" />
+            </picture>
             <span class="brand-banner__overlay" aria-hidden="true"></span>
             <span class="brand-banner__content">
               <span class="brand-banner__title">DR MARTENS</span>

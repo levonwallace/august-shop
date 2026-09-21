@@ -169,10 +169,16 @@ document.addEventListener("DOMContentLoaded", () => {
 
   /* ── Pointer drag (touch + mouse unified) ──────────────── */
 
-  const skipDrag = (el) =>
-    el.closest(
+  const skipDrag = (el) => {
+    const hit = el.closest(
       "button, a, input, select, textarea, .waveform, .audio-player__queue, .profile-drop, .profile-modal, .sheet, .tabbar"
     );
+    // Brand banner cards are one full-card link with nothing to scroll —
+    // vertical drags there belong to the stack. A tap/click without a
+    // drag still navigates (drags suppress the click below).
+    if (hit && hit.classList.contains("brand-banner")) return null;
+    return hit;
+  };
 
   let startY = 0;
   let startX = 0;
@@ -321,6 +327,14 @@ document.addEventListener("DOMContentLoaded", () => {
       return;
     }
     dragging = false;
+    // A real drag on a banner card must not fire the banner's link. The
+    // flag expires quickly so a later genuine tap still navigates even if
+    // the browser swallowed the post-drag click itself.
+    if (Math.abs(dy) > 6) {
+      suppressClick = true;
+      clearTimeout(suppressClickTimer);
+      suppressClickTimer = setTimeout(() => { suppressClick = false; }, 150);
+    }
     try { stack.releasePointerCapture(e.pointerId); } catch {}
     const dt = Math.max(1, performance.now() - startTime);
     const velocity = -dy / dt; // px/ms, positive = swiping up
@@ -336,6 +350,26 @@ document.addEventListener("DOMContentLoaded", () => {
 
   stack.addEventListener("pointerup", onUp);
   stack.addEventListener("pointercancel", onUp);
+
+  /* After a drag gesture, swallow the click so banner links only navigate
+     on a genuine tap/click (capture phase beats the anchor's default). */
+  let suppressClick = false;
+  let suppressClickTimer = null;
+  stack.addEventListener(
+    "click",
+    (e) => {
+      if (!suppressClick) return;
+      suppressClick = false;
+      e.preventDefault();
+      e.stopPropagation();
+    },
+    true
+  );
+
+  /* Keep the browser from starting a native link/image drag mid-swipe */
+  stack.addEventListener("dragstart", (e) => {
+    if (e.target.closest(".card-stack__card--brand")) e.preventDefault();
+  });
 
   /* ── Touch: scrollable cards advance at their edges ────────
      Cards with [data-card-scroll] scroll natively, which means the

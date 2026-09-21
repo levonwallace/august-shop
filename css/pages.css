@@ -61,24 +61,6 @@
   margin-bottom: 24px;
 }
 
-.cta-row {
-  display: flex;
-  gap: 12px;
-  align-items: center;
-}
-
-/* CTA row lives below the product grid — span both hero columns */
-.home-layout > .cta-row {
-  grid-column: 1 / -1;
-  justify-content: center;
-}
-
-/* 50% thinner CTA buttons */
-.cta-row .btn {
-  padding-top: 3px;
-  padding-bottom: 3px;
-}
-
 /* Mobile-only carousel heading — hidden on desktop */
 .home-grid__title {
   display: none;
@@ -1396,10 +1378,6 @@
     letter-spacing: -0.5px;
   }
 
-  .cta-row {
-    flex-wrap: wrap;
-  }
-
   .home-grid {
     gap: 12px;
   }
@@ -1586,10 +1564,6 @@
   .home-tile,
   .home-tile--tall {
     aspect-ratio: 1 / 1.05;
-  }
-
-  .cta-row .btn {
-    width: 100%;
   }
 
   .cart-line {

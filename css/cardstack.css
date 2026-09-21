@@ -293,10 +293,10 @@
   flex: 0 0 auto;
   height: 100%;
   align-items: stretch;
-  /* Desktop: headline, "new arrivals" tag, product grid, CTA row last. */
-  grid-template-columns: 1fr;
-  grid-template-rows: auto auto minmax(0, 1fr) auto;
-  gap: 24px 48px;
+  /* Desktop: copy left, one large hero photo right. */
+  grid-template-columns: minmax(260px, 1fr) minmax(0, 56%);
+  grid-template-rows: 1fr;
+  gap: 32px 48px;
   min-height: 0;
   max-width: none;
   width: 100%;
@@ -305,8 +305,15 @@
 .card-stack .home-copy {
   display: flex;
   flex-direction: column;
-  justify-content: flex-start;
+  justify-content: center;
+  grid-column: 1;
+  grid-row: 1;
   min-height: 0;
+  max-width: 460px;
+}
+
+.card-stack .home-copy h1 {
+  margin-bottom: 0;
 }
 
 /* Desktop header already carries the announce chip — hide the hero copy
@@ -316,35 +323,32 @@
   display: none;
 }
 
-/* "new arrivals" text label above the product cards — same voice as the
-   mobile "new footwear" heading. Hidden on mobile, which has that heading. */
-.card-stack .home-grid__tag {
-  justify-self: start;
-  margin: 0 0 -10px;
-  font-size: 12px;
-  font-weight: 500;
-  letter-spacing: 1.32px;
-  text-transform: lowercase;
-  color: var(--color-ink);
+/* Tag / carousel title are for the mobile strip — hide on desktop. */
+.card-stack .home-grid__tag,
+.card-stack .home-grid__title {
+  display: none;
 }
 
 .card-stack .home-grid {
-  /* 6 featured products on desktop: 3 across × 2 rows, large enough to read */
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  grid-template-rows: 1fr 1fr;
-  gap: 20px;
+  grid-column: 2;
+  grid-row: 1;
+  display: block;
+  justify-self: stretch;
+  width: 100%;
   height: 100%;
   min-height: 0;
 }
 
-/* Desktop-only tiles fill the second row (carousel extras stay mobile-only) */
-.card-stack .home-grid .home-tile--desktop {
-  display: block;
+/* One featured photo on desktop — the rest stay in the mobile carousel. */
+.card-stack .home-grid > .home-tile:not(.home-tile--hero) {
+  display: none;
 }
 
-/* Keep a 3×2 featured mosaic — extra desktop tiles would shrink every image */
-.card-stack .home-grid .home-tile--desktop:nth-child(n + 10) {
-  display: none;
+.card-stack .home-tile--hero {
+  display: block;
+  height: 100%;
+  min-height: 0;
+  aspect-ratio: auto;
 }
 
 .card-stack .home-tile,
@@ -477,19 +481,12 @@
   }
 
   .card-stack .home-layout {
-    gap: 20px 24px;
+    grid-template-columns: minmax(240px, 1fr) minmax(0, 54%);
+    gap: 24px 36px;
   }
 
-  .card-stack .home-copy h1 {
-    margin-bottom: 16px;
-  }
-
-  .card-stack .home-copy p {
-    margin-bottom: 16px;
-  }
-
-  .card-stack .home-grid {
-    gap: 16px 24px;
+  .card-stack .home-copy {
+    max-width: 380px;
   }
 }
 
@@ -542,17 +539,35 @@
 
   .card-stack .home-layout {
     grid-template-columns: 1fr;
-    grid-template-rows: auto auto 1fr auto;
+    grid-template-rows: auto auto 1fr;
     gap: 16px;
+  }
+
+  .card-stack .home-copy {
+    grid-column: auto;
+    grid-row: auto;
+    justify-content: flex-start;
+    max-width: none;
+  }
+
+  .card-stack .home-grid {
+    grid-column: auto;
+    grid-row: auto;
+    justify-self: stretch;
+    max-width: none;
+  }
+
+  .card-stack .home-grid > .home-tile:not(.home-tile--hero) {
+    display: block;
+  }
+
+  .card-stack .home-tile--hero {
+    padding: 0;
   }
 
   /* Mobile carousel already has its "new footwear" heading */
   .card-stack .home-grid__tag {
     display: none;
-  }
-
-  .card-stack .home-copy {
-    justify-content: flex-start;
   }
 
   /* Mobile keeps the hero chip — it's the only visible sale tag here */

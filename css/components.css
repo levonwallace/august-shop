@@ -668,21 +668,6 @@ a.brand-dir__head {
   width: 100%;
 }
 
-.btn--home-primary {
-  background: var(--color-ink-verdigris);
-  color: #fff;
-}
-
-@media (hover: hover) {
-  .btn--home-primary:hover {
-    background: var(--color-ink-verdigris-hover);
-  }
-}
-.btn--home-primary:active {
-  background: var(--color-ink-verdigris-hover);
-  transform: scale(0.98);
-}
-
 /* —— Product card —— */
 .product-card {
   display: flex;

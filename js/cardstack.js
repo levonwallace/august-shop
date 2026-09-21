@@ -185,14 +185,8 @@ document.addEventListener("DOMContentLoaded", () => {
      movement still clicks through; a confirmed drag suppresses the click. */
   const skipDrag = (el) =>
     el.closest(
-      "input, select, textarea, .waveform, .audio-player__queue, .profile-drop, .profile-modal, .sheet, .tabbar"
+      "input, select, textarea, .waveform, .audio-player__queue, .profile-drop, .profile-modal, .sheet, .tabbar, .home-tile, .product-card, a.btn"
     );
-    // Brand banner cards are one full-card link with nothing to scroll —
-    // vertical drags there belong to the stack. A tap/click without a
-    // drag still navigates (drags suppress the click below).
-    if (hit && hit.classList.contains("brand-banner")) return null;
-    return hit;
-  };
 
   let startY = 0;
   let startX = 0;

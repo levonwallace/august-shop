@@ -70,9 +70,55 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
+  /* Real AUX cover art scraped from august-shop.com/blogs/august-aux.
+     Exact match where our number exists in the real archive; otherwise
+     cycle the pool so every tile shows real artwork. */
+  const ART_BY_NO = {
+  "060": "https://cdn.shopify.com/s/files/1/2729/9188/files/AUGUST_AUX_060_PLAYLIST_COVER_1024x1024.png?v=1678650416",
+  "058": "https://cdn.shopify.com/s/files/1/2729/9188/files/AUGUST_AUX_058_PLAYLIST_COVER_1024x1024.png?v=1675083380",
+  "056": "https://cdn.shopify.com/s/files/1/2729/9188/files/AUGUST_AUX_056_PLAYLIST_COVER_1024x1024.jpg?v=1672425632",
+  "055": "https://cdn.shopify.com/s/files/1/2729/9188/files/AUGUST_AUX_055_PLAYLIST_COVER_1024x1024.png?v=1670467940",
+  "052": "https://cdn.shopify.com/s/files/1/2729/9188/files/AUGUST_AUX_052_SC_COVER_1024x1024.png?v=1666927960",
+  "051": "https://cdn.shopify.com/s/files/1/2729/9188/files/AUGUST_AUX_051_PLAYLIST_COVER_1024x1024.png?v=1666926095",
+  "050": "https://cdn.shopify.com/s/files/1/2729/9188/files/AUGUST_AUX_050_PLAYLIST_COVER_1024x1024.jpg?v=1664029953",
+  "049": "https://cdn.shopify.com/s/files/1/2729/9188/files/AUGUST_AUX_049_PLAYLIST_COVER_1024x1024.jpg?v=1663086818",
+  "048": "https://cdn.shopify.com/s/files/1/2729/9188/files/AUGUST_AUX_048_PLAYLIST_COVER_1024x1024.png?v=1660420109",
+  "046": "https://cdn.shopify.com/s/files/1/2729/9188/files/AUGUST_AUX_046_PLAYLIST_COVER_1024x1024.jpg?v=1657301147",
+  "045": "https://cdn.shopify.com/s/files/1/2729/9188/files/AUGUST_AUX_045_PLAYLIST_COVER_1024x1024.jpg?v=1655590105",
+  "044": "https://cdn.shopify.com/s/files/1/2729/9188/files/AUGUST_AUX_044_PLAYLIST_COVER_1024x1024.jpg?v=1654461535",
+  "043": "https://cdn.shopify.com/s/files/1/2729/9188/files/AUGUST_AUX_043_PLAYLIST_COVER_1024x1024.jpg?v=1654149933",
+  "042": "https://cdn.shopify.com/s/files/1/2729/9188/files/AUGUST_AUX_042_PLAYLIST_COVER_1024x1024.jpg?v=1649774525",
+  "041": "https://cdn.shopify.com/s/files/1/2729/9188/files/AUGUST_AUX_041_PLAYLIST_COVER_1024x1024.jpg?v=1649460194",
+  "040": "https://cdn.shopify.com/s/files/1/2729/9188/files/AUGUST_AUX_040_PLAYLIST_COVER_1024x1024.jpg?v=1648600057",
+  "039": "https://cdn.shopify.com/s/files/1/2729/9188/files/AUGUST_AUX_039_PLAYLIST_COVER_1024x1024.jpg?v=1648600138",
+  "038": "https://cdn.shopify.com/s/files/1/2729/9188/files/AUGUST_AUX_038_SPOTIFY_COVER_1024x1024.jpg?v=1655571985",
+  "036": "https://cdn.shopify.com/s/files/1/2729/9188/files/August_Aux_036_spotify_cover_1024x1024.jpg?v=1655572117"
+};
+  const ART_POOL = [
+  "https://cdn.shopify.com/s/files/1/2729/9188/files/AUGUST_AUX_060_PLAYLIST_COVER_1024x1024.png?v=1678650416",
+  "https://cdn.shopify.com/s/files/1/2729/9188/files/AUGUST_AUX_058_PLAYLIST_COVER_1024x1024.png?v=1675083380",
+  "https://cdn.shopify.com/s/files/1/2729/9188/files/AUGUST_AUX_056_PLAYLIST_COVER_1024x1024.jpg?v=1672425632",
+  "https://cdn.shopify.com/s/files/1/2729/9188/files/AUGUST_AUX_055_PLAYLIST_COVER_1024x1024.png?v=1670467940",
+  "https://cdn.shopify.com/s/files/1/2729/9188/files/AUGUST_AUX_052_SC_COVER_1024x1024.png?v=1666927960",
+  "https://cdn.shopify.com/s/files/1/2729/9188/files/AUGUST_AUX_051_PLAYLIST_COVER_1024x1024.png?v=1666926095",
+  "https://cdn.shopify.com/s/files/1/2729/9188/files/AUGUST_AUX_050_PLAYLIST_COVER_1024x1024.jpg?v=1664029953",
+  "https://cdn.shopify.com/s/files/1/2729/9188/files/AUGUST_AUX_049_PLAYLIST_COVER_1024x1024.jpg?v=1663086818",
+  "https://cdn.shopify.com/s/files/1/2729/9188/files/AUGUST_AUX_048_PLAYLIST_COVER_1024x1024.png?v=1660420109",
+  "https://cdn.shopify.com/s/files/1/2729/9188/files/AUGUST_AUX_046_PLAYLIST_COVER_1024x1024.jpg?v=1657301147",
+  "https://cdn.shopify.com/s/files/1/2729/9188/files/AUGUST_AUX_045_PLAYLIST_COVER_1024x1024.jpg?v=1655590105",
+  "https://cdn.shopify.com/s/files/1/2729/9188/files/AUGUST_AUX_044_PLAYLIST_COVER_1024x1024.jpg?v=1654461535",
+  "https://cdn.shopify.com/s/files/1/2729/9188/files/AUGUST_AUX_043_PLAYLIST_COVER_1024x1024.jpg?v=1654149933",
+  "https://cdn.shopify.com/s/files/1/2729/9188/files/AUGUST_AUX_042_PLAYLIST_COVER_1024x1024.jpg?v=1649774525",
+  "https://cdn.shopify.com/s/files/1/2729/9188/files/AUGUST_AUX_041_PLAYLIST_COVER_1024x1024.jpg?v=1649460194",
+  "https://cdn.shopify.com/s/files/1/2729/9188/files/AUGUST_AUX_040_PLAYLIST_COVER_1024x1024.jpg?v=1648600057",
+  "https://cdn.shopify.com/s/files/1/2729/9188/files/AUGUST_AUX_039_PLAYLIST_COVER_1024x1024.jpg?v=1648600138",
+  "https://cdn.shopify.com/s/files/1/2729/9188/files/AUGUST_AUX_038_SPOTIFY_COVER_1024x1024.jpg?v=1655571985",
+  "https://cdn.shopify.com/s/files/1/2729/9188/files/August_Aux_036_spotify_cover_1024x1024.jpg?v=1655572117"
+];
+  const artFor = (no, i) => ART_BY_NO[no] || ART_POOL[i % ART_POOL.length];
+
   const PAGE_SIZE = 9;
   const PAGES = Math.ceil(MIXES.length / PAGE_SIZE);
-  const ART = ["vol14", "vol15", "vol16", "g4", "g5", "g6"];
 
   let page = 0;
   let selectedNo = MIXES[0].no;
@@ -82,16 +128,15 @@ document.addEventListener("DOMContentLoaded", () => {
     if (!gridEl) return;
     const slice = MIXES.slice(page * PAGE_SIZE, page * PAGE_SIZE + PAGE_SIZE);
     gridEl.innerHTML = slice
-      .map(
-        (m) => `
+      .map((m, i) => {
+        const abs = page * PAGE_SIZE + i;
+        return `
       <button class="radio-cover aux-tile${m.no === selectedNo ? " is-active" : ""}" type="button" data-aux-no="${m.no}" aria-label="Play AUGUST AUX ${m.no} — ${m.name}">
-        <div class="radio-cover__art radio-cover__art--${ART[m.art]}">
-          <span class="radio-cover__vol">AUX :: ${m.no}</span>
-          <span class="radio-cover__name">${m.name}</span>
-          <span class="aux-tile__genre">${m.genre}</span>
-        </div>
-      </button>`
-      )
+        <div class="aux-tile__art"><img src="${artFor(m.no, abs)}" alt="" loading="lazy" /></div>
+        <span class="aux-tile__no">AUX :: ${m.no} · ${m.genre}</span>
+        <span class="aux-tile__title">${m.name}</span>
+      </button>`;
+      })
       .join("");
   };
 

@@ -337,6 +337,55 @@ document.addEventListener("DOMContentLoaded", () => {
   stack.addEventListener("pointerup", onUp);
   stack.addEventListener("pointercancel", onUp);
 
+  /* ── Touch: scrollable cards advance at their edges ────────
+     Cards with [data-card-scroll] scroll natively, which means the
+     pointer-drag above never fires inside them (the browser owns the
+     gesture). Mirror the wheel behavior for touch: once the scroller
+     is at its top/bottom edge, a continued swipe flips the card
+     instead of dead-ending — no more tapping dots to advance. */
+  const EDGE_SWIPE = 56; // px past the edge before the card flips
+  stack.querySelectorAll("[data-card-scroll]").forEach((scroller) => {
+    let startTouchY = 0;
+    let atTopAtStart = false;
+    let atBottomAtStart = false;
+    let consumed = false;
+
+    scroller.addEventListener(
+      "touchstart",
+      (e) => {
+        startTouchY = e.touches[0].clientY;
+        atTopAtStart = scroller.scrollTop <= 1;
+        atBottomAtStart = scroller.scrollTop + scroller.clientHeight >= scroller.scrollHeight - 2;
+        consumed = false;
+      },
+      { passive: true }
+    );
+
+    scroller.addEventListener(
+      "touchmove",
+      (e) => {
+        if (consumed || animating) return;
+        const dy = e.touches[0].clientY - startTouchY;
+        const atTop = scroller.scrollTop <= 1;
+        const atBottom = scroller.scrollTop + scroller.clientHeight >= scroller.scrollHeight - 2;
+
+        // Swipe up while pinned to the bottom → next card
+        if (dy < -EDGE_SWIPE && atBottom && atBottomAtStart) {
+          consumed = true;
+          e.preventDefault();
+          next();
+        }
+        // Swipe down while pinned to the top → previous card
+        else if (dy > EDGE_SWIPE && atTop && atTopAtStart) {
+          consumed = true;
+          e.preventDefault();
+          prev();
+        }
+      },
+      { passive: false }
+    );
+  });
+
   /* ── Keyboard ──────────────────────────────────────────── */
   window.addEventListener("keydown", (e) => {
     if (e.target.closest("input, textarea, select")) return;

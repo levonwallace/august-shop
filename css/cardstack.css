@@ -1501,3 +1501,227 @@
     font-size: 13px;
   }
 }
+
+/* ══════════════════════════════════════════════════════════════
+   AUX card — light theme override (white, not black) + real-art tiles.
+   Overrides the original dark styling wholesale; scoped to the card so
+   nothing else shifts.
+   ══════════════════════════════════════════════════════════════ */
+
+.card-stack__card--radio {
+  background: #fff;
+  color: var(--color-ink);
+}
+
+.card-stack__card--radio .radio-card {
+  scrollbar-color: rgba(15, 15, 15, 0.18) transparent;
+}
+
+.card-stack__card--radio .radio-hero__badge {
+  color: #2a7a33;
+}
+
+.card-stack__card--radio .radio-hero__tagline {
+  color: var(--color-muted);
+}
+
+.card-stack__card--radio .radio-hero__submit {
+  color: var(--color-muted-2);
+}
+
+.card-stack__card--radio .radio-hero__submit a {
+  color: #2a7a33;
+}
+
+/* ── Tiles: real album artwork, labels below (like the blog) ── */
+.card-stack__card--radio .aux-tile {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 8px;
+  text-align: left;
+}
+
+.card-stack__card--radio .aux-tile__art {
+  width: 100%;
+  aspect-ratio: 1;
+  overflow: hidden;
+  background: #f2f2ef;
+  border: 1px solid rgba(15, 15, 15, 0.08);
+}
+
+.card-stack__card--radio .aux-tile__art img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.card-stack__card--radio .aux-tile.is-active .aux-tile__art {
+  border-color: #2a7a33;
+  box-shadow: 0 0 0 2px rgba(42, 122, 51, 0.25);
+}
+
+.card-stack__card--radio .aux-tile__no {
+  font-size: 9px;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--color-muted);
+}
+
+.card-stack__card--radio .aux-tile.is-active .aux-tile__no {
+  color: #2a7a33;
+}
+
+.card-stack__card--radio .aux-tile__title {
+  font-size: 12px;
+  font-weight: 500;
+  line-height: 1.3;
+  color: var(--color-ink);
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+/* ── Now playing bar ── */
+.card-stack__card--radio .radio-hero__now-playing {
+  background: rgba(15, 15, 15, 0.035);
+  border-color: rgba(15, 15, 15, 0.07);
+}
+
+@media (hover: hover) {
+  .card-stack__card--radio .radio-hero__now-playing:hover {
+    background: rgba(15, 15, 15, 0.055);
+  }
+}
+
+.card-stack__card--radio .radio-hero__track-title {
+  color: var(--color-ink);
+}
+
+.card-stack__card--radio .radio-hero__track-sub {
+  color: var(--color-muted);
+}
+
+.card-stack__card--radio .radio-hero__play {
+  color: var(--color-ink);
+}
+
+@media (hover: hover) {
+  .card-stack__card--radio .radio-hero__play:hover {
+    color: #2a7a33;
+  }
+}
+
+.card-stack__card--radio .radio-hero__expand {
+  color: rgba(15, 15, 15, 0.45);
+}
+
+@media (hover: hover) {
+  .card-stack__card--radio .radio-hero__expand:hover {
+    color: var(--color-ink);
+  }
+}
+
+.card-stack__card--radio .radio-seek__track {
+  background: rgba(15, 15, 15, 0.1);
+}
+
+.card-stack__card--radio .radio-seek__fill {
+  background: #3aa046;
+}
+
+.card-stack__card--radio .radio-hero__time {
+  color: var(--color-muted);
+}
+
+.card-stack__card--radio .radio-hero__skip-btn {
+  color: rgba(15, 15, 15, 0.6);
+}
+
+@media (hover: hover) {
+  .card-stack__card--radio .radio-hero__skip-btn:hover {
+    color: var(--color-ink);
+    background: rgba(15, 15, 15, 0.05);
+  }
+}
+
+.card-stack__card--radio .radio-wave span {
+  background: #3aa046;
+}
+
+/* ── Dividers / pagination / archive link ── */
+.card-stack__card--radio .radio-card__divider {
+  background: rgba(15, 15, 15, 0.08);
+}
+
+.card-stack__card--radio .aux-page {
+  border-color: rgba(15, 15, 15, 0.14);
+  background: rgba(15, 15, 15, 0.03);
+  color: var(--color-muted-2);
+}
+
+@media (hover: hover) {
+  .card-stack__card--radio .aux-page:hover:not(.is-active):not(:disabled) {
+    color: var(--color-ink);
+    border-color: rgba(15, 15, 15, 0.35);
+  }
+}
+
+.card-stack__card--radio .aux-page.is-active {
+  background: var(--color-ink);
+  border-color: transparent;
+  color: #fff;
+}
+
+.card-stack__card--radio .aux-archive__all {
+  color: var(--color-muted);
+}
+
+@media (hover: hover) {
+  .card-stack__card--radio .aux-archive__all:hover {
+    color: var(--color-ink);
+  }
+}
+
+/* ── Newsletter ── */
+.card-stack__card--radio .radio-newsletter__heading {
+  color: var(--color-muted);
+}
+
+.card-stack__card--radio .aux-newsletter__sub {
+  color: var(--color-muted);
+}
+
+.card-stack__card--radio .aux-newsletter__form input {
+  border-color: rgba(15, 15, 15, 0.14);
+  background: #fafaf9;
+  color: var(--color-ink);
+}
+
+.card-stack__card--radio .aux-newsletter__form input::placeholder {
+  color: var(--color-placeholder);
+}
+
+.card-stack__card--radio .aux-newsletter__form input:focus {
+  border-color: rgba(15, 15, 15, 0.4);
+  background: #fff;
+}
+
+.card-stack__card--radio .aux-newsletter__form button {
+  background: var(--color-ink);
+  color: #fff;
+}
+
+@media (hover: hover) {
+  .card-stack__card--radio .aux-newsletter__form button:hover {
+    background: var(--color-ink-soft);
+  }
+}
+
+.card-stack__card--radio .aux-newsletter__form button:disabled {
+  background: #3aa046;
+  color: #fff;
+}

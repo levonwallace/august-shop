@@ -75,11 +75,6 @@ document.addEventListener("DOMContentLoaded", () => {
     const target = ((idx % total) + total) % total;
     if (target === active) return;
 
-    // First card is the start of the stack — going backward from it would
-    // wrap to the last card, so it's blocked. Forward navigation (including
-    // last card wrapping to the first) is unaffected.
-    if (dir < 0 && active === 0) return;
-
     const prev = active;
     active = target;
     animating = true;
@@ -179,28 +174,14 @@ document.addEventListener("DOMContentLoaded", () => {
      movement still clicks through; a confirmed drag suppresses the click. */
   const skipDrag = (el) =>
     el.closest(
-      "input, select, textarea, .waveform, .audio-player__queue, .profile-drop, .profile-modal, .sheet, .tabbar, .home-tile, .product-card, a.btn"
+      "input, select, textarea, .waveform, .audio-player__queue, .profile-drop, .profile-modal, .sheet, .tabbar"
     );
-
-  // After a real drag, swallow the click the browser fires on release so a
-  // swipe over a brand card doesn't also navigate to the brand page.
-  let suppressClick = false;
-  stack.addEventListener(
-    "click",
-    (e) => {
-      if (suppressClick) {
-        e.preventDefault();
-        e.stopPropagation();
-        suppressClick = false;
-      }
-    },
-    true
-  );
-
-  // Keep the browser from starting a native link/image drag mid-swipe.
-  stack.addEventListener("dragstart", (e) => {
-    if (dragging || suppressClick) e.preventDefault();
-  });
+    // Brand banner cards are one full-card link with nothing to scroll —
+    // vertical drags there belong to the stack. A tap/click without a
+    // drag still navigates (drags suppress the click below).
+    if (hit && hit.classList.contains("brand-banner")) return null;
+    return hit;
+  };
 
   let startY = 0;
   let startX = 0;
@@ -226,10 +207,6 @@ document.addEventListener("DOMContentLoaded", () => {
   };
 
   const applyDrag = (delta) => {
-    // First card is an edge — dragging down (toward prev) meets heavy
-    // resistance instead of wrapping around to the last card.
-    if (delta < 0 && active === 0) delta *= 0.3;
-
     // Progress: 0 at rest, 1 at commit distance
     const progress = Math.min(1, Math.abs(delta) / COMMIT_DIST);
     const dir = Math.sign(delta); // positive = drag up (swipe next), negative = drag down (swipe prev)
@@ -248,7 +225,7 @@ document.addEventListener("DOMContentLoaded", () => {
       const t = -14 * (1 - progress);
       const s = 0.965 + 0.035 * progress;
       nextCard.style.transform = `translate3d(0, ${t}px, -50px) scale(${s})`;
-    } else if (dir < 0 && active > 0) {
+    } else if (dir < 0) {
       const prevIdx = (active - 1 + total) % total;
       const prevCard = cards[prevIdx];
       const t = -110 * (1 - progress);
@@ -293,7 +270,6 @@ document.addEventListener("DOMContentLoaded", () => {
   stack.addEventListener("pointerdown", (e) => {
     if (skipDrag(e.target)) return;
     if (e.pointerType === "mouse" && e.button !== 0) return;
-    suppressClick = false; // fresh gesture — assume tap until movement proves otherwise
     startY = e.clientY;
     startX = e.clientX;
     dy = 0;
@@ -337,7 +313,6 @@ document.addEventListener("DOMContentLoaded", () => {
     // First frame of confirmed drag — mark cards as is-dragging so transitions off
     if (!cards[active].classList.contains("is-dragging")) {
       cards.forEach((c) => c.classList.add("is-dragging"));
-      suppressClick = true; // this gesture is a swipe, not a tap
       try { stack.setPointerCapture(e.pointerId); } catch {}
     }
 
@@ -355,6 +330,14 @@ document.addEventListener("DOMContentLoaded", () => {
       return;
     }
     dragging = false;
+    // A real drag on a banner card must not fire the banner's link. The
+    // flag expires quickly so a later genuine tap still navigates even if
+    // the browser swallowed the post-drag click itself.
+    if (Math.abs(dy) > 6) {
+      suppressClick = true;
+      clearTimeout(suppressClickTimer);
+      suppressClickTimer = setTimeout(() => { suppressClick = false; }, 150);
+    }
     try { stack.releasePointerCapture(e.pointerId); } catch {}
     const dt = Math.max(1, performance.now() - startTime);
     const velocity = -dy / dt; // px/ms, positive = swiping up
@@ -362,7 +345,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     let commit = null;
     if (delta > COMMIT_DIST || velocity > COMMIT_VEL) commit = "next";
-    else if ((delta < -COMMIT_DIST || velocity < -COMMIT_VEL) && active !== 0) commit = "prev";
+    else if (delta < -COMMIT_DIST || velocity < -COMMIT_VEL) commit = "prev";
 
     releaseDrag(commit, velocity);
     activePointerId = null;
@@ -370,6 +353,26 @@ document.addEventListener("DOMContentLoaded", () => {
 
   stack.addEventListener("pointerup", onUp);
   stack.addEventListener("pointercancel", onUp);
+
+  /* After a drag gesture, swallow the click so banner links only navigate
+     on a genuine tap/click (capture phase beats the anchor's default). */
+  let suppressClick = false;
+  let suppressClickTimer = null;
+  stack.addEventListener(
+    "click",
+    (e) => {
+      if (!suppressClick) return;
+      suppressClick = false;
+      e.preventDefault();
+      e.stopPropagation();
+    },
+    true
+  );
+
+  /* Keep the browser from starting a native link/image drag mid-swipe */
+  stack.addEventListener("dragstart", (e) => {
+    if (e.target.closest(".card-stack__card--brand")) e.preventDefault();
+  });
 
   /* ── Touch: scrollable cards advance at their edges ────────
      Cards with [data-card-scroll] scroll natively, which means the

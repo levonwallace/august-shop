@@ -5,8 +5,11 @@
   "description": "August Shop — iOS-inspired UX prototype (pre-Shopify Liquid). No build step required.",
   "scripts": {
     "dev": "./scripts/dev.sh",
-    "start": "./scripts/dev.sh",
+    "start": "serve . -l tcp://0.0.0.0:${PORT:-5173} --no-clipboard",
     "open": "open http://localhost:5173/index.html"
+  },
+  "dependencies": {
+    "serve": "^14.2.4"
   },
   "engines": {
     "node": ">=18"

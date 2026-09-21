@@ -292,6 +292,12 @@ body.sheet-open .page-scroll {
   gap: 8px;
 }
 
+.sheet-chips[data-filter-brands] {
+  max-height: 220px;
+  overflow-y: auto;
+  padding-right: 4px;
+}
+
 .sheet-chip {
   display: inline-flex;
   align-items: center;

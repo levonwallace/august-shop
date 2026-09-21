@@ -30,12 +30,10 @@ echo "────────────────────────�
 # Give the server a beat, then open the browser
 ( sleep 0.6 && open "$URL" ) &
 
-# Prefer python3 (macOS default). Fall back to python if only 2.x present.
+# No-cache server — stale JS/CSS made edits look broken during testing.
 if command -v python3 >/dev/null 2>&1; then
-  exec python3 -m http.server "$PORT"
-elif command -v python >/dev/null 2>&1; then
-  exec python -m SimpleHTTPServer "$PORT"
+  exec python3 "$SCRIPT_DIR/dev-server.py" "$PORT"
 else
-  echo "✗ Neither python3 nor python is installed." >&2
+  echo "✗ python3 is not installed." >&2
   exit 1
 fi

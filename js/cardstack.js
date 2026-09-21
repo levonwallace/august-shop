@@ -179,7 +179,7 @@ document.addEventListener("DOMContentLoaded", () => {
      movement still clicks through; a confirmed drag suppresses the click. */
   const skipDrag = (el) =>
     el.closest(
-      "input, select, textarea, .waveform, .audio-player__queue, .profile-drop, .profile-modal, .sheet, .tabbar"
+      "input, select, textarea, .waveform, .audio-player__queue, .profile-drop, .profile-modal, .sheet, .tabbar, .home-tile, .product-card, a.btn"
     );
 
   // After a real drag, swallow the click the browser fires on release so a
@@ -317,7 +317,7 @@ document.addEventListener("DOMContentLoaded", () => {
       renderAll();
       return;
     }
-    if (Math.abs(rawDy) < 6) return; // small threshold before starting drag visuals
+    if (Math.abs(rawDy) < 16) return; // keep taps on product tiles clickable
 
     // Inside a scrollable card region: let native scroll run until the
     // scroller hits its edge in the gesture's direction, then card-drag.

@@ -42,7 +42,20 @@ document.addEventListener("DOMContentLoaded", () => {
   if (longDesc) {
     longDesc.textContent = `${product.title} — sourced for the shop floor at August, Madison. Full product story lands here at Shopify port time; imagery and pricing are live from the real catalog.`;
   }
-  document.querySelector(".desc-card__bullets")?.setAttribute("hidden", "");
+  document.querySelector(".desc-card__bullets")?.remove();
+  document.querySelector(".pdp-thumbs")?.setAttribute("hidden", "");
+
+  const related = window.AugustCatalog.related(product, 4);
+  const extended = document.querySelector(".pdp-extended");
+  if (related.length && extended) {
+    const section = document.createElement("section");
+    section.className = "pdp-related";
+    section.setAttribute("aria-label", "More from August");
+    section.innerHTML = `
+      <h2>More from August</h2>
+      <div class="product-grid">${related.map(window.AugustCatalog.cardHtml).join("")}</div>`;
+    extended.parentNode.insertBefore(section, extended);
+  }
 
   /* Sizes depend on category (shoes / apparel / accessories) */
   const seg = document.querySelector(".buy-box .segmented");

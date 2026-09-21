@@ -190,11 +190,24 @@ document.addEventListener("DOMContentLoaded", () => {
 
   const brandsEl = page.querySelector("[data-account-brands]");
 
+  if (brandsEl && window.AugustCatalog) {
+    const key = window.AugustCatalog.brandKey;
+    brandsEl.innerHTML = window.AugustCatalog
+      .brands()
+      .map((b) => `<button type="button" class="pref-chip" data-value="${b}">${b}</button>`)
+      .join("");
+  }
+
   const hydrateBrands = () => {
     const user = load();
     const brands = (user && user.preferredBrands) || [];
+    const key = window.AugustCatalog?.brandKey || ((s) => s);
     brandsEl?.querySelectorAll(".pref-chip").forEach((c) => {
-      c.classList.toggle("is-active", brands.includes(c.getAttribute("data-value")));
+      const value = c.getAttribute("data-value");
+      c.classList.toggle(
+        "is-active",
+        brands.some((b) => key(b) === key(value))
+      );
     });
   };
 

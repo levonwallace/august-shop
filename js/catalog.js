@@ -575,13 +575,250 @@ window.AugustCatalog = (() => {
   }
 ];
 
-  /* Stable ids so every surface (PLP, PDP, cart, orders) points at the
-     same product. Port note: becomes the Shopify product handle. */
-  PRODUCTS.forEach((p, i) => {
+  /* Colorway duplicates share a title — collapse them so each PDP is a
+     distinct product. Port note: Shopify handles already unique products. */
+  const seenTitles = new Set();
+  const UNIQUE = PRODUCTS.filter((p) => {
+    const key = p.title.toLowerCase();
+    if (seenTitles.has(key)) return false;
+    seenTitles.add(key);
+    return true;
+  });
+  UNIQUE.forEach((p, i) => {
     p.id = "p" + i;
   });
 
-  const byId = (id) => PRODUCTS.find((p) => p.id === id) || null;
+  /* Infer August category types from titles so the directory can filter. */
+  const TYPE_RULES = [
+    { type: "socks", re: /\bsocks?\b/i },
+    { type: "hats", re: /\b(hat|cap|9twenty|beanie)\b/i },
+    { type: "bags", re: /\b(bag|wallet|cardholder|tote)\b/i },
+    { type: "jewelry", re: /\b(jewelry|necklace|ring|bracelet)\b/i },
+    { type: "tees", re: /\b(tee|t-shirt|tshirt)\b/i },
+    { type: "sweatshirts", re: /\b(hoodie|sweatshirt|crewneck)\b/i },
+    { type: "knits", re: /\b(sweater|knit|cardigan)\b/i },
+    { type: "denim", re: /\b(denim|jeans?)\b/i },
+    { type: "shorts", re: /\bshorts?\b/i },
+    { type: "pants", re: /\b(pants?|trousers?|chinos?)\b/i },
+    { type: "shirts", re: /\b(polo|shirt|rugby|longslee)\b/i },
+    { type: "outerwear", re: /\b(jacket|coat|parka|shell)\b/i },
+    { type: "sandals", re: /\b(sandal|slipper|arizona|boston)\b/i },
+    { type: "boots", re: /\b(boot|martens)\b/i },
+  ];
+  UNIQUE.forEach((p) => {
+    const hit = TYPE_RULES.find((r) => r.re.test(p.title));
+    if (hit) p.type = hit.type;
+    else if (p.cat === "shoes") p.type = "sneakers";
+    else if (p.cat === "apparel") p.type = "shirts";
+    else p.type = "bags";
+  });
+
+  const byId = (id) => UNIQUE.find((p) => p.id === id) || null;
+
+  const unique = (list) => {
+    const seen = new Set();
+    return list.filter((p) => {
+      if (seen.has(p.title)) return false;
+      seen.add(p.title);
+      return true;
+    });
+  };
+
+  /* Official brand directory from august-shop.com — not just brands we
+     currently have product cards for. Port note: Shopify collections. */
+  const BRANDS = [
+    "19-69",
+    "Adidas",
+    "Advisory Board Crystals",
+    "Agaric Fly",
+    "AIAIAI",
+    "Arc'teryx",
+    "ASICS",
+    "August",
+    "Awake NY",
+    "b.Eautiful",
+    "Birkenstock",
+    "Boiler Room",
+    "Boy Smells",
+    "Brain Dead",
+    "Butter Goods",
+    "Carhartt WIP",
+    "Carne Bollente",
+    "Converse",
+    "Dime",
+    "District Vision",
+    "Dr. Martens",
+    "Dude. Your Team Socks.",
+    "Eight & Bob",
+    "Engineered Garments",
+    "Estudio Niksen",
+    "Found",
+    "Full Court Press",
+    "G-Shock",
+    "HIDDEN.NY",
+    "HOKA®",
+    "Honor the Gift",
+    "James Oro",
+    "Jason Markk",
+    "Jungles",
+    "K-Swiss",
+    "Kardo",
+    "Karhu",
+    "Katie Weber",
+    "KEEN",
+    "KIDSUPER STUDIOS",
+    "Kids Of Immigrants",
+    "Lady White Co.",
+    "Les Deux",
+    "Maison Mihara Yasuhiro",
+    "Mister Green",
+    "Museum of Peace & Quiet",
+    "Needles",
+    "Neighborhood",
+    "Nike",
+    "Oakley Factory Team",
+    "On",
+    "Online Ceramics",
+    "One Of These Days",
+    "OrSlow",
+    "Paradise NYC",
+    "Pass~Port",
+    "Pleasures",
+    "Puma",
+    "Quiet Golf",
+    "Reebok",
+    "ROA",
+    "Salomon",
+    "Satisfy",
+    "Saucony",
+    "Serge DeNimes",
+    "Service Works",
+    "Sky High Farm Workwear",
+    "Sporty & Rich",
+    "Square Trade Goods",
+    "Stan Ray",
+    "Stepney Workers Club",
+    "Stüssy",
+    "Suicoke",
+    "Tears of Venus",
+    "UGG",
+    "Velva Sheen",
+    "Vans",
+    "Wax London",
+    "Wythe",
+  ];
+
+  const brandKey = (name) =>
+    String(name || "")
+      .normalize("NFD")
+      .replace(/[\u0300-\u036f]/g, "")
+      .toLowerCase()
+      .replace(/®/g, "")
+      .replace(/[^a-z0-9]+/g, "");
+
+  const brandMatch = (productBrand, selected) => {
+    const key = brandKey(productBrand);
+    return selected.some((b) => brandKey(b) === key);
+  };
+
+  const brandDirHtml = () => {
+    const cols = [
+      { head: "123 - G", items: [] },
+      { head: "H - O", items: [] },
+      { head: "P - Z", items: [] },
+    ];
+    BRANDS.forEach((name) => {
+      const ch = name.trim().charAt(0).toUpperCase();
+      cols[ch < "H" ? 0 : ch < "P" ? 1 : 2].items.push(name);
+    });
+    return `<div class="brand-dir" data-brand-dir>${cols
+      .map(
+        (col) => `
+      <div class="brand-dir__col">
+        <p class="brand-dir__head">${col.head}</p>
+        ${col.items
+          .map((n) => `<a href="collection.html?brand=${encodeURIComponent(n)}">${n}</a>`)
+          .join("")}
+      </div>`
+      )
+      .join("")}</div>`;
+  };
+
+  const brands = () => BRANDS.slice();
+
+  /* Official category directory from august-shop.com. */
+  const CATEGORIES = [
+    {
+      head: "Apparel",
+      href: "collection.html?cat=apparel",
+      items: [
+        { label: "Tees", type: "tees" },
+        { label: "Sweatshirts", type: "sweatshirts" },
+        { label: "Knits", type: "knits" },
+        { label: "Pants", type: "pants" },
+        { label: "Denim", type: "denim" },
+        { label: "Shorts", type: "shorts" },
+        { label: "Shirts", type: "shirts" },
+        { label: "Outerwear", type: "outerwear" },
+      ],
+    },
+    {
+      head: "Footwear",
+      href: "collection.html?cat=shoes",
+      items: [
+        { label: "Sneakers", type: "sneakers" },
+        { label: "Shoes + Boots", type: "boots" },
+        { label: "Sandals + Slippers", type: "sandals" },
+      ],
+    },
+    {
+      head: "Accessories",
+      href: "collection.html?cat=accessories",
+      items: [
+        { label: "Hats", type: "hats" },
+        { label: "Bags + Wallets", type: "bags" },
+        { label: "Jewelry", type: "jewelry" },
+        { label: "Socks", type: "socks" },
+      ],
+    },
+    {
+      head: "Objects",
+      href: "collection.html?cat=objects",
+      items: [
+        { label: "Candles + Incense", type: "candles" },
+        { label: "Ceramics", type: "ceramics" },
+        { label: "Home Goods", type: "home" },
+        { label: "Fragrance + Skin", type: "fragrance" },
+        { label: "Publications", type: "publications" },
+        { label: "Vinyl", type: "vinyl" },
+        { label: "Gift Cards", type: "gift-cards" },
+      ],
+    },
+  ];
+
+  const typeLabel = (type) => {
+    for (const col of CATEGORIES) {
+      const hit = col.items.find((i) => i.type === type);
+      if (hit) return hit.label;
+    }
+    return type;
+  };
+
+  const catDirHtml = () =>
+    `<div class="brand-dir brand-dir--cats" data-cat-dir>${CATEGORIES.map(
+      (col) => `
+      <div class="brand-dir__col">
+        <a class="brand-dir__head" href="${col.href}">${col.head}</a>
+        ${col.items
+          .map((item) => `<a href="collection.html?type=${encodeURIComponent(item.type)}">${item.label}</a>`)
+          .join("")}
+      </div>`
+    ).join("")}</div>`;
+
+  const related = (p, n = 4) =>
+    unique(
+      UNIQUE.filter((x) => x.id !== p.id && (x.cat === p.cat || x.brand === p.brand))
+    ).slice(0, n);
 
   const sizesFor = (p) =>
     p.cat === "shoes"
@@ -595,7 +832,7 @@ window.AugustCatalog = (() => {
     const dept = (hp && hp.department) || "all";
     const cat = (hp && hp.category) || "all";
     const saleOnly = !!(hp && hp.saleOnly);
-    const out = PRODUCTS.filter((p) => {
+    const out = UNIQUE.filter((p) => {
       if (dept !== "all" && p.dept !== dept && p.dept !== "unisex") return false;
       if (cat !== "all" && p.cat !== cat) return false;
       if (saleOnly && !p.sale) return false;
@@ -622,7 +859,25 @@ window.AugustCatalog = (() => {
       </div>
     </a>`;
 
-  return { PRODUCTS, byId, sizesFor, feed, money, priceHtml, cardHtml };
+  return {
+    PRODUCTS: UNIQUE,
+    BRANDS,
+    byId,
+    unique,
+    brands,
+    brandKey,
+    brandMatch,
+    brandDirHtml,
+    CATEGORIES,
+    catDirHtml,
+    typeLabel,
+    related,
+    sizesFor,
+    feed,
+    money,
+    priceHtml,
+    cardHtml,
+  };
 })();
 
 /* ── Cart + Orders stores ─────────────────────────────────────

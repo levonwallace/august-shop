@@ -466,7 +466,6 @@ document.addEventListener("DOMContentLoaded", () => {
     // Prefer the hero's own chip; fall back to the header promo chip
     const badge =
       document.querySelector(".announce-chip--hero") || document.querySelector(".announce-chip");
-    const primaryCta = document.querySelector(".btn--home-primary");
 
     const label = feedLabel(hp);
     const labelNoSale = feedLabel({ ...hp, saleOnly: false });
@@ -484,16 +483,6 @@ document.addEventListener("DOMContentLoaded", () => {
       badge.innerHTML = "";
       if (dot) badge.appendChild(dot);
       badge.append(`Your feed · ${label}`);
-    }
-    if (primaryCta) {
-      primaryCta.textContent = "Shop your feed";
-      const params = new URLSearchParams({
-        feed: "1",
-        dept: hp.department || "all",
-        cat: hp.category || "all",
-        sale: hp.saleOnly ? "1" : "0",
-      });
-      primaryCta.href = `collection.html?${params}`;
     }
 
     /* Swap the actual product imagery for the user's feed (real products

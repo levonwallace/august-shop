@@ -468,6 +468,25 @@
 
 /* ── Responsive ───────────────────────────────────────────── */
 
+/* Large desktop (≥1600px window) — the stage spans the full screen, so
+   give the hero roomier padding and a 4-up featured grid. */
+@media (min-width: 1600px) {
+  .card-stack .home-hero {
+    padding-left: 64px;
+    padding-right: 64px;
+  }
+
+  .card-stack .home-grid {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 24px;
+  }
+
+  /* All four desktop tiles join in — full 4×2 mosaic */
+  .card-stack .home-grid .home-tile--desktop:nth-child(n + 10) {
+    display: block;
+  }
+}
+
 /* Mid-desktop (~1024–1280px) — tighter gaps, smaller banner.
    Type stays Figma-sized (38px / 14px); only spacing compresses. */
 @media (max-width: 1280px) {

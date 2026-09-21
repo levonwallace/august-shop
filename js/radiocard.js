@@ -310,6 +310,90 @@ document.addEventListener("DOMContentLoaded", () => {
     selectMix(next.no);
   });
 
+  /* ── Events (first page of august-shop.com/blogs/events) ─── */
+  const EVENTS = [
+    {
+      series: "AUX",
+      date: "Oct 12, 2024",
+      title: "AUGUST AUX :: AUXILIARY 09 JEAN LE DUKE, SAMUEL WALLNER",
+      excerpt: "August Aux @ The Side Door. Trap, Footwork, and Juke with Sam Wallner and Jean Le Duke.",
+      href: "https://august-shop.com/blogs/events/august-aux-09-jean-le-duke-samuel-wallner",
+    },
+    {
+      series: "Art Collective",
+      date: "Jun 1, 2024",
+      title: "AUGUST ART COLLECTIVE :: 010 CHRIS MALCHOW",
+      excerpt: "Photographer and artist from Madison, WI. Work on display during June 2024.",
+      href: "https://august-shop.com/blogs/events/august-art-collective-010-chris-malchow",
+    },
+    {
+      series: "Art Collective",
+      date: "May 1, 2024",
+      title: "AUGUST ART COLLECTIVE :: 009 BENETT HOLGERSON",
+      excerpt: "Filmmaker and painter from Madison. Work on display during May 2024.",
+      href: "https://august-shop.com/blogs/events/august-art-collective-009-benett-holgerson",
+    },
+    {
+      series: "Art Collective",
+      date: "Apr 1, 2024",
+      title: "AUGUST ART COLLECTIVE :: 008 MABEL THADEN",
+      excerpt: "Ceramics under the name Germ — sculptural pieces and functional wares.",
+      href: "https://august-shop.com/blogs/events/august-art-collective-008-mabel-thaden",
+    },
+    {
+      series: "Art Collective",
+      date: "Mar 1, 2024",
+      title: "AUGUST ART COLLECTIVE: 007 KATE WEBER",
+      excerpt: "Local potter from Madison focusing on shape, closed forms, and the clay body.",
+      href: "https://august-shop.com/blogs/events/august-art-collective-007-kate-weber",
+    },
+    {
+      series: "Art Collective",
+      date: "Feb 15, 2024",
+      title: "AUGUST ART COLLECTIVE :: 006 MT KOSOBUCKI",
+      excerpt: "Documentary photographer working in sport and music. Displayed February 2024.",
+      href: "https://august-shop.com/blogs/events/august-art-collective-006-mt-kosobucki",
+    },
+    {
+      series: "Art Collective",
+      date: "Dec 1, 2023",
+      title: "AUGUST ART COLLECTIVE :: 005 LEXIE OLSON",
+      excerpt: "Multidisciplinary work at the crossroads of fiction and reality.",
+      href: "https://august-shop.com/blogs/events/august-art-collective-005-lexie-olson",
+    },
+    {
+      series: "AUX",
+      date: "Aug 27, 2022",
+      title: "AUGUST AUX :: AUXILIARY 08 SAMUEL WALLNER",
+      excerpt: "First Auxiliary set outside the shop — Lisa Link Peace Park on State Street.",
+      href: "https://august-shop.com/blogs/events/august-aux-auxiliary-08-samuel-wallner",
+    },
+    {
+      series: "AUX",
+      date: "Jun 18, 2022",
+      title: "AUGUST AUX :: AUXILIARY 07 CLANDESTINE CHEMISTRY, KTP, FTBK",
+      excerpt: "Three half-hour sets back to back: Clandestine Chemistry, KTP, and FTBK.",
+      href: "https://august-shop.com/blogs/events/august-aux-auxiliary-07-clandestine-chemistry-ktp-ftbk",
+    },
+  ];
+
+  const eventsEl = radioCard.querySelector("[data-aux-events]");
+  if (eventsEl) {
+    eventsEl.innerHTML = EVENTS.map(
+      (ev) => `
+      <li>
+        <a class="aux-event" href="${ev.href}" target="_blank" rel="noopener">
+          <div class="aux-event__meta">
+            <span class="aux-event__series">${ev.series}</span>
+            <span class="aux-event__date">${ev.date}</span>
+          </div>
+          <h3 class="aux-event__title">${ev.title}</h3>
+          <p class="aux-event__excerpt">${ev.excerpt}</p>
+        </a>
+      </li>`
+    ).join("");
+  }
+
   /* ── Newsletter (prototype: confirm inline, no backend) ──── */
   const newsForm = radioCard.querySelector("[data-aux-newsletter]");
   if (newsForm) {

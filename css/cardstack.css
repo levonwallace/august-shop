@@ -1318,6 +1318,98 @@
   white-space: nowrap;
 }
 
+/* ── Events (august-shop.com/blogs/events) ────────────────── */
+
+.aux-events {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.aux-events__head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 8px;
+}
+
+.aux-events__head .radio-newsletter__heading {
+  margin: 0;
+}
+
+.aux-events__head .aux-archive__all {
+  margin-top: 2px;
+}
+
+.aux-events__list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.aux-event {
+  display: block;
+  padding: 20px 4px;
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
+  text-decoration: none;
+  color: inherit;
+  border-radius: 10px;
+  transition: background 0.16s ease;
+}
+
+.aux-events__list li:last-child .aux-event {
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+@media (hover: hover) {
+  .aux-event:hover {
+    background: rgba(255, 255, 255, 0.04);
+  }
+}
+
+.aux-event__meta {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 8px;
+}
+
+.aux-event__series {
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.55);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: 999px;
+  padding: 3px 9px;
+  white-space: nowrap;
+}
+
+.aux-event__date {
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.04em;
+  color: rgba(255, 255, 255, 0.32);
+}
+
+.aux-event__title {
+  font-size: 16px;
+  font-weight: 600;
+  line-height: 1.35;
+  color: #f0f0ec;
+  margin: 0 0 6px;
+}
+
+.aux-event__excerpt {
+  font-size: 14px;
+  line-height: 1.5;
+  color: rgba(255, 255, 255, 0.4);
+  margin: 0;
+  max-width: 580px;
+}
+
 /* ── Newsletter signup (AUX page pattern) ─────────────────── */
 
 .aux-newsletter {
@@ -1577,6 +1669,18 @@
   .radio-newsletter__excerpt {
     font-size: 13px;
   }
+
+  .aux-event {
+    padding: 16px 0;
+  }
+
+  .aux-event__title {
+    font-size: 14px;
+  }
+
+  .aux-event__excerpt {
+    font-size: 13px;
+  }
 }
 
 /* ══════════════════════════════════════════════════════════════
@@ -1761,6 +1865,39 @@
   .card-stack__card--radio .aux-archive__all:hover {
     color: var(--color-ink);
   }
+}
+
+/* ── Events ── */
+.card-stack__card--radio .aux-event {
+  border-top-color: rgba(15, 15, 15, 0.08);
+}
+
+.card-stack__card--radio .aux-events__list li:last-child .aux-event {
+  border-bottom-color: rgba(15, 15, 15, 0.08);
+}
+
+@media (hover: hover) {
+  .card-stack__card--radio .aux-event:hover {
+    background: rgba(15, 15, 15, 0.035);
+  }
+}
+
+.card-stack__card--radio .aux-event__series {
+  color: #2a7a33;
+  border-color: rgba(42, 122, 51, 0.28);
+  background: rgba(42, 122, 51, 0.06);
+}
+
+.card-stack__card--radio .aux-event__date {
+  color: var(--color-muted);
+}
+
+.card-stack__card--radio .aux-event__title {
+  color: var(--color-ink);
+}
+
+.card-stack__card--radio .aux-event__excerpt {
+  color: var(--color-muted);
 }
 
 /* ── Newsletter ── */

@@ -185,7 +185,7 @@ document.addEventListener("DOMContentLoaded", () => {
      movement still clicks through; a confirmed drag suppresses the click. */
   const skipDrag = (el) =>
     el.closest(
-      "input, select, textarea, .waveform, .audio-player__queue, .profile-drop, .profile-modal, .sheet, .tabbar, .home-tile, .product-card, a.btn"
+      "input, select, textarea, .waveform, .audio-player__queue, .profile-drop, .profile-modal, .sheet, .tabbar, .home-tile, .product-card, a.btn, .aux-event"
     );
 
   let startY = 0;

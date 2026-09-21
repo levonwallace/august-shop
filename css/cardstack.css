@@ -475,15 +475,11 @@
 
 /* ── Responsive ───────────────────────────────────────────── */
 
-/* Large desktop (≥1600px window) — the stage spans the full screen, so
-   give the hero roomier padding and let the photo take more of the width
-   (otherwise the copy column turns into a huge empty field). */
+/* Large desktop (≥1600px window) — the stage spans the full screen; keep
+   the hero on the same 32px gutter as the header so their edges align,
+   and let the photo take more of the width (otherwise the copy column
+   turns into a huge empty field). */
 @media (min-width: 1600px) {
-  .card-stack .home-hero {
-    padding-left: 64px;
-    padding-right: 64px;
-  }
-
   .card-stack .home-layout {
     grid-template-columns: minmax(320px, 1fr) minmax(0, 62%);
   }
@@ -755,21 +751,17 @@
 }
 
 /* Desktop: the radio section fills the whole stage instead of a centered
-   860px column. The mix archive re-flows to as many tiles as fit. */
+   860px column, on the same 32px gutter as the header. The mix archive
+   re-flows to as many tiles as fit. */
 @media (min-width: 901px) {
   .radio-card__inner {
     max-width: none;
+    padding-left: 32px;
+    padding-right: 32px;
   }
 
   .radio-card .aux-grid {
     grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
-  }
-}
-
-@media (min-width: 1600px) {
-  .radio-card__inner {
-    padding-left: 64px;
-    padding-right: 64px;
   }
 }
 

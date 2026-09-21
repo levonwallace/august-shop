@@ -157,16 +157,27 @@
 
         <!-- Signed in -->
         <div data-account-signed-in hidden>
-          <h1>Hi, <span data-account-first></span></h1>
-          <p class="account-sub" data-account-email></p>
+          <header class="account-head">
+            <img class="account-head__avatar" src="assets/avatar-demo.jpg" alt="" />
+            <div class="account-head__meta">
+              <h1 data-account-name-display></h1>
+              <p class="account-sub"><span data-account-email></span> · Member since <span data-account-since></span></p>
+            </div>
+          </header>
 
           <div class="account-layout">
             <div class="account-main">
-              <!-- Homepage customizer — the site opens to this feed.
+              <!-- My feed — the personalized homepage.
                    Shopify port: writes customer metafields (august.homepage). -->
               <section class="glass-panel account-card account-homepage" aria-labelledby="homepage-heading">
-                <h2 id="homepage-heading">My homepage</h2>
-                <p class="account-card__hint">August opens to this feed every time you visit.</p>
+                <h2 id="homepage-heading">My feed</h2>
+                <p class="account-card__hint">A version of August tuned to what you shop for.</p>
+
+                <label class="pref-toggle account-feed-default">
+                  <input type="checkbox" data-home-enabled />
+                  <span class="pref-toggle__track"><span class="pref-toggle__thumb"></span></span>
+                  Open August to my feed
+                </label>
 
                 <p class="pref-label">Department</p>
                 <div class="pref-options" data-home-dept>
@@ -233,12 +244,27 @@
             <aside class="account-side">
               <div class="glass-panel account-card">
                 <h2>Details</h2>
-                <div class="account-detail"><span>Name</span><span data-account-name></span></div>
+                <label class="account-detail account-detail--edit">
+                  <span>Name</span>
+                  <input type="text" data-account-name-input autocomplete="name" />
+                </label>
                 <div class="cart-divider"></div>
                 <div class="account-detail"><span>Email</span><span data-account-email-2></span></div>
-                <div class="cart-divider"></div>
-                <div class="account-detail"><span>Member since</span><span data-account-since></span></div>
-                <button class="btn btn--ghost btn--block account-card__btn" type="button" data-profile-action="settings">Settings</button>
+                <button class="btn btn--ghost btn--block account-card__btn" type="button" data-details-save>Save details</button>
+              </div>
+
+              <div class="glass-panel account-card">
+                <h2>Brands I follow</h2>
+                <div class="pref-options pref-options--wrap" data-account-brands>
+                  <button type="button" class="pref-chip" data-value="vans">Vans</button>
+                  <button type="button" class="pref-chip" data-value="hoka">Hoka</button>
+                  <button type="button" class="pref-chip" data-value="lady-white">Lady White Co.</button>
+                  <button type="button" class="pref-chip" data-value="puma">Puma</button>
+                  <button type="button" class="pref-chip" data-value="saucony">Saucony</button>
+                  <button type="button" class="pref-chip" data-value="dr-martens">Dr. Martens</button>
+                  <button type="button" class="pref-chip" data-value="velva-sheen">Velva Sheen</button>
+                </div>
+                <button class="btn btn--ghost btn--block account-card__btn" type="button" data-brands-save>Save brands</button>
               </div>
 
               <div class="glass-panel account-card">
@@ -285,7 +311,7 @@
         </a>
         <a class="tabbar__item" href="cart.html">
           <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 8h14l-1 12a2 2 0 01-2 2H8a2 2 0 01-2-2L5 8z"/><path d="M9 8V6a3 3 0 016 0v2"/></svg>
-          <span class="tabbar__badge">3</span>
+          <span class="tabbar__badge" hidden></span>
           <span>Bag</span>
         </a>
         <button type="button" class="tabbar__item is-active" data-sheet-open="profile-sheet">
@@ -294,6 +320,7 @@
         </button>
       </nav>
     </div>
+    <script src="js/catalog.js"></script>
     <script src="js/main.js"></script>
     <script src="js/sheet.js"></script>
     <script src="js/segmented.js"></script>

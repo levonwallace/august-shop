@@ -187,9 +187,12 @@
     // Trigger the collapse a beat after the slide starts
     setTimeout(() => swipe.classList.add("is-removing"), 140);
     setTimeout(() => {
+      const index = Number(swipe.getAttribute("data-cart-index"));
       swipe.remove();
       if (nextDivider) nextDivider.remove();
-      updateCount();
+      // Write-through to the store, then re-render so indexes stay true
+      if (window.AugustCart && Number.isFinite(index)) window.AugustCart.removeAt(index);
+      renderCart();
     }, 460);
   };
 
@@ -200,17 +203,107 @@
     setTimeout(() => swipe.classList.remove("is-saved-flash"), 700);
   };
 
-  const updateCount = () => {
+  /* ── Render the cart from the store ─────────────────────── */
+
+  const ACTIONS_HTML = `
+    <div class="cart-swipe__actions" aria-hidden="true">
+      <button class="cart-swipe__action cart-swipe__action--save" data-cart-save type="button" aria-label="Save for later">
+        <svg width="18" height="18" viewBox="0 0 18 18" fill="none" aria-hidden="true"><path d="M4 3h10v13l-5-3-5 3V3z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/></svg>
+        <span>Save</span>
+      </button>
+      <button class="cart-swipe__action cart-swipe__action--delete" data-cart-remove type="button" aria-label="Remove">
+        <svg width="18" height="18" viewBox="0 0 18 18" fill="none" aria-hidden="true"><path d="M3 5h12M6 5V3.5A1.5 1.5 0 017.5 2h3A1.5 1.5 0 0112 3.5V5m1 0v9.5A1.5 1.5 0 0111.5 16h-5A1.5 1.5 0 015 14.5V5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+        <span>Remove</span>
+      </button>
+    </div>`;
+
+  const lineHtml = (item, product, index) => `
+    <div class="cart-swipe" data-cart-swipe data-cart-index="${index}">
+      ${ACTIONS_HTML}
+      <div class="cart-swipe__row cart-line">
+        <div class="cart-line__left">
+          <div class="cart-line__thumb"><img src="${product.img}" alt="" /></div>
+          <div>
+            <div class="cart-line__title">${product.title}</div>
+            <div class="cart-line__meta">${product.brand} · Size ${item.size} · Qty ${item.qty}</div>
+          </div>
+        </div>
+        <div class="cart-line__price">${window.AugustCatalog.money(product.price * item.qty)}</div>
+      </div>
+    </div>`;
+
+  const renderCart = () => {
     const list = document.querySelector("[data-cart-list]");
-    if (!list) return;
-    const remaining = list.querySelectorAll(".cart-swipe:not(.is-removing)").length;
-    const label = document.querySelector(".cart-page__count");
-    if (label) label.textContent = `${remaining} item${remaining === 1 ? "" : "s"}`;
-    // Also refresh totals as a nice touch (simple sum from data attrs would go here)
+    if (!list || !window.AugustCart || !window.AugustCatalog) return;
+
+    const items = window.AugustCart.items();
+    const empty = document.querySelector("[data-cart-empty]");
+    const layout = document.querySelector(".cart-layout");
+    const countLabel = document.querySelector("[data-cart-count]");
+
+    if (empty) empty.hidden = items.length > 0;
+    if (layout) layout.hidden = items.length === 0;
+    const n = window.AugustCart.count();
+    if (countLabel) countLabel.textContent = `${n} item${n === 1 ? "" : "s"}`;
+
+    const rows = items
+      .map((item, i) => {
+        const product = window.AugustCatalog.byId(item.id);
+        return product ? lineHtml(item, product, i) : "";
+      })
+      .filter(Boolean);
+    list.innerHTML =
+      rows.join('<div class="cart-divider"></div>') +
+      '<p class="cart-lines__hint">Swipe left on any item to save or remove.</p>';
+
+    list.querySelectorAll("[data-cart-swipe]").forEach(wireSwipe);
+
+    // Totals
+    const subtotal = window.AugustCart.subtotal();
+    const sub = document.querySelector("[data-cart-subtotal]");
+    const total = document.querySelector("[data-cart-total]");
+    if (sub) sub.textContent = window.AugustCatalog.money(subtotal);
+    if (total) total.textContent = window.AugustCatalog.money(subtotal);
+
+    const checkout = document.querySelector("[data-cart-checkout]");
+    if (checkout) checkout.classList.toggle("is-disabled", items.length === 0);
+  };
+
+  /* ── Checkout: place the order, show confirmation ─────────── */
+
+  const wireCheckout = () => {
+    const checkout = document.querySelector("[data-cart-checkout]");
+    if (!checkout) return;
+    checkout.addEventListener("click", (e) => {
+      e.preventDefault();
+      if (!window.AugustCart || !window.AugustCart.items().length) return;
+      const order = window.AugustCart.placeOrder();
+      if (!order) return;
+
+      const main = document.querySelector(".cart-page");
+      const layout = document.querySelector(".cart-layout");
+      const countLabel = document.querySelector("[data-cart-count]");
+      if (layout) layout.hidden = true;
+      if (countLabel) countLabel.textContent = "";
+
+      const confirm = document.createElement("div");
+      confirm.className = "cart-empty order-confirm";
+      confirm.innerHTML = `
+        <div class="cart-empty__icon" aria-hidden="true">
+          <svg viewBox="0 0 48 48" fill="none"><circle cx="24" cy="24" r="21" stroke="currentColor" stroke-width="1.5"/><path d="M15 24l6 6 12-12" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </div>
+        <h2 class="cart-empty__title">Order placed</h2>
+        <p class="cart-empty__sub">${order.no} · ${order.items.reduce((s, i) => s + i.qty, 0)} item${order.items.length === 1 ? "" : "s"} · ${window.AugustCatalog.money(order.total)}<br />Pickup at August, 218 State St — we'll email you when it's ready.</p>
+        <a class="btn btn--primary" href="account.html">View in your account</a>
+      `;
+      main?.appendChild(confirm);
+      confirm.scrollIntoView({ block: "center", behavior: "smooth" });
+    });
   };
 
   document.addEventListener("DOMContentLoaded", () => {
-    document.querySelectorAll("[data-cart-swipe]").forEach(wireSwipe);
+    renderCart();
+    wireCheckout();
 
     // Delegated action clicks
     document.addEventListener("click", (e) => {

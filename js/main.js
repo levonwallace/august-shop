@@ -265,31 +265,153 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
 
-  /* ── "Your feed" PLP view ─────────────────────────────────
-     collection.html?feed=1&dept=men&cat=shoes&sale=1 — linked from the
-     personalized home hero. Filters cards by data-cat and rewrites the
-     intro island. Shopify port: this is a filtered collection URL
-     (/collections/mens-shoes?filter.v.availability=sale). */
-  const grid = document.querySelector(".product-grid");
-  const feedParams = new URLSearchParams(location.search);
-  if (grid && feedParams.get("feed")) {
-    const dept = feedParams.get("dept") || "all";
-    const cat = feedParams.get("cat") || "all";
-    const sale = feedParams.get("sale") === "1";
+  /* ══════════════════════════════════════════════════════════
+     LIVE STORE LAYER — real catalog everywhere.
+     Port note: PLP → Liquid collection templates + filter params;
+     bag badge → cart item_count; search → /search?q=.
+     ══════════════════════════════════════════════════════════ */
 
-    let shown = 0;
-    grid.querySelectorAll(".product-card").forEach((card) => {
-      const match = cat === "all" || card.getAttribute("data-cat") === cat;
-      card.hidden = !match;
-      if (match) shown++;
+  /* ── Bag badge: live count on every page ─────────────────── */
+  const syncBadges = () => {
+    if (!window.AugustCart) return;
+    const n = window.AugustCart.count();
+    document.querySelectorAll(".tabbar__badge").forEach((b) => {
+      b.textContent = String(n);
+      b.hidden = n === 0;
+    });
+  };
+  syncBadges();
+  window.addEventListener("august:cart-changed", syncBadges);
+
+  /* ── Search: header fields + search sheet → collection?q= ── */
+  document.querySelectorAll('input[type="search"]').forEach((input) => {
+    input.addEventListener("keydown", (e) => {
+      if (e.key !== "Enter") return;
+      const q = input.value.trim();
+      if (q) location.href = `collection.html?q=${encodeURIComponent(q)}`;
+    });
+  });
+
+  /* ── PLP: render the grid from the real catalog ───────────── */
+  const grid = document.querySelector(".plp-main .product-grid");
+  if (grid && window.AugustCatalog) {
+    const params = new URLSearchParams(location.search);
+
+    const state = {
+      q: (params.get("q") || "").toLowerCase(),
+      dept: params.get("dept") || "all",
+      cat: params.get("cat") || "all",
+      sale: params.get("sale") === "1",
+      feed: !!params.get("feed"),
+      brands: [],
+      sort: "featured",
+    };
+
+    const matches = (p) => {
+      if (state.q && !(`${p.brand} ${p.title}`.toLowerCase().includes(state.q))) return false;
+      if (state.dept !== "all" && p.dept !== state.dept && p.dept !== "unisex") return false;
+      if (state.cat !== "all" && p.cat !== state.cat) return false;
+      if (state.sale && !p.sale) return false;
+      if (state.brands.length && !state.brands.includes(p.brand)) return false;
+      return true;
+    };
+
+    const sorted = (items) => {
+      const out = [...items];
+      if (state.sort === "price-asc") out.sort((a, b) => a.price - b.price);
+      else if (state.sort === "price-desc") out.sort((a, b) => b.price - a.price);
+      else if (state.sort === "newest") out.reverse();
+      return out;
+    };
+
+    const islandText = (n) => {
+      const dept = state.dept === "men" ? "Men's " : state.dept === "women" ? "Women's " : "";
+      const cat = state.cat === "all" ? "everything" : state.cat;
+      const sale = state.sale ? " on sale" : "";
+      const count = `${n} product${n === 1 ? "" : "s"}`;
+      if (state.q) return `Results for “${state.q}” · ${count}`;
+      if (state.feed) return `Your feed — ${dept}${cat}${sale} · ${count}`;
+      if (state.dept !== "all" || state.cat !== "all" || state.sale || state.brands.length)
+        return `${dept}${cat}${sale}${state.brands.length ? " · " + state.brands.join(", ") : ""} · ${count}`;
+      return `New arrivals from Nike, Adidas, Carhartt WIP, and more · ${count}`;
+    };
+
+    const renderPLP = () => {
+      const items = sorted(window.AugustCatalog.PRODUCTS.filter(matches));
+      grid.innerHTML = items.length
+        ? items.map(window.AugustCatalog.cardHtml).join("")
+        : '<p class="plp-empty">Nothing matches — clear a filter or two.</p>';
+      const island = document.querySelector(".plp-intro__island p");
+      if (island) island.textContent = islandText(items.length);
+    };
+
+    renderPLP();
+
+    // Filter & Sort sheet actually filters and sorts
+    const applyBtn = document.querySelector(".sheet__footer [data-sheet-close].btn--primary");
+    applyBtn?.addEventListener("click", () => {
+      state.brands = [...document.querySelectorAll(".sheet-chip.is-selected[data-filter-brand]")].map(
+        (c) => c.getAttribute("data-filter-brand")
+      );
+      const cats = [...document.querySelectorAll(".sheet-chip.is-selected[data-filter-cat]")].map((c) =>
+        c.getAttribute("data-filter-cat")
+      );
+      state.cat = cats.length === 1 ? cats[0] : "all";
+      state.sort =
+        document.querySelector("[data-filter-sort].is-active")?.getAttribute("data-filter-sort") ||
+        "featured";
+      renderPLP();
     });
 
-    const island = document.querySelector(".plp-intro__island p");
-    if (island) {
-      const deptLabel = dept === "men" ? "Men's " : dept === "women" ? "Women's " : "";
-      const catLabel = cat === "all" ? "everything" : cat;
-      const saleLabel = sale ? " on sale" : "";
-      island.textContent = `Your feed — ${deptLabel}${catLabel}${saleLabel} · ${shown} product${shown === 1 ? "" : "s"}`;
-    }
+    document.querySelector("[data-filter-clear]")?.addEventListener("click", () => {
+      state.brands = [];
+      state.cat = params.get("cat") || "all";
+      state.sort = "featured";
+      renderPLP();
+    });
+  }
+
+  /* ── Home: shelves render from the real catalog ───────────── */
+  if (document.querySelector(".page--home") && window.AugustCatalog) {
+    const all = window.AugustCatalog.PRODUCTS;
+    const shoes = all.filter((p) => p.cat === "shoes");
+    const apparel = all.filter((p) => p.cat === "apparel" || p.cat === "accessories");
+
+    // Hero tiles → newest footwear, each linking to its own PDP
+    document.querySelectorAll(".home-grid .home-tile").forEach((tile, i) => {
+      const p = shoes[i % shoes.length];
+      const img = tile.querySelector("img");
+      if (img) {
+        img.src = p.img;
+        img.alt = p.title;
+      }
+      tile.href = `product.html?p=${p.id}`;
+    });
+
+    // Named shelves: Apparel & Accessories / Best Sellers / Back in Stock
+    const shelves = document.querySelectorAll(".home-statement__grid");
+    const pools = [
+      apparel,
+      shoes.slice().reverse(),
+      all.filter((p) => p.sale),
+    ];
+    shelves.forEach((shelf, s) => {
+      const pool = pools[s] || all;
+      shelf.querySelectorAll(".product-card").forEach((card, i) => {
+        const p = pool[i % pool.length];
+        card.href = `product.html?p=${p.id}`;
+        const img = card.querySelector(".product-card__media img");
+        const brand = card.querySelector(".product-card__brand");
+        const title = card.querySelector(".product-card__title");
+        const price = card.querySelector(".product-card__price");
+        if (img) {
+          img.src = p.img;
+          img.alt = p.title;
+        }
+        if (brand) brand.textContent = p.brand;
+        if (title) title.textContent = p.title;
+        if (price) price.innerHTML = window.AugustCatalog.priceHtml(p);
+      });
+    });
   }
 });

@@ -10,7 +10,7 @@ document.addEventListener("DOMContentLoaded", () => {
     name: "",
     email: "",
     avatar: "",
-    homepage: { department: "all", category: "all", saleOnly: false },
+    homepage: { enabled: true, department: "all", category: "all", saleOnly: false },
     preferredBrands: [],
     createdAt: null,
   });
@@ -47,7 +47,7 @@ document.addEventListener("DOMContentLoaded", () => {
         ...defaults(),
         name: "Levon Wallace",
         email: "levon@august-shop.com",
-        homepage: { department: "men", category: "shoes", saleOnly: true },
+        homepage: { enabled: true, department: "men", category: "shoes", saleOnly: true },
         preferredBrands: ["vans", "hoka"],
         createdAt: Date.now() - 1000 * 60 * 60 * 24 * 90,
       })
@@ -112,10 +112,6 @@ document.addEventListener("DOMContentLoaded", () => {
             <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><circle cx="7" cy="5" r="2.6" stroke="currentColor" stroke-width="1.2"/><path d="M2.5 12.5c.6-2.4 2.4-3.8 4.5-3.8s3.9 1.4 4.5 3.8" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg>
             Account
           </a>
-          <button class="profile-drop__link" type="button" data-profile-action="settings">
-            <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M7 9a2 2 0 100-4 2 2 0 000 4z" stroke="currentColor" stroke-width="1.2"/><path d="M11.4 8.6l.8.5a.5.5 0 01.1.6l-.8 1.4a.5.5 0 01-.6.2l-.9-.4a3.6 3.6 0 01-.9.5l-.1 1a.5.5 0 01-.5.4H6.5a.5.5 0 01-.5-.4l-.1-1a3.6 3.6 0 01-.9-.5l-.9.4a.5.5 0 01-.6-.2l-.8-1.4a.5.5 0 01.1-.6l.8-.5a3.5 3.5 0 010-1l-.8-.5a.5.5 0 01-.1-.6l.8-1.4a.5.5 0 01.6-.2l.9.4c.3-.2.6-.4.9-.5l.1-1a.5.5 0 01.5-.4h1.5a.5.5 0 01.5.4l.1 1c.3.1.6.3.9.5l.9-.4a.5.5 0 01.6.2l.8 1.4a.5.5 0 01-.1.6l-.8.5a3.5 3.5 0 010 1z" stroke="currentColor" stroke-width="1.2"/></svg>
-            Settings
-          </button>
           <button class="profile-drop__link" type="button" data-profile-action="signout">
             <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M5 12H3a1 1 0 01-1-1V3a1 1 0 011-1h2M9 10l3-3-3-3M12 7H5" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
             Sign Out
@@ -161,40 +157,6 @@ document.addEventListener("DOMContentLoaded", () => {
         </div>
       </div>
 
-      <!-- Settings panel (post-login) -->
-      <div class="profile-modal" data-settings-modal hidden>
-        <div class="profile-modal__card profile-modal__card--settings">
-          <button class="profile-modal__close" type="button" data-settings-close aria-label="Close">
-            <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M1 1l10 10M11 1L1 11" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>
-          </button>
-
-          <h2 class="profile-modal__title">Settings</h2>
-
-          <div class="pref-section">
-            <label class="profile-field">
-              <span>Display name</span>
-              <input type="text" data-settings-name />
-            </label>
-          </div>
-
-          <div class="pref-section">
-            <p class="pref-label">Favorite brands</p>
-            <div class="pref-options pref-options--wrap" data-settings-brands>
-              <button type="button" class="pref-chip" data-value="vans">Vans</button>
-              <button type="button" class="pref-chip" data-value="hoka">Hoka</button>
-              <button type="button" class="pref-chip" data-value="lady-white">Lady White Co.</button>
-              <button type="button" class="pref-chip" data-value="puma">Puma</button>
-              <button type="button" class="pref-chip" data-value="saucony">Saucony</button>
-              <button type="button" class="pref-chip" data-value="dr-martens">Dr. Martens</button>
-              <button type="button" class="pref-chip" data-value="velva-sheen">Velva Sheen</button>
-            </div>
-          </div>
-
-          <p class="profile-modal__note">Homepage preferences live on your <a href="account.html">account page</a>.</p>
-
-          <button class="btn btn--primary btn--block profile-form__submit" type="button" data-settings-save>Save</button>
-        </div>
-      </div>
     `;
 
     while (shell.firstElementChild) {
@@ -211,8 +173,6 @@ document.addEventListener("DOMContentLoaded", () => {
   const signedIn = document.querySelector("[data-profile-signed-in]");
   const backdrop = document.querySelector("[data-profile-backdrop]");
   const modal = document.querySelector("[data-profile-modal]");
-  const settingsModal = document.querySelector("[data-settings-modal]");
-
   const $ = (sel) => document.querySelector(sel);
   const $$ = (sel) => document.querySelectorAll(sel);
 
@@ -246,16 +206,12 @@ document.addEventListener("DOMContentLoaded", () => {
           </div>
         </div>
         <div class="sheet-list">
-          <button class="sheet-list__row" type="button" data-profile-action="settings">
-            <span>Settings</span>
-            <svg width="10" height="10" viewBox="0 0 10 10" fill="none" aria-hidden="true"><path d="M3 1l4 4-4 4" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
-          </button>
-          <a class="sheet-list__row" href="cart.html">
-            <span>Your bag</span>
+          <a class="sheet-list__row" href="account.html">
+            <span>My account</span>
             <svg width="10" height="10" viewBox="0 0 10 10" fill="none" aria-hidden="true"><path d="M3 1l4 4-4 4" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
           </a>
-          <a class="sheet-list__row" href="account.html">
-            <span>Orders &amp; account</span>
+          <a class="sheet-list__row" href="cart.html">
+            <span>Your bag</span>
             <svg width="10" height="10" viewBox="0 0 10 10" fill="none" aria-hidden="true"><path d="M3 1l4 4-4 4" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
           </a>
           <a class="sheet-list__row" href="#">
@@ -437,10 +393,6 @@ document.addEventListener("DOMContentLoaded", () => {
       setAuthMode(a === "create" ? "create" : "signin");
       openModal(modal);
     }
-    if (a === "settings") {
-      closeDrop();
-      openSettingsModal();
-    }
     if (a === "signout") {
       closeDrop();
       logout();
@@ -482,40 +434,6 @@ document.addEventListener("DOMContentLoaded", () => {
     form.reset();
   });
 
-  /* ── Preference chips (shared logic) ────────────────────── */
-
-  const bindChips = (container, multi) => {
-    if (!container) return;
-    container.addEventListener("click", (e) => {
-      const chip = e.target.closest(".pref-chip");
-      if (!chip) return;
-      if (multi) {
-        chip.classList.toggle("is-active");
-      } else {
-        container.querySelectorAll(".pref-chip").forEach((c) => c.classList.remove("is-active"));
-        chip.classList.add("is-active");
-      }
-    });
-  };
-
-  bindChips($("[data-settings-homepage]"), false);
-  bindChips($("[data-settings-brands]"), true);
-
-  const readChips = (container) => {
-    if (!container) return [];
-    return [...container.querySelectorAll(".pref-chip.is-active")].map((c) =>
-      c.getAttribute("data-value")
-    );
-  };
-
-  const setChips = (container, values, multi) => {
-    if (!container) return;
-    container.querySelectorAll(".pref-chip").forEach((c) => {
-      const v = c.getAttribute("data-value");
-      c.classList.toggle("is-active", multi ? values.includes(v) : values[0] === v);
-    });
-  };
-
   /* ── Close buttons ──────────────────────────────────────── */
 
   $("[data-profile-modal-close]")?.addEventListener("click", () => {
@@ -525,43 +443,8 @@ document.addEventListener("DOMContentLoaded", () => {
 
   backdrop?.addEventListener("click", () => {
     closeModal(modal);
-    closeModal(settingsModal);
     form.reset();
   });
-
-  /* ── Settings modal ─────────────────────────────────────── */
-
-  const openSettingsModal = () => {
-    const user = load();
-    if (!user) return;
-
-    const nameInput = $("[data-settings-name]");
-    if (nameInput) nameInput.value = user.name;
-
-    setChips($("[data-settings-homepage]"), [user.homepageView || "default"], false);
-    setChips($("[data-settings-brands]"), user.preferredBrands || [], true);
-
-    const sf = $("[data-settings-sale-first]");
-    if (sf) sf.checked = !!user.showSaleFirst;
-
-    openModal(settingsModal);
-  };
-
-  $("[data-settings-save]")?.addEventListener("click", () => {
-    const user = load();
-    if (!user) return;
-
-    const nameInput = $("[data-settings-name]");
-    if (nameInput) user.name = nameInput.value.trim() || user.name;
-
-    user.preferredBrands = readChips($("[data-settings-brands]"));
-
-    save(user);
-    render();
-    closeModal(settingsModal);
-  });
-
-  $("[data-settings-close]")?.addEventListener("click", () => closeModal(settingsModal));
 
   /* ── Homepage takeover ────────────────────────────────────
      If the signed-in user set a homepage preference (account page),
@@ -574,7 +457,9 @@ document.addEventListener("DOMContentLoaded", () => {
     if (!document.querySelector(".page--home")) return;
 
     const hp = user?.homepage;
-    if (!user || feedIsDefault(hp)) return;
+    // Takeover only when a feed is configured AND switched on
+    // (missing `enabled` = true, for profiles saved before the toggle existed)
+    if (!user || feedIsDefault(hp) || hp.enabled === false) return;
 
     const heroTitle = document.querySelector(".home-copy h1");
     const heroSub = document.querySelector(".home-copy p");
@@ -610,9 +495,92 @@ document.addEventListener("DOMContentLoaded", () => {
       });
       primaryCta.href = `collection.html?${params}`;
     }
+
+    /* Swap the actual product imagery for the user's feed (real products
+       from august-shop.com via js/catalog.js). Hero tiles first, then the
+       first shelf below becomes "More of your feed". */
+    if (window.AugustCatalog) {
+      const items = window.AugustCatalog.feed(hp);
+      if (items.length) {
+        const tiles = document.querySelectorAll(".home-grid .home-tile");
+        tiles.forEach((tile, i) => {
+          const p = items[i % items.length];
+          tile.href = `product.html?p=${p.id}`;
+          const img = tile.querySelector("img");
+          if (img) {
+            img.src = p.img;
+            img.alt = p.title;
+          }
+        });
+
+        const gridTitle = document.querySelector(".home-grid__title");
+        if (gridTitle) gridTitle.textContent = `Your feed — ${label.toLowerCase()}`;
+
+        const shelfTitle = document.querySelector(".home-statement__title");
+        const shelfGrid = document.querySelector(".home-statement__grid");
+        if (shelfTitle && shelfGrid) {
+          shelfTitle.textContent = "More of your feed";
+          // Continue past the hero tiles; wrap around if the feed is short
+          const pool = items.slice(tiles.length).concat(items);
+          [...shelfGrid.querySelectorAll(".product-card")].forEach((card, i) => {
+            const p = pool[i % pool.length];
+            card.href = `product.html?p=${p.id}`;
+            const img = card.querySelector(".product-card__media img");
+            const brand = card.querySelector(".product-card__brand");
+            const title = card.querySelector(".product-card__title");
+            const price = card.querySelector(".product-card__price");
+            if (img) {
+              img.src = p.img;
+              img.alt = p.title;
+            }
+            if (brand) brand.textContent = p.brand;
+            if (title) title.textContent = p.title;
+            if (price) price.innerHTML = window.AugustCatalog.priceHtml(p);
+          });
+        }
+      }
+    }
+  };
+
+  /* ── Feed toggle (top of home) ────────────────────────────
+     Signed-in users with a configured feed get a pill switch:
+     "Your feed" ↔ "Everything". Flipping it writes homepage.enabled
+     and re-renders — exactly what a Liquid re-request would do. */
+  const injectFeedToggle = () => {
+    const host = document.querySelector(".page--home .home-copy");
+    const user = load();
+    if (!host || !user || feedIsDefault(user.homepage)) return;
+    if (document.querySelector("[data-feed-toggle]")) return;
+
+    const on = user.homepage.enabled !== false;
+    const wrap = document.createElement("div");
+    wrap.className = "feed-toggle";
+    wrap.setAttribute("data-feed-toggle", "");
+    wrap.setAttribute("role", "group");
+    wrap.setAttribute("aria-label", "Homepage view");
+    wrap.innerHTML = `
+      <button type="button" class="feed-toggle__opt${on ? " is-active" : ""}" data-feed-mode="on">Your feed</button>
+      <button type="button" class="feed-toggle__opt${on ? "" : " is-active"}" data-feed-mode="off">Everything</button>
+    `;
+    host.insertBefore(wrap, host.firstChild);
+
+    wrap.addEventListener("click", (e) => {
+      const btn = e.target.closest("[data-feed-mode]");
+      if (!btn) return;
+      const next = btn.getAttribute("data-feed-mode") === "on";
+      const u = load();
+      if (!u) return;
+      if ((u.homepage.enabled !== false) === next) return;
+      u.homepage.enabled = next;
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(u));
+      // Reload so the hero re-renders cleanly in the other mode —
+      // mirrors the server-rendered Liquid behavior at port time.
+      location.reload();
+    });
   };
 
   applyHomepagePrefs();
+  injectFeedToggle();
 
   window.addEventListener("august:profile-changed", () => {
     render();

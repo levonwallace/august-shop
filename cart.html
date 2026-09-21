@@ -145,7 +145,7 @@
       <div class="page-scroll">
       <main class="cart-page" id="main">
         <h1>Your bag</h1>
-        <p class="cart-page__count" data-cart-count>3 items</p>
+        <p class="cart-page__count" data-cart-count></p>
 
         <!-- Empty state (revealed when all lines are removed) -->
         <div class="cart-empty" data-cart-empty hidden>
@@ -162,81 +162,12 @@
 
         <div class="cart-layout">
           <div class="glass-panel cart-lines" data-cart-list>
-            <div class="cart-swipe" data-cart-swipe data-price="125.00">
-              <div class="cart-swipe__actions" aria-hidden="true">
-                <button class="cart-swipe__action cart-swipe__action--save" data-cart-save type="button" aria-label="Save for later">
-                  <svg width="18" height="18" viewBox="0 0 18 18" fill="none" aria-hidden="true"><path d="M4 3h10v13l-5-3-5 3V3z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/></svg>
-                  <span>Save</span>
-                </button>
-                <button class="cart-swipe__action cart-swipe__action--delete" data-cart-remove type="button" aria-label="Remove">
-                  <svg width="18" height="18" viewBox="0 0 18 18" fill="none" aria-hidden="true"><path d="M3 5h12M6 5V3.5A1.5 1.5 0 017.5 2h3A1.5 1.5 0 0112 3.5V5m1 0v9.5A1.5 1.5 0 0111.5 16h-5A1.5 1.5 0 015 14.5V5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
-                  <span>Remove</span>
-                </button>
-              </div>
-              <div class="cart-swipe__row cart-line">
-                <div class="cart-line__left">
-                  <div class="cart-line__thumb"><img src="assets/cart-1.png" alt="" /></div>
-                  <div>
-                    <div class="cart-line__title">Premium Old Skool 36 Souvenir</div>
-                    <div class="cart-line__meta">Vans · Size 8 · Qty 1</div>
-                  </div>
-                </div>
-                <div class="cart-line__price">$125.00</div>
-              </div>
-            </div>
-            <div class="cart-divider"></div>
-            <div class="cart-swipe" data-cart-swipe data-price="130.00">
-              <div class="cart-swipe__actions" aria-hidden="true">
-                <button class="cart-swipe__action cart-swipe__action--save" data-cart-save type="button" aria-label="Save for later">
-                  <svg width="18" height="18" viewBox="0 0 18 18" fill="none" aria-hidden="true"><path d="M4 3h10v13l-5-3-5 3V3z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/></svg>
-                  <span>Save</span>
-                </button>
-                <button class="cart-swipe__action cart-swipe__action--delete" data-cart-remove type="button" aria-label="Remove">
-                  <svg width="18" height="18" viewBox="0 0 18 18" fill="none" aria-hidden="true"><path d="M3 5h12M6 5V3.5A1.5 1.5 0 017.5 2h3A1.5 1.5 0 0112 3.5V5m1 0v9.5A1.5 1.5 0 0111.5 16h-5A1.5 1.5 0 015 14.5V5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
-                  <span>Remove</span>
-                </button>
-              </div>
-              <div class="cart-swipe__row cart-line">
-                <div class="cart-line__left">
-                  <div class="cart-line__thumb"><img src="assets/cart-2.png" alt="" /></div>
-                  <div>
-                    <div class="cart-line__title">Ora Primo EXT (Black/Frost)</div>
-                    <div class="cart-line__meta">Hoka · Size 9 · Qty 1</div>
-                  </div>
-                </div>
-                <div class="cart-line__price">$130.00</div>
-              </div>
-            </div>
-            <div class="cart-divider"></div>
-            <div class="cart-swipe" data-cart-swipe data-price="190.00">
-              <div class="cart-swipe__actions" aria-hidden="true">
-                <button class="cart-swipe__action cart-swipe__action--save" data-cart-save type="button" aria-label="Save for later">
-                  <svg width="18" height="18" viewBox="0 0 18 18" fill="none" aria-hidden="true"><path d="M4 3h10v13l-5-3-5 3V3z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/></svg>
-                  <span>Save</span>
-                </button>
-                <button class="cart-swipe__action cart-swipe__action--delete" data-cart-remove type="button" aria-label="Remove">
-                  <svg width="18" height="18" viewBox="0 0 18 18" fill="none" aria-hidden="true"><path d="M3 5h12M6 5V3.5A1.5 1.5 0 017.5 2h3A1.5 1.5 0 0112 3.5V5m1 0v9.5A1.5 1.5 0 0111.5 16h-5A1.5 1.5 0 015 14.5V5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
-                  <span>Remove</span>
-                </button>
-              </div>
-              <div class="cart-swipe__row cart-line">
-                <div class="cart-line__left">
-                  <div class="cart-line__thumb"><img src="assets/cart-3.png" alt="" /></div>
-                  <div>
-                    <div class="cart-line__title">Mafate 2 OG (Citrus/Black)</div>
-                    <div class="cart-line__meta">Hoka · Size 10 · Qty 1</div>
-                  </div>
-                </div>
-                <div class="cart-line__price">$190.00</div>
-              </div>
-            </div>
-            <p class="cart-lines__hint">Swipe left on any item to save or remove.</p>
           </div>
 
           <aside class="glass-panel cart-summary" data-cart-summary>
             <h2>Summary</h2>
             <div class="summary-row summary-row--muted">
-              <span>Subtotal</span><span data-cart-subtotal>$445.00</span>
+              <span>Subtotal</span><span data-cart-subtotal>$0.00</span>
             </div>
             <div class="cart-divider"></div>
             <div class="summary-row summary-row--muted">
@@ -244,7 +175,7 @@
             </div>
             <div class="cart-divider"></div>
             <div class="summary-row summary-row--total">
-              <span>Total</span><span data-cart-total>$445.00</span>
+              <span>Total</span><span data-cart-total>$0.00</span>
             </div>
             <p class="summary-note">Taxes calculated at checkout</p>
             <a href="/checkout" class="btn btn--primary btn--block" data-cart-checkout role="button">Checkout</a>
@@ -283,7 +214,7 @@
         </a>
         <a class="tabbar__item is-active" href="cart.html" aria-current="page">
           <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 8h14l-1 12a2 2 0 01-2 2H8a2 2 0 01-2-2L5 8z"/><path d="M9 8V6a3 3 0 016 0v2"/></svg>
-          <span class="tabbar__badge">3</span>
+          <span class="tabbar__badge" hidden></span>
           <span>Bag</span>
         </a>
         <button type="button" class="tabbar__item" data-sheet-open="profile-sheet">
@@ -292,6 +223,7 @@
         </button>
       </nav>
     </div>
+    <script src="js/catalog.js"></script>
     <script src="js/main.js"></script>
     <script src="js/sheet.js"></script>
     <script src="js/segmented.js"></script>

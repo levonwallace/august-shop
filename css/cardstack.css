@@ -487,23 +487,6 @@
   .card-stack .home-copy {
     max-width: 560px;
   }
-
-  /* Brand banners: the art is 1312px wide — don't smear it across an
-     ultra-wide stage. Frame it centered at a sane width instead. */
-  .brand-banner--full .brand-banner__media {
-    top: 50%;
-    bottom: auto;
-    left: 50%;
-    right: auto;
-    width: 1680px;
-    height: auto;
-    transform: translate(-50%, -50%);
-    border-radius: 16px;
-  }
-
-  .brand-banner--full .brand-banner__content {
-    left: calc(50% - 792px);
-  }
 }
 
 /* Mid-desktop (~1024–1280px) — tighter gaps, smaller banner.

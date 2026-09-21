@@ -123,7 +123,6 @@
   font-size: 10px;
   gap: 8px;
 }
-
 .announce-chip .dot {
   width: 6px;
   height: 6px;
@@ -654,6 +653,13 @@ body.mega-open .mega-backdrop {
   font-size: 14px;
   font-weight: 500;
   color: var(--color-ink);
+}
+
+/* Sale collection — struck-through original price before the markdown */
+.product-card__was {
+  margin-right: 2px;
+  color: var(--color-muted);
+  font-weight: 400;
 }
 
 .product-card__meta {

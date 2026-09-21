@@ -104,6 +104,15 @@
   background: #111;
 }
 
+/* Brand cards are one big link with nothing to scroll — claim vertical
+   swipes for the card stack instead of letting the browser treat them as
+   native pans (which cancels the drag on touch devices). */
+.card-stack__card--brand,
+.card-stack__card--brand a {
+  touch-action: none;
+  -webkit-user-drag: none;
+}
+
 .brand-banner--full {
   position: absolute;
   inset: 0;
@@ -284,8 +293,9 @@
   flex: 0 0 auto;
   height: 100%;
   align-items: stretch;
-  grid-template-columns: minmax(280px, 520px) minmax(320px, 668px);
-  justify-content: space-between;
+  /* Desktop: headline, "new arrivals" tag, product grid, CTA row last. */
+  grid-template-columns: 1fr;
+  grid-template-rows: auto auto minmax(0, 1fr) auto;
   gap: 24px 48px;
   min-height: 0;
   max-width: none;
@@ -299,11 +309,37 @@
   min-height: 0;
 }
 
+/* Desktop header already carries the announce chip — hide the hero copy
+   of it so the sale tag isn't duplicated. Mobile re-enables it below
+   (the mobile header has no chip of its own). */
+.card-stack .home-copy .announce-chip--hero {
+  display: none;
+}
+
+/* "new arrivals" text label above the product cards — same voice as the
+   mobile "new footwear" heading. Hidden on mobile, which has that heading. */
+.card-stack .home-grid__tag {
+  justify-self: start;
+  margin: 0 0 -10px;
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: 1.32px;
+  text-transform: lowercase;
+  color: var(--color-ink);
+}
+
 .card-stack .home-grid {
+  /* 8 product cards on desktop: 4 across × 2 rows under the headline */
+  grid-template-columns: repeat(4, minmax(0, 1fr));
   grid-template-rows: 1fr 1fr;
-  gap: 24px 44px;
+  gap: 24px;
   height: 100%;
   min-height: 0;
+}
+
+/* Desktop-only tiles fill the second row (carousel extras stay mobile-only) */
+.card-stack .home-grid .home-tile--desktop {
+  display: block;
 }
 
 .card-stack .home-tile,
@@ -414,6 +450,11 @@
     scroll-snap-align: center;
   }
 
+  /* Desktop-only fillers — the mobile carousel keeps its original set */
+  .card-stack .home-statement__grid .product-card--desktop {
+    display: none;
+  }
+
   .card-stack .home-statement__grid + .home-statement__title {
     margin-top: 36px;
   }
@@ -431,7 +472,6 @@
 
   .card-stack .home-layout {
     gap: 20px 24px;
-    grid-template-columns: minmax(240px, 520px) minmax(280px, 668px);
   }
 
   .card-stack .home-copy h1 {
@@ -500,8 +540,18 @@
     gap: 16px;
   }
 
+  /* Mobile carousel already has its "new footwear" heading */
+  .card-stack .home-grid__tag {
+    display: none;
+  }
+
   .card-stack .home-copy {
     justify-content: flex-start;
+  }
+
+  /* Mobile keeps the hero chip — it's the only visible sale tag here */
+  .card-stack .home-copy .announce-chip--hero {
+    display: inline-flex;
   }
 
   .card-stack .home-copy h1 {
@@ -546,6 +596,11 @@
 
   .card-stack .home-grid .home-tile--extra {
     display: block;
+  }
+
+  /* Desktop-only tiles — mobile carousel keeps its original set */
+  .card-stack .home-grid .home-tile--desktop {
+    display: none;
   }
 }
 

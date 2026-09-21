@@ -62,7 +62,7 @@
             </nav>
           </div>
           <div class="announce-wrap">
-            <div class="announce-chip"><span class="dot" aria-hidden="true"></span>Back to School Sale</div>
+            <a class="announce-chip" href="sale.html"><span class="dot" aria-hidden="true"></span>Back to School Sale</a>
           </div>
           <div class="header-island header-utilities">
             <label class="search-field">
@@ -137,7 +137,7 @@
           </div>
 
         <div class="mobile-nav" id="mobile-nav" data-mobile-nav hidden>
-          <div class="announce-chip announce-chip--mobile"><span class="dot" aria-hidden="true"></span>Back to School Sale</div>
+          <a class="announce-chip announce-chip--mobile" href="sale.html"><span class="dot" aria-hidden="true"></span>Back to School Sale</a>
           <label class="search-field search-field--mobile">
             <svg viewBox="0 0 14 14" fill="none" aria-hidden="true"><circle cx="6" cy="6" r="4.25" stroke="currentColor" stroke-width="1.4"/><path d="M9.2 9.2L12 12" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>
             <input type="search" placeholder="Search" aria-label="Search" />
@@ -158,10 +158,11 @@
           <main class="home-hero" data-card-scroll>
             <div class="home-layout">
               <div class="home-copy">
-                <div class="announce-chip announce-chip--hero"><span class="dot" aria-hidden="true"></span>Back to School Sale</div>
+                <a class="announce-chip announce-chip--hero" href="sale.html"><span class="dot" aria-hidden="true"></span>Back to School Sale</a>
                 <h1><span class="ink-leather">Streetwear,</span><br /><span class="ink-slate">sneakers,</span> <span class="ink-madder">art</span>, <span class="ink-cobalt">music</span>.</h1>
               </div>
               <h2 class="home-grid__title">New Footwear</h2>
+              <div class="home-grid__tag">New Arrivals</div>
               <div class="home-grid">
                 <a class="home-tile" href="product.html"><img src="assets/home-1.png" alt="Premium Old Skool 36 Souvenir" /></a>
                 <a class="home-tile" href="product.html"><img src="assets/home-2.png" alt="Ora Primo EXT" /></a>
@@ -170,6 +171,11 @@
                 <a class="home-tile home-tile--extra" href="product.html"><img src="assets/mega-1.png" alt="Souvenir Navy" /></a>
                 <a class="home-tile home-tile--extra" href="product.html"><img src="assets/mega-2.png" alt="Ora Primo EXT (Black/Frost)" /></a>
                 <a class="home-tile home-tile--extra" href="product.html"><img src="assets/mega-4.png" alt="Puma Basket (White/Gum)" /></a>
+                <!-- Desktop-only second row — mobile keeps its original carousel -->
+                <a class="home-tile home-tile--desktop" href="product.html"><img src="assets/mega-3.png" alt="Mini Hoodie (Pigment Elm)" /></a>
+                <a class="home-tile home-tile--desktop" href="product.html"><img src="assets/plp-7.png" alt="L/S Pima Lock Tee (Granite)" /></a>
+                <a class="home-tile home-tile--desktop" href="product.html"><img src="assets/plp-tote.jpg" alt="Canvas Tote (Natural)" /></a>
+                <a class="home-tile home-tile--desktop" href="product.html"><img src="assets/plp-cap.jpg" alt="Corduroy Cap (Forest)" /></a>
               </div>
               <div class="cta-row">
                 <a class="btn btn--home-primary" href="collection.html">Shop All Products</a>
@@ -226,6 +232,23 @@
                     <div class="product-card__brand">August</div>
                     <div class="product-card__title">Corduroy Cap (Forest)</div>
                     <div class="product-card__price">$60.00</div>
+                  </div>
+                </a>
+                <!-- Desktop-only cards — round the grid out to 8 (mobile carousel keeps 6) -->
+                <a class="product-card product-card--desktop" href="product.html">
+                  <div class="product-card__media"><img src="assets/plp-tee-velva.png" alt="" loading="lazy" /></div>
+                  <div class="product-card__meta">
+                    <div class="product-card__brand">Velva Sheen</div>
+                    <div class="product-card__title">Heavyweight Pocket Tee (White)</div>
+                    <div class="product-card__price">$70.00</div>
+                  </div>
+                </a>
+                <a class="product-card product-card--desktop" href="product.html">
+                  <div class="product-card__media"><img src="assets/plp-beanie.png" alt="" loading="lazy" /></div>
+                  <div class="product-card__meta">
+                    <div class="product-card__brand">August</div>
+                    <div class="product-card__title">Ribbed Wool Beanie (Charcoal)</div>
+                    <div class="product-card__price">$40.00</div>
                   </div>
                 </a>
               </div>

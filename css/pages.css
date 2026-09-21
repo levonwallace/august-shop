@@ -1339,6 +1339,62 @@
     opacity: 1;
   }
 
+  /* —— Menu promo tiles (iamgia-style imagery in the drawer) —— */
+  .mobile-nav__promos {
+    display: flex;
+    gap: 10px;
+    margin: 2px -16px 0;
+    padding: 2px 16px 4px;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+  }
+
+  .mobile-nav__promos::-webkit-scrollbar {
+    display: none;
+  }
+
+  .mobile-nav__promo {
+    position: relative;
+    flex: 0 0 132px;
+    aspect-ratio: 3 / 4;
+    border-radius: 14px;
+    border: 1px solid var(--color-border);
+    overflow: hidden;
+    scroll-snap-align: start;
+    background: #ececea;
+  }
+
+  .mobile-nav__promo img {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .mobile-nav__promo::after {
+    content: "";
+    position: absolute;
+    inset: 45% 0 0;
+    background: linear-gradient(180deg, transparent, rgba(0, 0, 0, 0.42));
+  }
+
+  .mobile-nav__promo span {
+    position: absolute;
+    left: 10px;
+    right: 10px;
+    bottom: 8px;
+    z-index: 1;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    text-transform: lowercase;
+    color: #fff;
+    text-shadow: 0 1px 6px rgba(0, 0, 0, 0.4);
+  }
+
   .site-footer {
     height: auto;
     min-height: 48px;

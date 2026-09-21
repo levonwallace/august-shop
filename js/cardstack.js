@@ -122,23 +122,19 @@ document.addEventListener("DOMContentLoaded", () => {
   const next = () => goTo(active + 1, 1);
   const prev = () => goTo(active - 1, -1);
 
-  /* ── Wheel: one gesture → one card ───────────────────────
-     Trackpads emit a burst of pixel deltas for a single flick.
-     Hitting the threshold, resetting, then hitting it again in the
-     same burst used to queue a second goTo (felt like a double scroll). */
+  /* ── Wheel: continuous scroll rotates the stack ──────────
+     A fresh gesture flips a card quickly (small threshold). Keeping the
+     scroll going flips the next card as soon as each animation settles —
+     no need to stop and re-scroll between cards. A single flick's inertia
+     tail won't double-flip: repeat flips inside the same event stream
+     need a much larger accumulated delta, which decaying inertia rarely
+     reaches, while a deliberate sustained scroll easily does. */
   let wheelAccum = 0;
-  let wheelLocked = false;
-  let wheelIdleTimer = null;
-  const WHEEL_THRESHOLD = 80;
-  const WHEEL_IDLE_MS = 280;
-
-  const armWheelUnlock = () => {
-    clearTimeout(wheelIdleTimer);
-    wheelIdleTimer = setTimeout(() => {
-      wheelLocked = false;
-      wheelAccum = 0;
-    }, WHEEL_IDLE_MS);
-  };
+  let lastWheelAt = 0;
+  let flippedThisStream = false;
+  const WHEEL_THRESHOLD = 80;   // fresh gesture
+  const WHEEL_REPEAT = 260;     // continued scroll in the same stream
+  const WHEEL_GAP_MS = 140;     // pause that separates gestures
 
   stack.addEventListener("wheel", (e) => {
     const scroller = e.target.closest("[data-card-scroll]");
@@ -150,21 +146,36 @@ document.addEventListener("DOMContentLoaded", () => {
 
     e.preventDefault();
 
-    if (animating || wheelLocked) {
-      armWheelUnlock();
+    const now = performance.now();
+    if (now - lastWheelAt > WHEEL_GAP_MS) {
+      // New gesture (finger lifted / wheel paused) — reset the stream.
+      wheelAccum = 0;
+      flippedThisStream = false;
+    }
+    lastWheelAt = now;
+
+    // Don't bank deltas while a flip animates — a long scroll should
+    // advance one card per animation, not queue a burst of them.
+    if (animating) {
+      wheelAccum = 0;
       return;
+    }
+
+    // Direction change resets accumulation
+    if (wheelAccum !== 0 && Math.sign(e.deltaY) !== Math.sign(wheelAccum)) {
+      wheelAccum = 0;
     }
 
     wheelAccum += e.deltaY;
 
-    if (Math.abs(wheelAccum) < WHEEL_THRESHOLD) return;
+    const needed = flippedThisStream ? WHEEL_REPEAT : WHEEL_THRESHOLD;
+    if (Math.abs(wheelAccum) < needed) return;
 
     const dir = wheelAccum;
-    wheelLocked = true;
     wheelAccum = 0;
+    flippedThisStream = true;
     if (dir > 0) next();
     else prev();
-    armWheelUnlock();
   }, { passive: false });
 
   /* ── Pointer drag (touch + mouse unified) ──────────────── */

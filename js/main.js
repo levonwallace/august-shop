@@ -603,6 +603,14 @@ document.addEventListener("DOMContentLoaded", () => {
       if (img) {
         img.src = p.img;
         img.alt = p.title;
+        const set = window.AugustCatalog.srcset(p.img);
+        if (set) {
+          img.srcset = set;
+          // Hero tile spans ~62% of desktop; everything else renders small.
+          img.sizes = el.classList.contains("home-tile--hero")
+            ? "(min-width: 901px) 62vw, 75vw"
+            : "(min-width: 901px) 24vw, 70vw";
+        }
       }
       const brand = el.querySelector(".product-card__brand");
       const title = el.querySelector(".product-card__title");

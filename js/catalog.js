@@ -859,7 +859,17 @@ window.AugustCatalog = (() => {
       </div>
     </a>`;
 
+  /* Responsive sources — Shopify's CDN resizes via the width param, so one
+     asset serves every breakpoint. Returns "" for non-CDN (local) images. */
+  const srcset = (url) =>
+    /width=\d+/.test(url)
+      ? [400, 600, 900, 1400]
+          .map((w) => `${url.replace(/width=\d+/, `width=${w}`)} ${w}w`)
+          .join(", ")
+      : "";
+
   return {
+    srcset,
     PRODUCTS: UNIQUE,
     BRANDS,
     byId,

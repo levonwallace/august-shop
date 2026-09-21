@@ -499,6 +499,13 @@ document.addEventListener("DOMContentLoaded", () => {
           if (img) {
             img.src = p.img;
             img.alt = p.title;
+            const set = window.AugustCatalog.srcset(p.img);
+            if (set) {
+              img.srcset = set;
+              img.sizes = tile.classList.contains("home-tile--hero")
+                ? "(min-width: 901px) 62vw, 75vw"
+                : "(min-width: 901px) 24vw, 70vw";
+            }
           }
         });
 
@@ -521,6 +528,11 @@ document.addEventListener("DOMContentLoaded", () => {
             if (img) {
               img.src = p.img;
               img.alt = p.title;
+              const set = window.AugustCatalog.srcset(p.img);
+              if (set) {
+                img.srcset = set;
+                img.sizes = "(min-width: 901px) 24vw, 45vw";
+              }
             }
             if (brand) brand.textContent = p.brand;
             if (title) title.textContent = p.title;

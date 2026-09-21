@@ -358,11 +358,14 @@
   min-height: 0;
 }
 
+/* Catalog photos are square-ish product shots on baked-in white — contain
+   (not cover) so nothing gets cropped or blur-upscaled, at any tile size.
+   The white letterbox is invisible against the white tile. */
 .card-stack .home-tile img,
 .card-stack .home-tile--tall img {
   width: 100%;
   height: 100%;
-  object-fit: cover;
+  object-fit: contain;
   object-position: center;
 }
 

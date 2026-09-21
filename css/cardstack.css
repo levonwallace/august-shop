@@ -579,6 +579,13 @@
     overflow-y: hidden;
     scroll-snap-type: x mandatory;
     -webkit-overflow-scrolling: touch;
+    /* Full-bleed: cancel the hero's 16px side padding so tiles scroll
+       edge-to-edge; inner padding keeps the resting alignment. */
+    margin-left: -16px;
+    margin-right: -16px;
+    padding-left: 16px;
+    padding-right: 16px;
+    scroll-padding: 0 16px;
     scrollbar-width: none;
   }
 
@@ -601,6 +608,15 @@
   /* Desktop-only tiles — mobile carousel keeps its original set */
   .card-stack .home-grid .home-tile--desktop {
     display: none;
+  }
+
+  /* Product shelves below the fold — same full-bleed treatment */
+  .card-stack .home-statement__grid {
+    margin-left: -16px;
+    margin-right: -16px;
+    padding-left: 16px;
+    padding-right: 16px;
+    scroll-padding: 0 16px;
   }
 }
 

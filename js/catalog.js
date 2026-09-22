@@ -572,6 +572,297 @@ window.AugustCatalog = (() => {
     "price": 84.0,
     "compare": 120.0,
     "img": "https://cdn.shopify.com/s/files/1/2729/9188/files/1_57016079-2729-4855-b39e-2e489eccf045.jpg?width=600"
+  },
+  {
+    "title": "Vans Premium Old Skool 36 Souvenir (Navy)",
+    "brand": "Vans",
+    "dept": "unisex",
+    "cat": "shoes",
+    "sale": false,
+    "price": 125.0,
+    "compare": null,
+    "img": "assets/plp-1.png"
+  },
+  {
+    "title": "Vans Premium Old Skool 36 Souvenir (Black)",
+    "brand": "Vans",
+    "dept": "unisex",
+    "cat": "shoes",
+    "sale": false,
+    "price": 125.0,
+    "compare": null,
+    "img": "assets/mega-1.png"
+  },
+  {
+    "title": "Vans Authentic (True White)",
+    "brand": "Vans",
+    "dept": "unisex",
+    "cat": "shoes",
+    "sale": false,
+    "price": 70.0,
+    "compare": null,
+    "img": "assets/pdp-gallery.png"
+  },
+  {
+    "title": "Vans Old Skool (Black/White)",
+    "brand": "Vans",
+    "dept": "unisex",
+    "cat": "shoes",
+    "sale": false,
+    "price": 80.0,
+    "compare": null,
+    "img": "assets/home-1.png"
+  },
+  {
+    "title": "Vans Sk8-Hi (Navy/White)",
+    "brand": "Vans",
+    "dept": "unisex",
+    "cat": "shoes",
+    "sale": false,
+    "price": 90.0,
+    "compare": null,
+    "img": "assets/home-2.png"
+  },
+  {
+    "title": "Vans Family Era (Pig Suede)",
+    "brand": "Vans",
+    "dept": "unisex",
+    "cat": "shoes",
+    "sale": false,
+    "price": 85.0,
+    "compare": null,
+    "img": "assets/banner-vans.png"
+  },
+  {
+    "title": "Dr. Martens Men's Delapre Penny Loafer - Repello Calf Suede MB (Field Green)",
+    "brand": "Dr. Martens",
+    "dept": "men",
+    "cat": "shoes",
+    "sale": false,
+    "price": 260.0,
+    "compare": null,
+    "handle": "dr-martens-mens-delapre-penny-loafer-repello-calf-suede-mb-field-green",
+    "img": "https://cdn.shopify.com/s/files/1/2729/9188/files/1_dfee84c5-9422-4753-90b8-c644d0c5adfe.jpg?width=600"
+  },
+  {
+    "title": "Dr. Martens Unisex Lowell Leather Moc Toe Shoes - Black (Wild Grain)",
+    "brand": "Dr. Martens",
+    "dept": "unisex",
+    "cat": "shoes",
+    "sale": false,
+    "price": 190.0,
+    "compare": null,
+    "handle": "dr-martens-unisex-lowell-leather-moc-toe-shoes-black-wild-grain",
+    "img": "https://cdn.shopify.com/s/files/1/2729/9188/files/1_11e9a77e-a695-4b86-a35a-9384072594d3.jpg?width=600"
+  },
+  {
+    "title": "Dr. Martens Women's Buzz 5-Eye Shoes - Leopard (Light Tan)",
+    "brand": "Dr. Martens",
+    "dept": "women",
+    "cat": "shoes",
+    "sale": true,
+    "price": 114.0,
+    "compare": 160.0,
+    "handle": "dr-martens-womens-buzz-5-eye-shoes-leopard-light-tan",
+    "img": "https://cdn.shopify.com/s/files/1/2729/9188/files/29_c8dfc554-6241-4392-9dce-0f78f58b40b1.jpg?width=600"
+  },
+  {
+    "title": "Dr. Martens Unisex Lowell Leather Moc Toe Shoes - DMS Olive (Wild Grain)",
+    "brand": "Dr. Martens",
+    "dept": "unisex",
+    "cat": "shoes",
+    "sale": true,
+    "price": 134.0,
+    "compare": 190.0,
+    "handle": "dr-martens-unisex-lowell-leather-moc-toe-shoes-dms-olive-wild-grain",
+    "img": "https://cdn.shopify.com/s/files/1/2729/9188/files/46_4ce5c821-5aa7-49b5-818d-211d22f38fd3.jpg?width=600"
+  },
+  {
+    "title": "Dr. Martens Unisex Lowell Leather Moc Toe Shoes (Cherry Red)",
+    "brand": "Dr. Martens",
+    "dept": "unisex",
+    "cat": "shoes",
+    "sale": true,
+    "price": 129.0,
+    "compare": 180.0,
+    "handle": "dr-martens-unisex-lowell-leather-moc-toe-shoes-cherry-red",
+    "img": "https://cdn.shopify.com/s/files/1/2729/9188/files/68_0499c51f-3cc7-4d30-ad80-4c39fa64ad60.jpg?width=600"
+  },
+  {
+    "title": "Dr. Martens Unisex Lowell Hair On Leather Moc Toe Shoes - Pebble Emboss (Olive Green)",
+    "brand": "Dr. Martens",
+    "dept": "unisex",
+    "cat": "shoes",
+    "sale": true,
+    "price": 134.0,
+    "compare": 190.0,
+    "handle": "dr-martens-unisex-lowell-hair-on-leather-moc-toe-shoes-pebble-emboss-olive-green",
+    "img": "https://cdn.shopify.com/s/files/1/2729/9188/files/31_af7079e2-ed17-4b0e-919f-fba83cd4a545.jpg?width=600"
+  },
+  {
+    "title": "Dr. Martens Men's 1460 Pascal MT (Black Wyoming)",
+    "brand": "Dr. Martens",
+    "dept": "men",
+    "cat": "shoes",
+    "sale": true,
+    "price": 154.0,
+    "compare": 220.0,
+    "handle": "dr-martens-mens-1460-pascal-mt-black-wyoming",
+    "img": "https://cdn.shopify.com/s/files/1/2729/9188/files/DOC_MARTENS_1460_MT.png?width=600"
+  },
+  {
+    "title": "Dr. Martens Unisex Lowell Leather Moc Toe Shoes (Black/Analine)",
+    "brand": "Dr. Martens",
+    "dept": "unisex",
+    "cat": "shoes",
+    "sale": false,
+    "price": 180.0,
+    "compare": null,
+    "handle": "dr-marten-unisex-lowell-leather-moc-toe-shoes-black-analine",
+    "img": "https://cdn.shopify.com/s/files/1/2729/9188/files/1_05dfaa46-c173-4fe3-97eb-0b85daf3698d.jpg?width=600"
+  },
+  {
+    "title": "Dr. Martens Women's Buzz 5-Eye Grizzly Leather Shoes (Dark Brown)",
+    "brand": "Dr. Martens",
+    "dept": "women",
+    "cat": "shoes",
+    "sale": false,
+    "price": 140.0,
+    "compare": null,
+    "handle": "dr-martens-womens-buzz-5-eye-grizzly-leather-shoes-dark-brown",
+    "img": "https://cdn.shopify.com/s/files/1/2729/9188/files/Buzz.jpg?width=600"
+  },
+  {
+    "title": "Dr. Martens Men's 1460 Pascal Steel Toe Analine Croc Embossed Boot (Black)",
+    "brand": "Dr. Martens",
+    "dept": "men",
+    "cat": "shoes",
+    "sale": true,
+    "price": 139.0,
+    "compare": 210.0,
+    "handle": "dr-martens-mens-1460-pascal-steel-toe-analine-croc-embossed-boot-black",
+    "img": "https://cdn.shopify.com/s/files/1/2729/9188/files/boot_07b6f474-81b9-4771-9936-3ccaa0b497e0.jpg?width=600"
+  },
+  {
+    "title": "Square Trade Goods Roaring Pines 10oz. Candle",
+    "brand": "Square Trade Goods",
+    "dept": "unisex",
+    "cat": "accessories",
+    "sale": true,
+    "price": 24.0,
+    "compare": 36.0,
+    "handle": "square-trade-goods-roaring-pines-10oz-candle",
+    "img": "https://cdn.shopify.com/s/files/1/2729/9188/files/12_1ec1eb4c-72cc-4e27-bc53-6340f6846bbc.jpg?width=600"
+  },
+  {
+    "title": "Square Trade Goods Juniper Santal 10oz. Candle",
+    "brand": "Square Trade Goods",
+    "dept": "unisex",
+    "cat": "accessories",
+    "sale": true,
+    "price": 24.0,
+    "compare": 36.0,
+    "handle": "square-trade-goods-juniper-santal-10oz-candle",
+    "img": "https://cdn.shopify.com/s/files/1/2729/9188/files/11_3b758c23-2b91-4658-973e-71c0d08a1e63.jpg?width=600"
+  },
+  {
+    "title": "Square Trade Goods Palo Santo & Sage 10oz. Candle",
+    "brand": "Square Trade Goods",
+    "dept": "unisex",
+    "cat": "accessories",
+    "sale": true,
+    "price": 24.0,
+    "compare": 36.0,
+    "handle": "square-trade-goods-palo-santo-sage-10oz-candle",
+    "img": "https://cdn.shopify.com/s/files/1/2729/9188/files/10_9ff03f7f-010e-4b06-869e-4f5d1d8bae99.jpg?width=600"
+  },
+  {
+    "title": "Square Trade Goods Golden Cedar 10oz. Candle",
+    "brand": "Square Trade Goods",
+    "dept": "unisex",
+    "cat": "accessories",
+    "sale": true,
+    "price": 24.0,
+    "compare": 36.0,
+    "handle": "square-trade-goods-golden-cedar-10oz-candle",
+    "img": "https://cdn.shopify.com/s/files/1/2729/9188/files/9_dac03ad2-c7ef-43f2-b7e0-f3e26efd2f71.jpg?width=600"
+  },
+  {
+    "title": "Square Trade Goods Smoked Fig 10oz. Candle",
+    "brand": "Square Trade Goods",
+    "dept": "unisex",
+    "cat": "accessories",
+    "sale": true,
+    "price": 24.0,
+    "compare": 36.0,
+    "handle": "square-trade-goods-smoked-fig-10oz-candle",
+    "img": "https://cdn.shopify.com/s/files/1/2729/9188/files/8_9cd94d9e-bfcd-49e5-b04a-8c31f55cdaf7.jpg?width=600"
+  },
+  {
+    "title": "Square Trade Goods Fig & Sage 10oz. Candle",
+    "brand": "Square Trade Goods",
+    "dept": "unisex",
+    "cat": "accessories",
+    "sale": true,
+    "price": 24.0,
+    "compare": 36.0,
+    "handle": "square-trade-goods-fig-sage-10oz-candle",
+    "img": "https://cdn.shopify.com/s/files/1/2729/9188/files/7_53e7ca38-c827-47fc-9102-9888923fa317.jpg?width=600"
+  },
+  {
+    "title": "Square Trade Goods Roaring Pines Incense Cones",
+    "brand": "Square Trade Goods",
+    "dept": "unisex",
+    "cat": "accessories",
+    "sale": true,
+    "price": 16.0,
+    "compare": 22.0,
+    "handle": "square-trade-goods-roaring-pines-incense-cones",
+    "img": "https://cdn.shopify.com/s/files/1/2729/9188/files/6_5df3920c-e927-4729-b41b-78be1d8ccbda.jpg?width=600"
+  },
+  {
+    "title": "Square Trade Goods Big Sur Incense Cones",
+    "brand": "Square Trade Goods",
+    "dept": "unisex",
+    "cat": "accessories",
+    "sale": true,
+    "price": 16.0,
+    "compare": 22.0,
+    "handle": "square-trade-goods-big-sur-incense-cones",
+    "img": "https://cdn.shopify.com/s/files/1/2729/9188/files/4_e7697948-d455-4efe-b76c-7ce36410045a.jpg?width=600"
+  },
+  {
+    "title": "Square Trade Goods Palo Santo & Sage Incense Cones",
+    "brand": "Square Trade Goods",
+    "dept": "unisex",
+    "cat": "accessories",
+    "sale": true,
+    "price": 16.0,
+    "compare": 22.0,
+    "handle": "square-trade-goods-palo-santo-sage-incense-cones",
+    "img": "https://cdn.shopify.com/s/files/1/2729/9188/files/3_fd65f905-a25a-4db8-baa9-0218edf9c53a.jpg?width=600"
+  },
+  {
+    "title": "Square Trade Goods Hinoki Incense Cones",
+    "brand": "Square Trade Goods",
+    "dept": "unisex",
+    "cat": "accessories",
+    "sale": true,
+    "price": 16.0,
+    "compare": 22.0,
+    "handle": "square-trade-goods-hinoki-incense-cones",
+    "img": "https://cdn.shopify.com/s/files/1/2729/9188/files/2_c8e8bfa6-7320-48c4-bd75-08d4b6bab835.jpg?width=600"
+  },
+  {
+    "title": "Square Trade Goods Smoked Fig Incense Cones",
+    "brand": "Square Trade Goods",
+    "dept": "unisex",
+    "cat": "accessories",
+    "sale": true,
+    "price": 16.0,
+    "compare": 22.0,
+    "handle": "square-trade-goods-smoked-fig-incense-cones",
+    "img": "https://cdn.shopify.com/s/files/1/2729/9188/files/1_9828c3c7-8e31-47fc-9695-cd5c08975fa0.jpg?width=600"
   }
 ];
 

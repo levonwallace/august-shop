@@ -282,7 +282,9 @@
 
 .pdp-gallery {
   position: relative;
-  height: 680px;
+  min-height: 680px;
+  height: auto;
+  align-self: stretch;
   border-radius: var(--radius-panel);
   background: #fff;
   box-shadow: var(--shadow-card);
@@ -327,11 +329,12 @@
 }
 
 .buy-box {
-  height: 680px;
+  min-height: 680px;
+  height: auto;
   padding: 36px;
   display: flex;
   flex-direction: column;
-  gap: 20px;
+  gap: 18px;
   box-shadow: var(--shadow-product);
 }
 
@@ -402,7 +405,11 @@
 
 .pdp-related {
   width: min(1364px, calc(100% - 64px));
-  margin: 0 auto 8px;
+  margin: 0 auto 48px;
+}
+
+.pdp-related .product-grid {
+  gap: 36px 32px;
 }
 
 .pdp-related h2 {
@@ -415,35 +422,37 @@
 }
 
 .ask-ai {
-  padding: 24px 28px 20px;
+  padding-top: 16px;
+  border-top: 1px solid var(--color-border-soft);
 }
 
 .ask-ai__input {
   width: 100%;
   border: 1px solid var(--color-border);
   background: #fff;
-  padding: 13px 16px;
-  font-size: 14px;
+  padding: 11px 14px;
+  font-size: 13px;
   color: var(--color-placeholder);
-  margin-bottom: 14px;
+  margin-bottom: 10px;
+  border-radius: var(--radius-chip);
 }
 
 .ask-ai__chips {
   display: flex;
   flex-wrap: wrap;
-  gap: 10px;
-  margin-bottom: 14px;
+  gap: 8px;
+  margin-bottom: 10px;
 }
 
 .ask-ai__chips button {
   display: inline-flex;
   align-items: center;
-  gap: 6px;
-  padding: 7px 12px;
+  gap: 5px;
+  padding: 6px 10px;
   border-radius: var(--radius-chip);
   border: 1px solid var(--color-border-mid);
   background: #fff;
-  font-size: 12px;
+  font-size: 11px;
   color: var(--color-ink-soft);
 }
 
@@ -1739,20 +1748,11 @@
 
   .pdp-related {
     width: calc(100% - 32px);
+    margin-bottom: 32px;
   }
 
-  .ask-ai,
   .desc-card {
     padding: 20px;
-  }
-
-  .ask-ai__chips {
-    flex-direction: column;
-  }
-
-  .ask-ai__chips button {
-    width: 100%;
-    justify-content: flex-start;
   }
 
   .tab-bar {

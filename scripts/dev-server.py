@@ -215,6 +215,40 @@ def score_product(p, q, tokens):
     return score
 
 
+def brand_key(name):
+    return re.sub(r"[^a-z0-9]+", "", (name or "").lower())
+
+
+def filter_brand(brand, limit):
+    key = brand_key(brand)
+    if not key:
+        return []
+    out = []
+    with CACHE_LOCK:
+        pool = list(PRODUCTS)
+    for p in pool:
+        if brand_key(p.get("brand")) == key:
+            out.append(p)
+            if len(out) >= limit:
+                break
+    return out
+
+
+def collection_products(handle, limit):
+    handle = re.sub(r"[^a-z0-9-]+", "", (handle or "").lower())
+    if not handle:
+        return []
+    try:
+        data = shop_get(
+            "/collections/%s/products.json?limit=%s" % (urllib.parse.quote(handle), min(250, limit)),
+            timeout=12,
+        )
+        return [normalize_catalog(p) for p in (data.get("products") or [])]
+    except Exception as exc:
+        sys.stderr.write("collection %s failed: %s\n" % (handle, exc))
+        return []
+
+
 def search_cache(q, limit):
     tokens = [t for t in re.split(r"\s+", q) if t]
     scored = []
@@ -297,10 +331,25 @@ class NoCacheHandler(SimpleHTTPRequestHandler):
         if parsed.path == "/api/search":
             qs = urllib.parse.parse_qs(parsed.query)
             q = (qs.get("q") or [""])[0].strip()
+            brand = (qs.get("brand") or [""])[0].strip()
             try:
                 limit = max(1, min(48, int((qs.get("limit") or ["24"])[0])))
             except ValueError:
                 limit = 24
+            if brand:
+                coll = collection_products(
+                    re.sub(r"[^a-z0-9]+", "-", brand.lower()).strip("-"), limit
+                )
+                cached = filter_brand(brand, limit)
+                self._json(
+                    {
+                        "q": q,
+                        "brand": brand,
+                        "products": merge_results(coll, cached, limit),
+                        "cached": CACHE_READY,
+                    }
+                )
+                return
             if len(q) < 2:
                 self._json({"products": [], "q": q})
                 return

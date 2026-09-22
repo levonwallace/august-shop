@@ -57,6 +57,22 @@ window.AugustShop = (() => {
     }
   };
 
+  const byBrand = async (brand, limit = 48) => {
+    const name = String(brand || "").trim();
+    if (!name) return [];
+    const match = (p) =>
+      window.AugustCatalog ? window.AugustCatalog.brandMatch(p.brand, [name]) : p.brand === name;
+    try {
+      const res = await fetch(`/api/search?brand=${encodeURIComponent(name)}&limit=${limit}`);
+      if (!res.ok) throw new Error("brand " + res.status);
+      const data = await res.json();
+      const live = (data.products || []).map(remember).filter(match);
+      if (live.length) return live;
+    } catch {}
+    if (!window.AugustCatalog) return [];
+    return window.AugustCatalog.PRODUCTS.filter(match).slice(0, limit);
+  };
+
   const product = async (handle) => {
     const hit = cached("h:" + handle) || cached(handle);
     if (hit && hit.body && (hit.images?.length || hit.sizes?.length)) return hit;
@@ -77,5 +93,5 @@ window.AugustShop = (() => {
       <span class="sheet-list__price">${window.AugustCatalog ? window.AugustCatalog.money(p.price) : ""}</span>
     </a>`;
 
-  return { search, product, remember, cached, href, resultRow };
+  return { search, byBrand, product, remember, cached, href, resultRow };
 })();

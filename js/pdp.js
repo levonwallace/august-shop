@@ -17,7 +17,10 @@ document.addEventListener("DOMContentLoaded", async () => {
     try {
       product = await window.AugustShop.product(handle);
     } catch {
-      product = product || window.AugustCatalog.PRODUCTS[0];
+      product =
+        product ||
+        window.AugustCatalog.PRODUCTS.find((p) => p.handle === handle) ||
+        window.AugustCatalog.PRODUCTS[0];
     }
   }
   product = product || window.AugustCatalog.PRODUCTS[0];

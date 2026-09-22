@@ -532,6 +532,8 @@ document.addEventListener("DOMContentLoaded", () => {
       const count = `${n} product${n === 1 ? "" : "s"}`;
       if (state.q) return `Results for “${state.q}” · ${count}`;
       if (state.feed) return `Your feed — ${dept}${cat}${sale} · ${count}`;
+      if (state.brands.length === 1 && !state.cats.length && state.dept === "all" && !state.type)
+        return `${state.brands[0]}${sale} · ${count}`;
       if (state.dept !== "all" || state.cats.length || state.type || state.sale || state.brands.length || state.price)
         return `${dept}${cat}${sale}${state.brands.length ? " · " + state.brands.join(", ") : ""} · ${count}`;
       return `New arrivals from Nike, Adidas, Carhartt WIP, and more · ${count}`;
@@ -622,11 +624,36 @@ document.addEventListener("DOMContentLoaded", () => {
 
     syncSheet();
 
+    const heading = document.querySelector(".plp-main > h1");
+    if (heading && state.brands.length === 1) heading.textContent = state.brands[0];
+    if (state.brands.length === 1) document.title = `${state.brands[0]} — August`;
+
+    const mergeBrandHits = (live) => {
+      const local = window.AugustCatalog.PRODUCTS.filter((p) =>
+        window.AugustCatalog.brandMatch(p.brand, state.brands)
+      );
+      const seen = new Set();
+      const out = [];
+      for (const p of [...(live || []), ...local]) {
+        const key = p.handle || p.id || p.title;
+        if (seen.has(key)) continue;
+        seen.add(key);
+        out.push(p);
+      }
+      return out;
+    };
+
     if (state.q && window.AugustShop) {
       grid.innerHTML = '<p class="plp-empty">Searching the shop…</p>';
       window.AugustShop.search(state.q, 48).then((hits) => {
         liveHits = hits.length ? hits : null;
         hits.forEach((p) => window.AugustShop.remember(p));
+        renderPLP();
+      });
+    } else if (state.brands.length && window.AugustShop?.byBrand) {
+      grid.innerHTML = '<p class="plp-empty">Loading this brand…</p>';
+      window.AugustShop.byBrand(state.brands[0], 48).then((hits) => {
+        liveHits = mergeBrandHits(hits);
         renderPLP();
       });
     } else {

@@ -297,7 +297,11 @@ body.mega-open .mega-backdrop {
   flex-direction: column;
   width: 100%;
   max-width: 1376px;
-  max-height: calc(100dvh - 24px);
+  /* Exactly a quarter of the visible screen at every desktop/tablet width.
+     dvh is pre-zoom (visual) — divide by --ui-scale to get layout px,
+     same trick as the page stage in base.css. */
+  height: calc(25dvh / var(--ui-scale));
+  min-height: 240px; /* floor only for very short windows */
   margin: 0 auto;
   border-radius: var(--radius-panel);
   background: rgba(255, 255, 255, 0.94);
@@ -432,6 +436,11 @@ body.mega-open .mega-backdrop {
   align-items: stretch;
   padding: 20px 24px 24px;
   background: #fff;
+  /* Body fills whatever the fixed 25%-of-screen shell leaves and scrolls
+     if a panel (e.g. brand directory) needs more room. */
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
 }
 
 .morph-links__label {
@@ -468,7 +477,6 @@ body.mega-open .mega-backdrop {
   align-items: start;
   padding: 28px 40px 40px;
   overflow-y: auto;
-  max-height: calc(100dvh - 88px);
 }
 
 .morph-menu__body.is-directory .morph-products,

@@ -358,11 +358,14 @@
   min-height: 0;
 }
 
+/* Catalog photos are square-ish product shots on baked-in white — contain
+   (not cover) so nothing gets cropped or blur-upscaled, at any tile size.
+   The white letterbox is invisible against the white tile. */
 .card-stack .home-tile img,
 .card-stack .home-tile--tall img {
   width: 100%;
   height: 100%;
-  object-fit: cover;
+  object-fit: contain;
   object-position: center;
 }
 
@@ -471,6 +474,20 @@
 }
 
 /* ── Responsive ───────────────────────────────────────────── */
+
+/* Large desktop (≥1600px window) — the stage spans the full screen; keep
+   the hero on the same 32px gutter as the header so their edges align,
+   and let the photo take more of the width (otherwise the copy column
+   turns into a huge empty field). */
+@media (min-width: 1600px) {
+  .card-stack .home-layout {
+    grid-template-columns: minmax(320px, 1fr) minmax(0, 62%);
+  }
+
+  .card-stack .home-copy {
+    max-width: 560px;
+  }
+}
 
 /* Mid-desktop (~1024–1280px) — tighter gaps, smaller banner.
    Type stays Figma-sized (38px / 14px); only spacing compresses. */
@@ -714,6 +731,21 @@
   flex-direction: column;
   gap: 48px;
   min-height: 100%;
+}
+
+/* Desktop: the radio section fills the whole stage instead of a centered
+   860px column, on the same 32px gutter as the header. The mix archive
+   re-flows to as many tiles as fit. */
+@media (min-width: 901px) {
+  .radio-card__inner {
+    max-width: none;
+    padding-left: 32px;
+    padding-right: 32px;
+  }
+
+  .radio-card .aux-grid {
+    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  }
 }
 
 /* ── Radio Hero Section ───────────────────────────────────── */

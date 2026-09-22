@@ -101,9 +101,9 @@ p {
 
   .page {
     width: 100%;
-    /* 1920 layout px = 1440 physical at 0.75 zoom. Ultra-wide monitors get a
-       centered stage instead of chrome stretched across the whole screen. */
-    max-width: 1920px;
+    /* Full-width stage on large desktops — pages pad their own content,
+       so no centered cap / dead gutters on ultra-wide monitors. */
+    max-width: none;
     height: calc(100dvh / var(--ui-scale));
   }
 }

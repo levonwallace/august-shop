@@ -20,8 +20,12 @@
     <meta property="og:description" content="New arrivals dropping weekly from Vans, Hoka, Lady White Co., Dr. Martens, and more — curated in Madison, WI." />
     <meta property="og:url" content="https://august-shop.com/" />
     <meta property="og:site_name" content="August" />
-    <meta property="og:image" content="https://august-shop.com/assets/home-bts.png" />
+    <meta property="og:image" content="https://raw.githubusercontent.com/levonwallace/august-shop/master/assets/og-image.jpg" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:image:alt" content="August — streetwear, sneakers, art & music — Madison, WI" />
     <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:image" content="https://raw.githubusercontent.com/levonwallace/august-shop/master/assets/og-image.jpg" />
     <meta name="twitter:title" content="August — Streetwear, sneakers, art & music" />
     <meta name="twitter:description" content="New arrivals dropping weekly, curated in Madison, WI." />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -153,6 +157,28 @@
             <a href="inn.html">august inn</a>
             <a href="cart.html">bag</a>
           </nav>
+          <div class="mobile-nav__promos" aria-label="Featured">
+            <a class="mobile-nav__promo" href="collection.html">
+              <img src="assets/mega-1.png" alt="" loading="lazy" />
+              <span>new arrivals</span>
+            </a>
+            <a class="mobile-nav__promo" href="collection.html">
+              <img src="assets/banner-vans.png" alt="" loading="lazy" />
+              <span>vans</span>
+            </a>
+            <a class="mobile-nav__promo" href="collection.html">
+              <img src="assets/banner-square-trade-mobile.jpg" alt="" loading="lazy" />
+              <span>square trade goods</span>
+            </a>
+            <a class="mobile-nav__promo" href="collection.html">
+              <img src="assets/banner-dr-martens-mobile.jpg" alt="" loading="lazy" />
+              <span>dr. martens</span>
+            </a>
+            <a class="mobile-nav__promo" href="sale.html">
+              <img src="assets/plp-1.png" alt="" loading="lazy" />
+              <span>sale</span>
+            </a>
+          </div>
         </div>
       </header>
 
@@ -345,7 +371,11 @@
         <!-- Card 2: Square Trade Goods -->
         <div class="card-stack__card card-stack__card--brand" data-card="2">
           <a class="brand-banner brand-banner--full" href="collection.html">
-            <img class="brand-banner__media" src="assets/banner-square-trade.jpg" alt="" width="1312" height="738" />
+            <picture>
+              <!-- Portrait art for the tall mobile card; landscape everywhere else -->
+              <source media="(max-width: 900px)" srcset="assets/banner-square-trade-mobile.jpg" width="720" height="1280" />
+              <img class="brand-banner__media" src="assets/banner-square-trade.jpg" alt="" width="1312" height="738" />
+            </picture>
             <span class="brand-banner__overlay" aria-hidden="true"></span>
             <span class="brand-banner__content">
               <span class="brand-banner__title">SQUARE TRADE GOODS</span>
@@ -357,7 +387,11 @@
         <!-- Card 3: Dr Martens -->
         <div class="card-stack__card card-stack__card--brand" data-card="3">
           <a class="brand-banner brand-banner--full" href="collection.html">
-            <img class="brand-banner__media" src="assets/banner-dr-martens.jpg" alt="" width="1312" height="738" />
+            <picture>
+              <!-- Portrait art for the tall mobile card; landscape everywhere else -->
+              <source media="(max-width: 900px)" srcset="assets/banner-dr-martens-mobile.jpg" width="720" height="1280" />
+              <img class="brand-banner__media" src="assets/banner-dr-martens.jpg" alt="" width="1312" height="738" />
+            </picture>
             <span class="brand-banner__overlay" aria-hidden="true"></span>
             <span class="brand-banner__content">
               <span class="brand-banner__title">DR MARTENS</span>

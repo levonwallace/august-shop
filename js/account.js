@@ -79,9 +79,11 @@ document.addEventListener("DOMContentLoaded", () => {
         day: "numeric",
         year: "numeric",
       });
+      const status = order.status || "Processing";
+      const statusClass = window.AugustOrders?.statusClass(status) || "order-status--transit";
       const row = document.createElement("a");
       row.className = "order-row";
-      row.href = `product.html?p=${first.id}`;
+      row.href = `order.html?o=${encodeURIComponent(order.no)}`;
       row.setAttribute("data-placed-order", "");
       row.innerHTML = `
         <div class="order-row__thumb"><img src="${first.img}" alt="" /></div>
@@ -89,7 +91,7 @@ document.addEventListener("DOMContentLoaded", () => {
           <span class="order-row__title">${first.title}${extra}</span>
           <span class="order-row__meta">${order.no} · ${date}</span>
         </div>
-        <span class="order-status order-status--transit">${order.status || "Processing"}</span>
+        <span class="order-status ${statusClass}">${status}</span>
         <span class="order-row__price">${window.AugustCatalog.money(order.total)}</span>
       `;
       heading.insertAdjacentElement("afterend", row);
@@ -106,6 +108,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const saleEl = page.querySelector("[data-home-sale]");
   const enabledEl = page.querySelector("[data-home-enabled]");
   const previewEl = page.querySelector("[data-home-preview]");
+  const stageEl = page.querySelector("[data-home-stage]");
   const saveBtn = page.querySelector("[data-home-save]");
 
   const readChip = (el) =>
@@ -125,16 +128,48 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 
   const updatePreview = () => {
-    if (!previewEl || !window.AugustProfile) return;
     const hp = currentPrefs();
-    if (window.AugustProfile.feedIsDefault(hp)) {
-      previewEl.textContent = "Homepage: standard August";
-    } else {
-      const label = window.AugustProfile.feedLabel(hp);
-      previewEl.textContent = hp.enabled
-        ? `Homepage: ${label}`
-        : `Saved feed: ${label} (off)`;
+    if (previewEl && window.AugustProfile) {
+      if (window.AugustProfile.feedIsDefault(hp)) {
+        previewEl.textContent = "Homepage: standard August";
+      } else {
+        const label = window.AugustProfile.feedLabel(hp);
+        previewEl.textContent = hp.enabled
+          ? `Homepage: ${label}`
+          : `Saved feed: ${label} (off)`;
+      }
     }
+    renderStage(hp);
+  };
+
+  const renderStage = (hp) => {
+    if (!stageEl || !window.AugustCatalog) return;
+    let items = window.AugustCatalog.feed(hp, 5);
+    if (items.length < 5 && hp.saleOnly) {
+      const extra = window.AugustCatalog
+        .feed({ ...hp, saleOnly: false }, 8)
+        .filter((p) => !items.some((x) => x.id === p.id));
+      items = [...items, ...extra].slice(0, 5);
+    }
+    if (!items.length) {
+      stageEl.removeAttribute("data-count");
+      stageEl.innerHTML = `<p class="account-feed__empty">Nothing in this mix yet. Try another filter.</p>`;
+      return;
+    }
+    const href = window.AugustCatalog.href;
+    stageEl.dataset.count = String(items.length);
+    stageEl.innerHTML = items
+      .map(
+        (p, i) => `
+      <a class="feed-tile${i === 0 ? " feed-tile--hero" : ""}" href="${href(p)}">
+        <img src="${p.img}" alt="" />
+        <span class="feed-tile__meta">
+          <span class="feed-tile__brand">${p.brand}</span>
+          <span class="feed-tile__title">${p.title}</span>
+        </span>
+      </a>`
+      )
+      .join("");
   };
 
   const hydratePrefs = () => {

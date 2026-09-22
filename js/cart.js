@@ -293,8 +293,8 @@
           <svg viewBox="0 0 48 48" fill="none"><circle cx="24" cy="24" r="21" stroke="currentColor" stroke-width="1.5"/><path d="M15 24l6 6 12-12" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
         </div>
         <h2 class="cart-empty__title">Order placed</h2>
-        <p class="cart-empty__sub">${order.no} · ${order.items.reduce((s, i) => s + i.qty, 0)} item${order.items.length === 1 ? "" : "s"} · ${window.AugustCatalog.money(order.total)}<br />Pickup at August, 218 State St — we'll email you when it's ready.</p>
-        <a class="btn btn--primary" href="account.html">View in your account</a>
+        <p class="cart-empty__sub">${order.no} · ${order.items.reduce((s, i) => s + i.qty, 0)} item${order.items.length === 1 ? "" : "s"} · ${window.AugustCatalog.money(order.total)}<br />On the way from August, 414 State St.</p>
+        <a class="btn btn--primary" href="order.html?o=${encodeURIComponent(order.no)}">Track your order</a>
       `;
       main?.appendChild(confirm);
       confirm.scrollIntoView({ block: "center", behavior: "smooth" });

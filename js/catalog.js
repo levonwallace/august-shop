@@ -952,7 +952,7 @@ window.AugustCart = (() => {
       date: Date.now(),
       items: list,
       total: subtotal(),
-      status: "Processing",
+      status: "In transit",
     };
     const all = orders();
     all.unshift(order);

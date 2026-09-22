@@ -34,12 +34,14 @@
   font-size: 12px;
 }
 
-/* The sliding thumb — positioned absolutely, JS drives its transform */
+/* The sliding thumb — positioned absolutely, JS drives transform + width
+   from offsetLeft/offsetWidth (layout px). left: 0 so we don't double-count
+   track padding; offsetLeft already includes it. */
 .segmented__thumb {
   position: absolute;
   top: 3px;
   bottom: 3px;
-  left: 3px;
+  left: 0;
   border-radius: 9px;
   background: #fff;
   box-shadow:
@@ -56,7 +58,7 @@
 .segmented--compact .segmented__thumb {
   top: 2px;
   bottom: 2px;
-  left: 2px;
+  left: 0;
   border-radius: 7px;
 }
 

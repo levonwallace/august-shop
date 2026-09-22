@@ -128,24 +128,13 @@ p {
    opacity echo the rug's sun-faded reds/greens and the maple's warmth
    without ever reading as "a colored background". */
 .page--home {
-  background:
-    radial-gradient(1200px 800px at 88% -12%, var(--tint-cognac), transparent 62%),
-    radial-gradient(1000px 720px at -8% 32%, var(--tint-verdigris), transparent 56%),
-    radial-gradient(920px 880px at 72% 112%, var(--tint-madder), transparent 60%),
-    radial-gradient(700px 560px at 40% 55%, var(--tint-ochre), transparent 58%),
-    #fff;
+  background: #fcfcfa;
 }
 
-.page--plp {
-  background: linear-gradient(90deg, var(--color-page-plp), var(--color-page-plp-end));
-}
-
-.page--pdp {
-  background: var(--color-page);
-}
-
+.page--plp,
+.page--pdp,
 .page--cart {
-  background: var(--color-page);
+  background: #fcfcfa;
 }
 
 /* ── Ambient animated background (mirrors the home hero) ─────
@@ -165,21 +154,21 @@ p {
 
 .page--plp::before {
   background:
-    radial-gradient(36% 28% at 90% 4%, rgba(176, 112, 58, 0.1), transparent 52%),
-    radial-gradient(30% 32% at 8% 96%, rgba(43, 85, 168, 0.1), transparent 50%);
+    radial-gradient(36% 28% at 90% 4%, rgba(176, 112, 58, 0.018), transparent 56%),
+    radial-gradient(30% 32% at 8% 96%, rgba(43, 85, 168, 0.016), transparent 54%);
 }
 
 .page--pdp::before {
   background:
-    radial-gradient(36% 30% at 86% 6%, rgba(74, 111, 94, 0.11), transparent 52%),
-    radial-gradient(32% 28% at 6% 94%, rgba(176, 112, 58, 0.09), transparent 50%);
+    radial-gradient(36% 30% at 86% 6%, rgba(74, 111, 94, 0.018), transparent 56%),
+    radial-gradient(32% 28% at 6% 94%, rgba(176, 112, 58, 0.014), transparent 54%);
   animation-duration: 24s;
 }
 
 .page--cart::before {
   background:
-    radial-gradient(34% 28% at 88% 6%, rgba(168, 67, 46, 0.1), transparent 50%),
-    radial-gradient(32% 30% at 8% 94%, rgba(74, 111, 94, 0.09), transparent 50%);
+    radial-gradient(34% 28% at 88% 6%, rgba(168, 67, 46, 0.016), transparent 54%),
+    radial-gradient(32% 30% at 8% 94%, rgba(74, 111, 94, 0.014), transparent 54%);
   animation-duration: 20s;
 }
 
@@ -199,31 +188,31 @@ p {
 }
 
 .page--plp::after {
-  background: radial-gradient(closest-side, rgba(43, 85, 168, 0.14) 0%, rgba(74, 111, 94, 0.06) 40%, transparent 64%);
+  background: radial-gradient(closest-side, rgba(43, 85, 168, 0.028) 0%, rgba(74, 111, 94, 0.01) 40%, transparent 64%);
 }
 
 .page--pdp::after {
-  background: radial-gradient(closest-side, rgba(74, 111, 94, 0.14) 0%, rgba(217, 163, 38, 0.06) 40%, transparent 64%);
+  background: radial-gradient(closest-side, rgba(74, 111, 94, 0.028) 0%, rgba(217, 163, 38, 0.01) 40%, transparent 64%);
   animation-duration: 30s;
 }
 
 .page--cart::after {
-  background: radial-gradient(closest-side, rgba(168, 67, 46, 0.12) 0%, rgba(176, 112, 58, 0.06) 40%, transparent 64%);
+  background: radial-gradient(closest-side, rgba(168, 67, 46, 0.022) 0%, rgba(176, 112, 58, 0.01) 40%, transparent 64%);
   animation-duration: 24s;
 }
 
 @keyframes page-hue-drift {
   0%,
   100% {
-    filter: hue-rotate(0deg) saturate(1.08) contrast(1.2);
+    filter: hue-rotate(0deg) saturate(1.04);
     transform: translate3d(0, 0, 0);
   }
   33% {
-    filter: hue-rotate(16deg) saturate(1.16) contrast(1.26);
+    filter: hue-rotate(14deg) saturate(1.08);
     transform: translate3d(-5%, 4%, 0);
   }
   66% {
-    filter: hue-rotate(-12deg) saturate(1.1) contrast(1.18);
+    filter: hue-rotate(-10deg) saturate(1.05);
     transform: translate3d(4%, -5%, 0);
   }
 }

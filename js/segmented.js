@@ -30,24 +30,24 @@
     const position = (index, animated = true) => {
       const target = segments[index];
       if (!target) return;
-      const targetRect = target.getBoundingClientRect();
-      const rootRect = root.getBoundingClientRect();
-      const rootStyle = getComputedStyle(root);
-      const padLeft = parseFloat(rootStyle.paddingLeft) || 0;
-
-      const x = targetRect.left - rootRect.left - padLeft;
-      const w = targetRect.width;
+      /* offsetLeft/Width are layout CSS pixels — the same space as
+         style.width and transform. getBoundingClientRect is visual and
+         disagrees with html { zoom: var(--ui-scale) }, which stretched
+         the thumb across neighboring segments. */
+      const x = target.offsetLeft;
+      const w = target.offsetWidth;
+      const apply = () => {
+        thumb.style.transform = `translate3d(${x}px, 0, 0)`;
+        thumb.style.width = `${w}px`;
+      };
       if (!animated) {
         const prev = thumb.style.transition;
         thumb.style.transition = "none";
-        thumb.style.transform = `translate3d(${x}px, 0, 0)`;
-        thumb.style.width = `${w}px`;
-        // force reflow, then restore
-        void thumb.offsetHeight;
+        apply();
+        void thumb.offsetWidth;
         thumb.style.transition = prev;
       } else {
-        thumb.style.transform = `translate3d(${x}px, 0, 0)`;
-        thumb.style.width = `${w}px`;
+        apply();
       }
     };
 
@@ -133,6 +133,8 @@
 
     const ro = new ResizeObserver(() => position(activeIndex, false));
     ro.observe(root);
+    segments.forEach((s) => ro.observe(s));
+    document.fonts?.ready?.then(() => position(activeIndex, false));
 
     // Update tabIndex on load
     segments.forEach((s, i) => (s.tabIndex = i === activeIndex ? 0 : -1));

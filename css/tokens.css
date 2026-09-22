@@ -60,6 +60,8 @@
   --radius-card: 16px;
   --radius-panel: 28px;
   --radius-panel-sm: 22px;
+  /* Header islands + footer — same corner on every chrome bar */
+  --radius-chrome: 8px;
 
   --page-max: 1440px;
   --gutter: 64px;

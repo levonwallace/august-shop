@@ -149,40 +149,38 @@ p {
 }
 
 /* ── Ambient animated background (mirrors the home hero) ─────
-   Each page's color washes live on ::before so they can slowly
-   drift through hues; ::after is a soft glow that roams the page.
-   Palettes lean differently per page: plp → cobalt, pdp → verdigris,
-   cart → madder. */
+   Lighter wells, tighter falloff, faster roam — same idea as the
+   home field: airy, not creamy, with motion that still reads. */
 .page--plp::before,
 .page--pdp::before,
 .page--cart::before {
   content: "";
   position: absolute;
-  inset: -6%;
+  inset: -10%;
   pointer-events: none;
   z-index: 0;
-  will-change: filter;
-  animation: page-hue-drift 38s ease-in-out infinite;
+  will-change: filter, transform;
+  animation: page-hue-drift 22s ease-in-out infinite;
 }
 
 .page--plp::before {
   background:
-    radial-gradient(1100px 700px at 92% -8%, var(--tint-cognac), transparent 60%),
-    radial-gradient(900px 720px at 4% 108%, var(--tint-cobalt), transparent 55%);
+    radial-gradient(36% 28% at 90% 4%, rgba(176, 112, 58, 0.1), transparent 52%),
+    radial-gradient(30% 32% at 8% 96%, rgba(43, 85, 168, 0.1), transparent 50%);
 }
 
 .page--pdp::before {
   background:
-    radial-gradient(1100px 760px at 86% -10%, var(--tint-verdigris), transparent 60%),
-    radial-gradient(940px 700px at -6% 106%, var(--tint-cognac), transparent 56%);
-  animation-duration: 42s;
+    radial-gradient(36% 30% at 86% 6%, rgba(74, 111, 94, 0.11), transparent 52%),
+    radial-gradient(32% 28% at 6% 94%, rgba(176, 112, 58, 0.09), transparent 50%);
+  animation-duration: 24s;
 }
 
 .page--cart::before {
   background:
-    radial-gradient(1000px 720px at 90% -8%, var(--tint-madder), transparent 58%),
-    radial-gradient(940px 720px at -4% 104%, var(--tint-verdigris), transparent 56%);
-  animation-duration: 34s;
+    radial-gradient(34% 28% at 88% 6%, rgba(168, 67, 46, 0.1), transparent 50%),
+    radial-gradient(32% 30% at 8% 94%, rgba(74, 111, 94, 0.09), transparent 50%);
+  animation-duration: 20s;
 }
 
 .page--plp::after,
@@ -190,40 +188,43 @@ p {
 .page--cart::after {
   content: "";
   position: absolute;
-  top: -160px;
-  right: -140px;
-  width: 560px;
-  height: 560px;
+  top: -120px;
+  right: -100px;
+  width: 380px;
+  height: 380px;
   pointer-events: none;
   z-index: 0;
   will-change: transform;
-  animation: page-glow-roam 46s ease-in-out infinite;
+  animation: page-glow-roam 26s ease-in-out infinite;
 }
 
 .page--plp::after {
-  background: radial-gradient(closest-side, rgba(43, 85, 168, 0.14), rgba(74, 111, 94, 0.09) 55%, transparent 74%);
+  background: radial-gradient(closest-side, rgba(43, 85, 168, 0.14) 0%, rgba(74, 111, 94, 0.06) 40%, transparent 64%);
 }
 
 .page--pdp::after {
-  background: radial-gradient(closest-side, rgba(74, 111, 94, 0.18), rgba(217, 163, 38, 0.09) 55%, transparent 74%);
-  animation-duration: 52s;
+  background: radial-gradient(closest-side, rgba(74, 111, 94, 0.14) 0%, rgba(217, 163, 38, 0.06) 40%, transparent 64%);
+  animation-duration: 30s;
 }
 
 .page--cart::after {
-  background: radial-gradient(closest-side, rgba(168, 67, 46, 0.14), rgba(176, 112, 58, 0.1) 55%, transparent 74%);
-  animation-duration: 40s;
+  background: radial-gradient(closest-side, rgba(168, 67, 46, 0.12) 0%, rgba(176, 112, 58, 0.06) 40%, transparent 64%);
+  animation-duration: 24s;
 }
 
 @keyframes page-hue-drift {
   0%,
   100% {
-    filter: hue-rotate(0deg) saturate(1);
+    filter: hue-rotate(0deg) saturate(1.08) contrast(1.2);
+    transform: translate3d(0, 0, 0);
   }
   33% {
-    filter: hue-rotate(24deg) saturate(1.12);
+    filter: hue-rotate(16deg) saturate(1.16) contrast(1.26);
+    transform: translate3d(-5%, 4%, 0);
   }
   66% {
-    filter: hue-rotate(-18deg) saturate(1.04);
+    filter: hue-rotate(-12deg) saturate(1.1) contrast(1.18);
+    transform: translate3d(4%, -5%, 0);
   }
 }
 
@@ -233,13 +234,13 @@ p {
     transform: translate3d(0, 0, 0) scale(1);
   }
   24% {
-    transform: translate3d(-56vw, 32vh, 0) scale(1.14);
+    transform: translate3d(-68vw, 30vh, 0) scale(1.28);
   }
   48% {
-    transform: translate3d(-16vw, 68vh, 0) scale(0.9);
+    transform: translate3d(-10vw, 74vh, 0) scale(0.78);
   }
   74% {
-    transform: translate3d(-46vw, 10vh, 0) scale(1.08);
+    transform: translate3d(-58vw, 4vh, 0) scale(1.18);
   }
 }
 

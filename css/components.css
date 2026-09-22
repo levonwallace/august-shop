@@ -18,7 +18,7 @@
 
 .header-desktop {
   display: grid;
-  grid-template-columns: minmax(280px, 517px) 1fr minmax(280px, 557px);
+  grid-template-columns: max-content minmax(0, 1fr) minmax(220px, 1fr);
   align-items: center;
   gap: 16px;
   pointer-events: none;
@@ -30,7 +30,7 @@
 
 .header-island {
   height: 57px;
-  border-radius: 8px;
+  border-radius: var(--radius-chrome);
   background: var(--color-island);
   border: 1px solid var(--color-island-border);
   box-shadow: var(--shadow-island);
@@ -40,10 +40,11 @@
 .header-nav {
   display: flex;
   align-items: center;
-  gap: 40px;
+  gap: 32px;
   height: 100%;
-  padding: 0 24px 0 28px;
-  min-width: 0;
+  padding: 0 22px 0 26px;
+  width: max-content;
+  max-width: 100%;
 }
 
 .wordmark {
@@ -57,9 +58,8 @@
 .nav-links {
   display: flex;
   align-items: center;
-  gap: 18px;
-  min-width: 0;
-  overflow: hidden;
+  gap: 20px;
+  flex: 0 0 auto;
 }
 
 .nav-links a,
@@ -789,7 +789,7 @@ a.brand-dir__head {
   right: var(--footer-inset);
   bottom: var(--footer-inset);
   height: var(--footer-h);
-  border-radius: 50px;
+  border-radius: var(--radius-chrome);
   background: var(--color-island);
   border: 1px solid var(--color-island-border);
   box-shadow: var(--shadow-island);

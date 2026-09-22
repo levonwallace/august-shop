@@ -3,13 +3,25 @@
    Add to bag writes the cart store. Port note: this file disappears —
    Liquid renders product templates server-side; add-to-bag becomes
    the Shopify Ajax Cart /cart/add call. */
-document.addEventListener("DOMContentLoaded", () => {
+document.addEventListener("DOMContentLoaded", async () => {
   const gallery = document.querySelector(".pdp-gallery__image");
   if (!gallery || !window.AugustCatalog) return;
 
   const params = new URLSearchParams(location.search);
-  const product =
-    window.AugustCatalog.byId(params.get("p")) || window.AugustCatalog.PRODUCTS[0];
+  const handle = params.get("h");
+  let product = handle
+    ? window.AugustShop?.cached("h:" + handle) || window.AugustShop?.cached(handle)
+    : window.AugustCatalog.byId(params.get("p"));
+
+  if (handle && window.AugustShop) {
+    try {
+      product = await window.AugustShop.product(handle);
+    } catch {
+      product = product || window.AugustCatalog.PRODUCTS[0];
+    }
+  }
+  product = product || window.AugustCatalog.PRODUCTS[0];
+  window.AugustShop?.remember(product);
 
   const money = window.AugustCatalog.money;
 
@@ -24,7 +36,7 @@ document.addEventListener("DOMContentLoaded", () => {
     if (el) el.textContent = text;
   };
 
-  setText(".buy-box__brand", product.brand.toUpperCase());
+  setText(".buy-box__brand", (product.brand || "").toUpperCase());
   setText(".buy-box__title", product.title);
 
   const price = document.querySelector(".buy-box__price");
@@ -35,19 +47,43 @@ document.addEventListener("DOMContentLoaded", () => {
     const saleLine = product.sale && product.compare
       ? ` Now ${money(product.price)}, down from ${money(product.compare)}.`
       : "";
-    desc.textContent = `${product.title} from ${product.brand}.${saleLine} Available now at August.`;
+    desc.textContent = product.body
+      ? product.body
+      : `${product.title} from ${product.brand}.${saleLine} Available now at August.`;
   }
 
   const longDesc = document.querySelector(".desc-card__body");
   if (longDesc) {
-    longDesc.textContent = `${product.title} — sourced for the shop floor at August, Madison. Full product story lands here at Shopify port time; imagery and pricing are live from the real catalog.`;
+    longDesc.textContent = product.body
+      ? product.body
+      : `${product.title} — sourced for the shop floor at August, Madison.`;
   }
   document.querySelector(".desc-card__bullets")?.remove();
-  document.querySelector(".pdp-thumbs")?.setAttribute("hidden", "");
+
+  const thumbs = document.querySelector(".pdp-thumbs");
+  const extras = (product.images || []).filter(Boolean);
+  if (thumbs && extras.length > 1) {
+    thumbs.removeAttribute("hidden");
+    thumbs.innerHTML = extras
+      .slice(0, 5)
+      .map(
+        (src, i) =>
+          `<button type="button" class="pdp-thumbs__btn${i === 0 ? " is-active" : ""}" data-thumb="${src}"><img src="${src}" alt="" /></button>`
+      )
+      .join("");
+    thumbs.addEventListener("click", (e) => {
+      const btn = e.target.closest("[data-thumb]");
+      if (!btn) return;
+      gallery.src = btn.getAttribute("data-thumb");
+      thumbs.querySelectorAll(".pdp-thumbs__btn").forEach((b) => b.classList.toggle("is-active", b === btn));
+    });
+  } else {
+    thumbs?.setAttribute("hidden", "");
+  }
 
   const related = window.AugustCatalog.related(product, 4);
   const extended = document.querySelector(".pdp-extended");
-  if (related.length && extended) {
+  if (related.length && extended && !document.querySelector(".pdp-related")) {
     const section = document.createElement("section");
     section.className = "pdp-related";
     section.setAttribute("aria-label", "More from August");
@@ -57,9 +93,9 @@ document.addEventListener("DOMContentLoaded", () => {
     extended.parentNode.insertBefore(section, extended);
   }
 
-  /* Sizes depend on category (shoes / apparel / accessories) */
+  /* Sizes: live Shopify options when we have them */
   const seg = document.querySelector(".buy-box .segmented");
-  const sizes = window.AugustCatalog.sizesFor(product);
+  const sizes = product.sizes?.length ? product.sizes : window.AugustCatalog.sizesFor(product);
   if (seg) {
     seg.innerHTML = sizes
       .map(
@@ -77,7 +113,6 @@ document.addEventListener("DOMContentLoaded", () => {
       const size = seg?.querySelector(".is-active")?.getAttribute("data-value") || sizes[0];
       window.AugustCart.add(product.id, size);
 
-      // Confirmation sheet shows what was actually added
       const thumb = document.querySelector(".sheet-confirm__thumb img");
       const title = document.querySelector(".sheet-confirm__title");
       const sub = document.querySelector(".sheet-confirm__sub");

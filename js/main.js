@@ -35,7 +35,12 @@ document.addEventListener("DOMContentLoaded", () => {
                 <button type="button" class="sheet-chip" data-search-chip>Sporty &amp; Rich</button>
               </div>
             </div>
-            <div class="sheet-section">
+            <div class="sheet-section" data-search-live hidden>
+              <p class="sheet-section__label">Results</p>
+              <div class="sheet-list" data-search-results></div>
+              <a class="sheet-list__row" data-search-all href="collection.html">See all results</a>
+            </div>
+            <div class="sheet-section" data-search-idle>
               <p class="sheet-section__label">Recent</p>
               <div class="sheet-list" data-search-recents></div>
             </div>
@@ -339,20 +344,100 @@ document.addEventListener("DOMContentLoaded", () => {
   syncBadges();
   window.addEventListener("august:cart-changed", syncBadges);
 
-  /* ── Search: header fields + search sheet → collection?q= ── */
-  document.querySelectorAll('input[type="search"]').forEach((input) => {
-    input.addEventListener("keydown", (e) => {
-      if (e.key !== "Enter") return;
+  /* ── Search: live results from august-shop.com via /api/search ── */
+  const goSearch = (q) => {
+    const query = String(q || "").trim();
+    if (query) location.href = `collection.html?q=${encodeURIComponent(query)}`;
+  };
+
+  const paintSuggest = (host, products, q) => {
+    if (!host) return;
+    if (!products.length) {
+      host.innerHTML = q
+        ? `<p class="search-suggest__empty">No matches for “${q}”</p>`
+        : "";
+      return;
+    }
+    const Shop = window.AugustShop;
+    host.innerHTML =
+      products.map((p) => Shop.resultRow(p)).join("") +
+      `<a class="sheet-list__row" href="collection.html?q=${encodeURIComponent(q)}">See all results</a>`;
+  };
+
+  const bindLiveSearch = (input, panel) => {
+    let timer = 0;
+    let seq = 0;
+    const run = async () => {
       const q = input.value.trim();
-      if (q) location.href = `collection.html?q=${encodeURIComponent(q)}`;
+      const live = document.querySelector("[data-search-live]");
+      const idle = document.querySelector("[data-search-idle]");
+      const all = document.querySelector("[data-search-all]");
+      if (q.length < 2) {
+        if (panel) {
+          panel.hidden = true;
+          panel.innerHTML = "";
+        }
+        if (live) live.hidden = true;
+        if (idle) idle.hidden = false;
+        return;
+      }
+      const ticket = ++seq;
+      const products = await window.AugustShop.search(q, 8);
+      if (ticket !== seq) return;
+      if (panel) {
+        panel.hidden = false;
+        paintSuggest(panel, products, q);
+      }
+      const results = document.querySelector("[data-search-results]");
+      if (results) paintSuggest(results, products, q);
+      if (all) all.href = `collection.html?q=${encodeURIComponent(q)}`;
+      if (live) live.hidden = false;
+      if (idle) idle.hidden = true;
+    };
+    input.addEventListener("input", () => {
+      clearTimeout(timer);
+      timer = setTimeout(run, 180);
+    });
+    input.addEventListener("keydown", (e) => {
+      if (e.key === "Enter") {
+        e.preventDefault();
+        goSearch(input.value);
+      } else if (e.key === "Escape" && panel) {
+        panel.hidden = true;
+      }
+    });
+    input.addEventListener("focus", () => {
+      if (input.value.trim().length >= 2) run();
+    });
+  };
+
+  document.querySelectorAll('input[type="search"]').forEach((input) => {
+    const field = input.closest(".search-field");
+    let panel = null;
+    if (field && !input.closest("[data-sheet]")) {
+      const host = field.parentElement;
+      if (host) {
+        host.classList.add("search-host");
+        panel = host.querySelector(".search-suggest");
+        if (!panel) {
+          panel = document.createElement("div");
+          panel.className = "search-suggest";
+          panel.hidden = true;
+          field.insertAdjacentElement("afterend", panel);
+        }
+      }
+    }
+    bindLiveSearch(input, panel);
+  });
+
+  document.addEventListener("pointerdown", (e) => {
+    document.querySelectorAll(".search-suggest").forEach((panel) => {
+      if (!panel.hidden && !panel.parentElement.contains(e.target)) panel.hidden = true;
     });
   });
 
   document.querySelectorAll("[data-search-chip]").forEach((chip) => {
-    chip.addEventListener("click", () => {
-      const q = chip.textContent.trim();
-      if (q) location.href = `collection.html?q=${encodeURIComponent(q)}`;
-    });
+    chip.addEventListener("click", () => goSearch(chip.textContent));
   });
 
   if (window.AugustCatalog) {
@@ -412,8 +497,10 @@ document.addEventListener("DOMContentLoaded", () => {
         .join("");
     }
 
+    let liveHits = null;
+
     const matches = (p) => {
-      if (state.q && !(`${p.brand} ${p.title}`.toLowerCase().includes(state.q))) return false;
+      if (state.q && !liveHits && !(`${p.brand} ${p.title}`.toLowerCase().includes(state.q))) return false;
       if (state.dept !== "all" && p.dept !== state.dept && p.dept !== "unisex") return false;
       if (state.cats.length && !state.cats.includes(p.cat)) return false;
       if (state.type && p.type !== state.type) return false;
@@ -516,10 +603,11 @@ document.addEventListener("DOMContentLoaded", () => {
     };
 
     const renderPLP = () => {
-      const items = sorted(window.AugustCatalog.PRODUCTS.filter(matches));
+      const pool = liveHits || window.AugustCatalog.PRODUCTS;
+      const items = sorted(pool.filter(matches));
       grid.innerHTML = items.length
         ? items.map(window.AugustCatalog.cardHtml).join("")
-        : '<p class="plp-empty">Nothing matches — clear a filter or two.</p>';
+        : '<p class="plp-empty">Nothing matches — try another search or clear a filter.</p>';
       const island = document.querySelector(".plp-intro__island p");
       if (island) island.textContent = islandText(items.length);
       const eyebrow = document.querySelector("[data-filter-eyebrow]");
@@ -533,7 +621,17 @@ document.addEventListener("DOMContentLoaded", () => {
     };
 
     syncSheet();
-    renderPLP();
+
+    if (state.q && window.AugustShop) {
+      grid.innerHTML = '<p class="plp-empty">Searching the shop…</p>';
+      window.AugustShop.search(state.q, 48).then((hits) => {
+        liveHits = hits.length ? hits : null;
+        hits.forEach((p) => window.AugustShop.remember(p));
+        renderPLP();
+      });
+    } else {
+      renderPLP();
+    }
 
     const exclusiveSelect = (chips, target) => {
       const on = !target.classList.contains("is-selected");

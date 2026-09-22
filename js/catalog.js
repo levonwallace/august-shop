@@ -613,7 +613,11 @@ window.AugustCatalog = (() => {
     else p.type = "bags";
   });
 
-  const byId = (id) => UNIQUE.find((p) => p.id === id) || null;
+  const href = (p) =>
+    window.AugustShop?.href(p) ||
+    (p?.handle ? `product.html?h=${encodeURIComponent(p.handle)}` : `product.html?p=${p?.id || ""}`);
+
+  const byId = (id) => UNIQUE.find((p) => p.id === id) || window.AugustShop?.cached(id) || null;
 
   const unique = (list) => {
     const seen = new Set();
@@ -850,7 +854,7 @@ window.AugustCatalog = (() => {
 
   /* Matches the PLP/home .product-card markup exactly */
   const cardHtml = (p) => `
-    <a class="product-card" href="product.html?p=${p.id}">
+    <a class="product-card" href="${href(p)}">
       <div class="product-card__media"><img src="${p.img}" alt="${p.title}" loading="lazy" /></div>
       <div class="product-card__meta">
         <div class="product-card__brand">${p.brand}</div>
@@ -863,6 +867,7 @@ window.AugustCatalog = (() => {
     PRODUCTS: UNIQUE,
     BRANDS,
     byId,
+    href,
     unique,
     brands,
     brandKey,

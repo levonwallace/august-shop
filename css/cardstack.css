@@ -346,7 +346,6 @@
   font-size: 12px;
   font-weight: 500;
   letter-spacing: 1.32px;
-  text-transform: lowercase;
   color: var(--color-ink);
 }
 
@@ -375,7 +374,6 @@
   font-size: 11px;
   font-weight: 500;
   letter-spacing: 1.32px;
-  text-transform: lowercase;
 }
 
 .card-stack .home-scroll-note__arrow {
@@ -560,7 +558,6 @@
     font-size: 12px;
     font-weight: 500;
     letter-spacing: 1.32px;
-    text-transform: lowercase;
     color: var(--color-ink);
   }
 
@@ -726,7 +723,6 @@
   font-size: 11px;
   font-weight: 600;
   letter-spacing: 0.12em;
-  text-transform: uppercase;
   color: var(--color-dot, #4fbf7a);
 }
 
@@ -847,7 +843,6 @@
   font-size: 10px;
   font-weight: 700;
   letter-spacing: 0.16em;
-  text-transform: uppercase;
   color: rgba(255,255,255,0.5);
   margin-bottom: 4px;
 }
@@ -1031,7 +1026,6 @@
   font-size: 12px;
   font-weight: 600;
   letter-spacing: 0.08em;
-  text-transform: uppercase;
   color: rgba(255,255,255,0.75);
   text-decoration: none;
   white-space: nowrap;
@@ -1171,7 +1165,6 @@
   font-size: 9px;
   font-weight: 600;
   letter-spacing: 0.14em;
-  text-transform: uppercase;
   color: rgba(255,255,255,0.4);
   margin-top: 6px;
 }
@@ -1192,43 +1185,28 @@
 }
 
 .aux-page {
-  min-width: 34px;
-  height: 34px;
-  padding: 0 6px;
-  border-radius: 999px;
-  border: 1px solid rgba(255,255,255,0.12);
-  background: rgba(255,255,255,0.04);
-  color: rgba(255,255,255,0.55);
-  font-size: 12px;
-  font-weight: 600;
+  min-width: 28px;
+  height: 32px;
+  padding: 0 4px;
+  border: 0;
+  background: none;
+  color: rgba(255,255,255,0.4);
+  font-size: 13px;
+  font-weight: 500;
   font-variant-numeric: tabular-nums;
   cursor: pointer;
-  transition: background 0.16s ease, color 0.16s ease, border-color 0.16s ease;
+  transition: color 0.16s ease;
 }
 
 @media (hover: hover) {
-  .aux-page:hover:not(.is-active):not(:disabled) {
+  .aux-page:hover:not(.is-active) {
     color: #fff;
-    border-color: rgba(255,255,255,0.3);
   }
 }
 
 .aux-page.is-active {
-  background: #f0f0ec;
-  border-color: transparent;
-  color: #0a0a0a;
-  cursor: default;
-}
-
-.aux-page--nav {
-  border: 0;
-  background: none;
-  font-size: 18px;
-  line-height: 1;
-}
-
-.aux-page:disabled {
-  opacity: 0.25;
+  color: #fff;
+  font-weight: 600;
   cursor: default;
 }
 
@@ -1236,7 +1214,6 @@
   font-size: 11px;
   font-weight: 500;
   letter-spacing: 0.08em;
-  text-transform: uppercase;
   color: rgba(255,255,255,0.4);
   white-space: nowrap;
   transition: color 0.16s ease;
@@ -1315,7 +1292,6 @@
   font-size: 10px;
   font-weight: 600;
   letter-spacing: 0.1em;
-  text-transform: uppercase;
   color: rgba(255,255,255,0.5);
   border: 1px solid rgba(255,255,255,0.14);
   border-radius: 999px;
@@ -1384,7 +1360,6 @@
   font-size: 10px;
   font-weight: 600;
   letter-spacing: 0.1em;
-  text-transform: uppercase;
   color: rgba(255, 255, 255, 0.55);
   border: 1px solid rgba(255, 255, 255, 0.14);
   border-radius: 999px;
@@ -1502,7 +1477,6 @@
   font-size: 11px;
   font-weight: 600;
   letter-spacing: 0.14em;
-  text-transform: uppercase;
   color: rgba(255,255,255,0.45);
   margin: 0;
 }
@@ -1601,11 +1575,10 @@
     gap: 8px;
   }
 
-  /* Keep pagination tappable — 36px pills with row spacing ≈ HIG target */
   .aux-page {
-    min-width: 36px;
+    min-width: 32px;
     height: 36px;
-    font-size: 11px;
+    font-size: 13px;
   }
 
   .aux-pages {
@@ -1752,7 +1725,6 @@
   font-size: 9px;
   font-weight: 600;
   letter-spacing: 0.12em;
-  text-transform: uppercase;
   color: var(--color-muted);
 }
 
@@ -1844,22 +1816,17 @@
 }
 
 .card-stack__card--radio .aux-page {
-  border-color: rgba(15, 15, 15, 0.14);
-  background: rgba(15, 15, 15, 0.03);
-  color: var(--color-muted-2);
+  color: var(--color-muted);
 }
 
 @media (hover: hover) {
-  .card-stack__card--radio .aux-page:hover:not(.is-active):not(:disabled) {
+  .card-stack__card--radio .aux-page:hover:not(.is-active) {
     color: var(--color-ink);
-    border-color: rgba(15, 15, 15, 0.35);
   }
 }
 
 .card-stack__card--radio .aux-page.is-active {
-  background: var(--color-ink);
-  border-color: transparent;
-  color: #fff;
+  color: var(--color-ink);
 }
 
 .card-stack__card--radio .aux-archive__all {

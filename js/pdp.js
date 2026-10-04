@@ -39,7 +39,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     if (el) el.textContent = text;
   };
 
-  setText(".buy-box__brand", (product.brand || "").toUpperCase());
+  setText(".buy-box__brand", product.brand || "");
   setText(".buy-box__title", product.title);
 
   const price = document.querySelector(".buy-box__price");

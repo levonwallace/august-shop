@@ -40,7 +40,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const slice = MIXES.slice(page * PAGE_SIZE, page * PAGE_SIZE + PAGE_SIZE);
     gridEl.innerHTML = slice
       .map((m) => `
-      <a class="radio-cover aux-tile${m.no === selectedNo ? " is-active" : ""}" href="mix.html?m=${m.no}" data-aux-no="${m.no}" aria-label="AUGUST AUX ${m.no} — ${m.name}">
+      <a class="radio-cover aux-tile${m.no === selectedNo ? " is-active" : ""}" href="mix.html?m=${m.no}" data-aux-no="${m.no}" aria-label="August AUX ${m.no} — ${m.name}">
         <div class="aux-tile__art"><img src="${m.art}" alt="" loading="lazy" /></div>
         <span class="aux-tile__no">AUX :: ${m.no} · ${m.genre}</span>
         <span class="aux-tile__title">${m.name}</span>
@@ -50,11 +50,10 @@ document.addEventListener("DOMContentLoaded", () => {
 
   const renderPages = () => {
     if (!pagesEl) return;
-    let html = `<button class="aux-page aux-page--nav" type="button" data-aux-page="prev" aria-label="Previous page"${page === 0 ? " disabled" : ""}>‹</button>`;
+    let html = "";
     for (let i = 0; i < PAGES; i++) {
       html += `<button class="aux-page${i === page ? " is-active" : ""}" type="button" data-aux-page="${i}" aria-label="Page ${i + 1}"${i === page ? ' aria-current="page"' : ""}>${i + 1}</button>`;
     }
-    html += `<button class="aux-page aux-page--nav" type="button" data-aux-page="next" aria-label="Next page"${page === PAGES - 1 ? " disabled" : ""}>›</button>`;
     pagesEl.innerHTML = html;
   };
 
@@ -76,7 +75,7 @@ document.addEventListener("DOMContentLoaded", () => {
     selectedNo = no;
 
     if (titleEl) {
-      titleEl.textContent = `AUGUST AUX :: ${mix.no}`;
+      titleEl.textContent = `August AUX :: ${mix.no}`;
       if (titleEl.tagName === "A") titleEl.setAttribute("href", `mix.html?m=${mix.no}`);
     }
     if (subEl) subEl.textContent = mix.name;

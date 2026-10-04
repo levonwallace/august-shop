@@ -1062,8 +1062,8 @@ window.AugustCatalog = (() => {
       href: "collection.html?cat=shoes",
       items: [
         { label: "Sneakers", type: "sneakers" },
-        { label: "Shoes + Boots", type: "boots" },
-        { label: "Sandals + Slippers", type: "sandals" },
+        { label: "Shoes + boots", type: "boots" },
+        { label: "Sandals + slippers", type: "sandals" },
       ],
     },
     {
@@ -1071,7 +1071,7 @@ window.AugustCatalog = (() => {
       href: "collection.html?cat=accessories",
       items: [
         { label: "Hats", type: "hats" },
-        { label: "Bags + Wallets", type: "bags" },
+        { label: "Bags + wallets", type: "bags" },
         { label: "Jewelry", type: "jewelry" },
         { label: "Socks", type: "socks" },
       ],
@@ -1080,13 +1080,13 @@ window.AugustCatalog = (() => {
       head: "Objects",
       href: "collection.html?cat=objects",
       items: [
-        { label: "Candles + Incense", type: "candles" },
+        { label: "Candles + incense", type: "candles" },
         { label: "Ceramics", type: "ceramics" },
-        { label: "Home Goods", type: "home" },
-        { label: "Fragrance + Skin", type: "fragrance" },
+        { label: "Home goods", type: "home" },
+        { label: "Fragrance + skin", type: "fragrance" },
         { label: "Publications", type: "publications" },
         { label: "Vinyl", type: "vinyl" },
-        { label: "Gift Cards", type: "gift-cards" },
+        { label: "Gift cards", type: "gift-cards" },
       ],
     },
   ];

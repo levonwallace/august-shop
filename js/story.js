@@ -26,7 +26,7 @@ document.addEventListener("DOMContentLoaded", () => {
     if (Number.isNaN(d.getTime())) {
       return { mon: "", day: "", yr: "", weekday: "", pretty: str, upcoming: false };
     }
-    const mon = d.toLocaleDateString("en-US", { month: "short" }).toUpperCase();
+    const mon = d.toLocaleDateString("en-US", { month: "short" });
     const day = String(d.getDate());
     const yr = String(d.getFullYear());
     const weekday = d.toLocaleDateString("en-US", { weekday: "short" });
@@ -41,6 +41,17 @@ document.addEventListener("DOMContentLoaded", () => {
     return { mon, day, yr, weekday, pretty, upcoming: end >= new Date() };
   };
 
+  const unshout = (s) => {
+    if (!s || /[a-z]/.test(s)) return s;
+    const keep = /^(AUX|DJ|B2B|KTP|FTBK|NBA|AAC|SRC|NYC|MT)$/i;
+    return s.replace(/\b([A-Z0-9'“”]+)\b/g, (word) => {
+      if (keep.test(word)) return word.toUpperCase();
+      if (/^\d+$/.test(word)) return word;
+      const lower = word.toLowerCase();
+      return lower.charAt(0).toUpperCase() + lower.slice(1);
+    });
+  };
+
   const cleanTitle = (ev) => {
     const t = ev.title
       .replace(/^AUGUST\s+AUX\s*::\s*/i, "")
@@ -50,7 +61,7 @@ document.addEventListener("DOMContentLoaded", () => {
       .replace(/^AUXILIARY\s+\d+\s*/i, "")
       .replace(/^0*\d{1,3}\s+/i, "")
       .trim();
-    return t || ev.title;
+    return unshout(t || ev.title);
   };
 
   const shortVenue = (venue) => {

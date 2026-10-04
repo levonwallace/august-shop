@@ -15,25 +15,17 @@
   --color-border-soft: rgba(0, 0, 0, 0.06);
   --color-border-mid: rgba(0, 0, 0, 0.14);
   --color-link: #2b55a8;
-  --color-island: rgba(255, 255, 255, 0.28);
-  --color-island-border: rgba(0, 0, 0, 0.14);
-  --color-glass: rgba(255, 255, 255, 0.32);
+  --color-island: rgba(255, 255, 255, 0.62);
+  --color-island-border: rgba(0, 0, 0, 0.05);
+  --color-glass: rgba(255, 255, 255, 0.66);
   --color-footer: rgba(0, 0, 0, 0.4);
   --color-dot: #4fbf7a;
 
-  /* Liquid Glass — frost + refraction. Dark hairline so it silhouettes
-     on white; saturate/contrast so photos smear through the chrome. */
-  --glass-blur: 48px;
-  --glass-saturate: 200%;
-  --glass-brightness: 1.06;
-  --glass-contrast: 1.08;
-  --glass-filter: blur(var(--glass-blur)) saturate(var(--glass-saturate)) brightness(var(--glass-brightness)) contrast(var(--glass-contrast));
-  --glass-sheen: linear-gradient(
-    180deg,
-    rgba(255, 255, 255, 0.72) 0%,
-    rgba(255, 255, 255, 0.18) 18%,
-    rgba(255, 255, 255, 0) 42%
-  );
+  /* Liquid Glass — thin optical frost. Blur + a little saturate only;
+     no brightness/contrast (those read as processed plastic). */
+  --glass-blur: 24px;
+  --glass-saturate: 155%;
+  --glass-filter: blur(var(--glass-blur)) saturate(var(--glass-saturate));
 
   /* ─── Storefront palette — lifted from the shop itself ───
      madder    → the vintage rug + painting reds, sun-faded
@@ -61,11 +53,8 @@
 
   --font: "Helvetica Neue", Helvetica, Arial, sans-serif;
   --shadow-island:
-    inset 0 1.5px 0 rgba(255, 255, 255, 0.95),
-    inset 0 -8px 16px -10px rgba(80, 110, 160, 0.12),
-    0 0 0 0.5px rgba(0, 0, 0, 0.18),
-    0 1px 2px rgba(0, 0, 0, 0.06),
-    0 16px 40px -12px rgba(0, 0, 0, 0.24);
+    inset 0 0.5px 0 rgba(255, 255, 255, 0.5),
+    0 6px 16px -8px rgba(0, 0, 0, 0.08);
   --shadow-card: 0 18px 40px -4px rgba(0, 0, 0, 0.08);
   --shadow-soft: 0 12px 28px -8px rgba(0, 0, 0, 0.07);
   --shadow-player: 0 20px 48px -10px rgba(0, 0, 0, 0.18);

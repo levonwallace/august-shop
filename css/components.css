@@ -29,12 +29,10 @@
 }
 
 .header-island {
-  position: relative;
-  isolation: isolate;
   height: 60px;
   border-radius: var(--radius-chrome);
   background: var(--color-island);
-  border: 1px solid var(--color-island-border);
+  border: 0.5px solid var(--color-island-border);
   box-shadow: var(--shadow-island);
   backdrop-filter: var(--glass-filter);
   -webkit-backdrop-filter: var(--glass-filter);
@@ -71,7 +69,6 @@
   font-size: 11px;
   font-weight: 500;
   letter-spacing: 1.32px;
-  text-transform: lowercase;
   color: #000;
   opacity: 0.72;
   white-space: nowrap;
@@ -152,11 +149,9 @@
   height: 32px;
   padding: 0 14px;
   border-radius: var(--radius-pill);
-  background: rgba(255, 255, 255, 0.28);
-  border: 1px solid rgba(255, 255, 255, 0.42);
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.55);
-  backdrop-filter: blur(16px) saturate(160%);
-  -webkit-backdrop-filter: blur(16px) saturate(160%);
+  background: rgba(255, 255, 255, 0.42);
+  border: 0.5px solid rgba(255, 255, 255, 0.5);
+  box-shadow: inset 0 0.5px 0 rgba(255, 255, 255, 0.6);
   min-width: 0;
 }
 
@@ -196,8 +191,8 @@
   padding: 6px;
   border-radius: 16px;
   background: var(--color-glass);
-  border: 1px solid var(--color-island-border);
-  box-shadow: var(--shadow-island), 0 18px 40px -16px rgba(15, 15, 15, 0.22);
+  border: 0.5px solid var(--color-island-border);
+  box-shadow: var(--shadow-island);
   backdrop-filter: var(--glass-filter);
   -webkit-backdrop-filter: var(--glass-filter);
 }
@@ -247,7 +242,6 @@
   font-size: 11px;
   font-weight: 500;
   letter-spacing: 1.32px;
-  text-transform: lowercase;
   color: var(--color-ink);
   cursor: pointer;
 }
@@ -313,8 +307,8 @@ body.mega-open .mega-backdrop {
   margin: 0 auto;
   border-radius: var(--radius-panel);
   background: var(--color-island);
-  border: 1px solid var(--color-island-border);
-  box-shadow: var(--shadow-island), var(--shadow-morph);
+  border: 0.5px solid var(--color-island-border);
+  box-shadow: var(--shadow-island);
   backdrop-filter: var(--glass-filter);
   -webkit-backdrop-filter: var(--glass-filter);
   overflow: hidden;
@@ -393,7 +387,6 @@ body.mega-open .mega-backdrop {
   font-size: 13px;
   font-weight: 500;
   letter-spacing: 1.1px;
-  text-transform: lowercase;
   color: var(--color-ink);
   opacity: 0.55;
   background: none;
@@ -462,7 +455,6 @@ body.mega-open .mega-backdrop {
   font-size: 11px;
   font-weight: 600;
   letter-spacing: 1.4px;
-  text-transform: uppercase;
   color: #666;
   opacity: 0.7;
 }
@@ -556,7 +548,6 @@ a.brand-dir__head {
   font-size: 14px;
   font-weight: 500;
   letter-spacing: 0.12em;
-  text-transform: uppercase;
   color: var(--color-ink);
   opacity: 0.82;
   line-height: 1.4;
@@ -660,7 +651,6 @@ a.brand-dir__head {
   font-size: 11px;
   font-weight: 500;
   letter-spacing: 1.4px;
-  text-transform: uppercase;
   opacity: 0.45;
 }
 
@@ -827,7 +817,7 @@ a.brand-dir__head {
   height: var(--footer-h);
   border-radius: var(--radius-chrome);
   background: var(--color-island);
-  border: 1px solid var(--color-island-border);
+  border: 0.5px solid var(--color-island-border);
   box-shadow: var(--shadow-island);
   backdrop-filter: var(--glass-filter);
   -webkit-backdrop-filter: var(--glass-filter);
@@ -923,67 +913,10 @@ a.brand-dir__head {
 
 /* —— Panels / cards —— */
 .glass-panel {
-  position: relative;
-  isolation: isolate;
   background: var(--color-glass);
-  border: 1px solid var(--color-island-border);
+  border: 0.5px solid var(--color-island-border);
   backdrop-filter: var(--glass-filter);
   -webkit-backdrop-filter: var(--glass-filter);
   border-radius: var(--radius-panel);
-  box-shadow: var(--shadow-island), var(--shadow-card);
-}
-
-.white-panel {
-  background: #fff;
-  border: 1px solid var(--color-border-soft);
-  border-radius: var(--radius-panel-sm);
-  box-shadow: var(--shadow-soft);
-}
-
-/* —— Liquid Glass sheen — sits between the frosted fill and the type.
-   z-index: -1 stays inside isolation so it never covers copy, and
-   header overflow stays visible so search/suggest can drop out. */
-.header-island::before,
-.header-mobile::before,
-.site-footer::before,
-.tabbar::before,
-.morph-menu::before,
-.glass-panel::before,
-.offer__panel::before,
-.swipe-toast::before,
-.swipe-more::before,
-.profile-drop::before,
-.plp-intro__island::before,
-.plp-filter-btn::before {
-  content: "";
-  position: absolute;
-  inset: 0;
-  border-radius: inherit;
-  pointer-events: none;
-  z-index: -1;
-  background: var(--glass-sheen);
-  opacity: 1;
-}
-
-.header-island::after,
-.header-mobile::after,
-.site-footer::after,
-.tabbar::after,
-.morph-menu::after,
-.glass-panel::after {
-  content: "";
-  position: absolute;
-  left: 8%;
-  right: 28%;
-  top: 0;
-  height: 46%;
-  border-radius: inherit;
-  pointer-events: none;
-  z-index: -1;
-  background: radial-gradient(
-    ellipse 90% 80% at 50% 0%,
-    rgba(255, 255, 255, 0.55),
-    transparent 70%
-  );
-  opacity: 0.9;
+  box-shadow: var(--shadow-island);
 }

@@ -168,11 +168,11 @@ document.addEventListener("DOMContentLoaded", () => {
 
   const megaPanels = {
     "new-arrivals": {
-      label: "New Arrivals",
+      label: "New arrivals",
       all: "Shop all new arrivals →",
       href: "collection.html",
       links: [
-        { label: "This Week", href: "collection.html" },
+        { label: "This week", href: "collection.html" },
         { label: "Footwear", href: "collection.html?cat=shoes" },
         { label: "Apparel", href: "collection.html?cat=apparel" },
         { label: "Accessories", href: "collection.html?cat=accessories" },
@@ -196,7 +196,7 @@ document.addEventListener("DOMContentLoaded", () => {
       pool: "all",
     },
     "shop-by-color": {
-      label: "Shop by Color",
+      label: "Shop by color",
       all: "Browse all colors →",
       href: "collection.html",
       links: [

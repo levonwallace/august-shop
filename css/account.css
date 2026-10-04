@@ -205,7 +205,7 @@
   padding: 36px 24px;
   border-radius: var(--radius-chrome);
   background: var(--color-glass);
-  box-shadow: var(--shadow-island), var(--shadow-card);
+  box-shadow: var(--shadow-island);
   backdrop-filter: var(--glass-filter);
   -webkit-backdrop-filter: var(--glass-filter);
   color: var(--color-muted);

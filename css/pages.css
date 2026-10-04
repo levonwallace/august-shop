@@ -192,14 +192,13 @@
 
 .plp-intro__island {
   position: relative;
-  isolation: isolate;
   display: inline-flex;
   align-items: center;
   height: 32px;
   padding: 0 16px;
   border-radius: var(--radius-pill);
   background: var(--color-island);
-  border: 1px solid var(--color-island-border);
+  border: 0.5px solid var(--color-island-border);
   box-shadow: var(--shadow-island);
   backdrop-filter: var(--glass-filter);
   -webkit-backdrop-filter: var(--glass-filter);
@@ -217,7 +216,6 @@
 /* Filter & Sort trigger (sits next to the intro island) */
 .plp-filter-btn {
   position: relative;
-  isolation: isolate;
   display: inline-flex;
   align-items: center;
   gap: 8px;
@@ -226,7 +224,7 @@
   margin-left: 8px;
   border-radius: var(--radius-pill);
   background: var(--color-island);
-  border: 1px solid var(--color-island-border);
+  border: 0.5px solid var(--color-island-border);
   box-shadow: var(--shadow-island);
   backdrop-filter: var(--glass-filter);
   -webkit-backdrop-filter: var(--glass-filter);
@@ -422,7 +420,6 @@
   font-size: 12px;
   font-weight: 500;
   letter-spacing: 1.32px;
-  text-transform: lowercase;
   color: var(--color-ink);
 }
 
@@ -1083,7 +1080,6 @@
   font-size: 10px;
   font-weight: 600;
   letter-spacing: 0.08em;
-  text-transform: uppercase;
   padding: 5px 10px;
   border-radius: 999px;
   white-space: nowrap;
@@ -1254,7 +1250,6 @@
   font-size: 10px;
   font-weight: 600;
   letter-spacing: 0.08em;
-  text-transform: uppercase;
   color: var(--color-muted);
 }
 
@@ -1516,8 +1511,6 @@
   }
 
   .header-mobile {
-    position: relative;
-    isolation: isolate;
     display: flex;
     align-items: center;
     justify-content: space-between;
@@ -1526,7 +1519,7 @@
     padding: 0 10px 0 16px;
     border-radius: var(--radius-chrome);
     background: var(--color-island);
-    border: 1px solid var(--color-island-border);
+    border: 0.5px solid var(--color-island-border);
     box-shadow: var(--shadow-island);
     backdrop-filter: var(--glass-filter);
     -webkit-backdrop-filter: var(--glass-filter);
@@ -1549,7 +1542,7 @@
     padding: 18px 16px 20px;
     border-radius: 24px;
     background: var(--color-glass);
-    border: 1px solid var(--color-island-border);
+    border: 0.5px solid var(--color-island-border);
     box-shadow: var(--shadow-island);
     backdrop-filter: var(--glass-filter);
     -webkit-backdrop-filter: var(--glass-filter);
@@ -1588,7 +1581,6 @@
     font-size: 15px;
     font-weight: 500;
     letter-spacing: 0.04em;
-    text-transform: lowercase;
     border-bottom: 1px solid rgba(15, 15, 15, 0.06);
   }
 
@@ -1651,7 +1643,6 @@
     font-size: 11px;
     font-weight: 600;
     letter-spacing: 0.06em;
-    text-transform: lowercase;
     color: #fff;
     text-shadow: 0 1px 6px rgba(0, 0, 0, 0.4);
   }
@@ -1975,7 +1966,6 @@
   font-size: 11px;
   font-weight: 600;
   letter-spacing: 0.14em;
-  text-transform: uppercase;
   color: var(--color-verdigris);
 }
 
@@ -2053,7 +2043,6 @@
   font-size: 11px;
   font-weight: 600;
   letter-spacing: 0.1em;
-  text-transform: uppercase;
   color: var(--color-muted);
 }
 
@@ -2089,7 +2078,6 @@
   font-size: 11px;
   font-weight: 600;
   letter-spacing: 0.14em;
-  text-transform: uppercase;
   color: var(--color-muted);
 }
 
@@ -2171,7 +2159,6 @@
   font-size: 10px;
   font-weight: 600;
   letter-spacing: 0.1em;
-  text-transform: uppercase;
   color: var(--color-verdigris);
 }
 
@@ -2278,7 +2265,6 @@
   font-size: 10px;
   font-weight: 600;
   letter-spacing: 0.1em;
-  text-transform: uppercase;
   color: var(--color-muted);
 }
 
@@ -2326,7 +2312,6 @@
   font-size: 10px;
   font-weight: 600;
   letter-spacing: 0.1em;
-  text-transform: uppercase;
   color: var(--color-verdigris);
 }
 
@@ -2524,7 +2509,6 @@
   font-size: 10px;
   font-weight: 600;
   letter-spacing: 0.1em;
-  text-transform: uppercase;
   color: var(--color-muted);
 }
 
@@ -2553,7 +2537,6 @@
   font-size: 11px;
   font-weight: 600;
   letter-spacing: 0.14em;
-  text-transform: uppercase;
   color: var(--color-muted);
 }
 
@@ -2873,7 +2856,6 @@
   font-size: 10px;
   font-weight: 600;
   letter-spacing: 0.1em;
-  text-transform: uppercase;
   color: var(--color-muted);
 }
 
@@ -2905,7 +2887,6 @@
   font-size: 10px;
   font-weight: 600;
   letter-spacing: 0.1em;
-  text-transform: uppercase;
   color: var(--color-muted);
 }
 

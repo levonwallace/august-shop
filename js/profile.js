@@ -327,14 +327,9 @@ document.addEventListener("DOMContentLoaded", () => {
     btn.type = "button";
     btn.className = "avatar-btn";
     btn.setAttribute("aria-label", "Account");
-    btn.setAttribute("title", "Account");
     btn.setAttribute("data-avatar-trigger", "");
     img.replaceWith(btn);
     btn.appendChild(img);
-    const label = document.createElement("span");
-    label.className = "avatar-btn__label";
-    label.textContent = "Account";
-    btn.appendChild(label);
   });
 
   /* ── Render state ───────────────────────────────────────── */

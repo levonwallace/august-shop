@@ -1,14 +1,13 @@
 /* August — Account page
-   Instagram-style profile: fit-pic header, swipe stats, Shop / Liked /
-   Less / Orders tabs. Feed chips, brands, and details still read/write
-   the same localStorage profile (→ Shopify customer + metafields). */
+   Instagram-style profile: fit-pic header, swipe stats, Liked / Less /
+   Orders tabs. Feed and brand alerts sit as quiet prefs above the tabs. */
 document.addEventListener("DOMContentLoaded", () => {
   const page = document.querySelector(".account-page");
   if (!page) return;
 
   const gate = page.querySelector("[data-account-signed-out]");
   const dash = page.querySelector("[data-account-signed-in]");
-  const TABS = ["shop", "liked", "less", "orders"];
+  const TABS = ["liked", "less", "orders"];
 
   const load = () => {
     try {
@@ -93,11 +92,11 @@ document.addEventListener("DOMContentLoaded", () => {
 
   const tabFromHash = () => {
     const raw = (location.hash || "").replace(/^#/, "").toLowerCase();
-    return TABS.includes(raw) ? raw : "shop";
+    return TABS.includes(raw) ? raw : "liked";
   };
 
   const applyTab = (name) => {
-    const tab = TABS.includes(name) ? name : "shop";
+    const tab = TABS.includes(name) ? name : "liked";
     page.querySelectorAll("[data-account-tabs] [data-account-tab]").forEach((btn) => {
       const on = btn.getAttribute("data-account-tab") === tab;
       btn.classList.toggle("is-active", on);
@@ -109,13 +108,20 @@ document.addEventListener("DOMContentLoaded", () => {
   };
 
   const goTab = (name) => {
-    const tab = TABS.includes(name) ? name : "shop";
+    const tab = TABS.includes(name) ? name : "liked";
     applyTab(tab);
     const next = `#${tab}`;
     if (location.hash !== next) history.replaceState(null, "", next);
   };
 
   page.querySelector("[data-account-signed-in]")?.addEventListener("click", (e) => {
+    const scroll = e.target.closest("[data-account-scroll]");
+    if (scroll && dash?.contains(scroll)) {
+      const id = scroll.getAttribute("data-account-scroll");
+      const target = id === "brands" ? page.querySelector("#account-brands") : page.querySelector(`#${id}`);
+      target?.scrollIntoView({ behavior: "smooth", block: "start" });
+      return;
+    }
     const btn = e.target.closest("button[data-account-tab]");
     if (!btn || !dash?.contains(btn)) return;
     goTab(btn.getAttribute("data-account-tab"));
@@ -275,10 +281,9 @@ document.addEventListener("DOMContentLoaded", () => {
   const deptEl = page.querySelector("[data-home-dept]");
   const catEl = page.querySelector("[data-home-cat]");
   const saleEl = page.querySelector("[data-home-sale]");
-  const enabledEl = page.querySelector("[data-home-enabled]");
+  const modeEl = page.querySelector("[data-home-mode]");
+  const filtersEl = page.querySelector("[data-home-filters]");
   const previewEl = page.querySelector("[data-home-preview]");
-  const stageEl = page.querySelector("[data-home-stage]");
-  const saveBtn = page.querySelector("[data-home-save]");
 
   const readChip = (el) =>
     el?.querySelector(".pref-chip.is-active")?.getAttribute("data-value") || "all";
@@ -289,56 +294,43 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   };
 
+  const modeOn = () =>
+    modeEl?.querySelector("[data-home-mode-opt].is-active")?.getAttribute("data-home-mode-opt") === "on";
+
+  const setMode = (on) => {
+    modeEl?.querySelectorAll("[data-home-mode-opt]").forEach((btn) => {
+      btn.classList.toggle("is-active", btn.getAttribute("data-home-mode-opt") === (on ? "on" : "off"));
+    });
+    if (filtersEl) filtersEl.hidden = !on;
+  };
+
   const currentPrefs = () => ({
-    enabled: !!enabledEl?.checked,
+    enabled: modeOn(),
     department: readChip(deptEl),
     category: readChip(catEl),
-    saleOnly: !!saleEl?.checked,
+    saleOnly: readChip(saleEl) === "sale",
   });
+
+  const persistPrefs = () => {
+    const user = load();
+    if (!user || !window.AugustProfile) return;
+    user.homepage = currentPrefs();
+    window.AugustProfile.save(user);
+  };
 
   const updatePreview = () => {
     const hp = currentPrefs();
-    if (previewEl && window.AugustProfile) {
-      if (window.AugustProfile.feedIsDefault(hp)) {
-        previewEl.textContent = "Homepage: standard August";
-      } else {
-        const label = window.AugustProfile.feedLabel(hp);
-        previewEl.textContent = hp.enabled
-          ? `Homepage: ${label}`
-          : `Saved feed: ${label} (off)`;
-      }
-    }
-    renderStage(hp);
-  };
-
-  const renderStage = (hp) => {
-    if (!stageEl || !window.AugustCatalog) return;
-    let items = window.AugustCatalog.feed(hp, 5);
-    if (items.length < 5 && hp.saleOnly) {
-      const extra = window.AugustCatalog
-        .feed({ ...hp, saleOnly: false }, 8)
-        .filter((p) => !items.some((x) => x.id === p.id));
-      items = [...items, ...extra].slice(0, 5);
-    }
-    if (!items.length) {
-      stageEl.removeAttribute("data-count");
-      stageEl.innerHTML = `<p class="account-feed__empty">Nothing in this mix yet. Try another filter.</p>`;
+    if (!previewEl) return;
+    if (!hp.enabled) {
+      previewEl.textContent = "August will open to the full shop.";
       return;
     }
-    const href = window.AugustCatalog.href;
-    stageEl.dataset.count = String(items.length);
-    stageEl.innerHTML = items
-      .map(
-        (p, i) => `
-      <a class="feed-tile${i === 0 ? " feed-tile--hero" : ""}" href="${href(p)}">
-        <img src="${p.img}" alt="" />
-        <span class="feed-tile__meta">
-          <span class="feed-tile__brand">${p.brand}</span>
-          <span class="feed-tile__title">${p.title}</span>
-        </span>
-      </a>`
-      )
-      .join("");
+    if (window.AugustProfile?.feedIsDefault(hp)) {
+      previewEl.textContent = "My feed is on, but nothing is narrowed yet — that’s the same as Everything.";
+      return;
+    }
+    const label = (window.AugustProfile?.feedLabel(hp) || "your mix").toLowerCase();
+    previewEl.textContent = `August will open to ${label}.`;
   };
 
   const hydratePrefs = () => {
@@ -349,31 +341,29 @@ document.addEventListener("DOMContentLoaded", () => {
       category: "all",
       saleOnly: false,
     };
+    setMode(hp.enabled !== false);
     setChip(deptEl, hp.department || "all");
     setChip(catEl, hp.category || "all");
-    if (saleEl) saleEl.checked = !!hp.saleOnly;
-    if (enabledEl) enabledEl.checked = hp.enabled !== false;
+    setChip(saleEl, hp.saleOnly ? "sale" : "all");
     updatePreview();
   };
 
-  [deptEl, catEl].forEach((el) => {
+  modeEl?.addEventListener("click", (e) => {
+    const btn = e.target.closest("[data-home-mode-opt]");
+    if (!btn) return;
+    setMode(btn.getAttribute("data-home-mode-opt") === "on");
+    updatePreview();
+    persistPrefs();
+  });
+
+  [deptEl, catEl, saleEl].forEach((el) => {
     el?.addEventListener("click", (e) => {
       const chip = e.target.closest(".pref-chip");
       if (!chip) return;
       setChip(el, chip.getAttribute("data-value"));
       updatePreview();
+      persistPrefs();
     });
-  });
-
-  saleEl?.addEventListener("change", updatePreview);
-  enabledEl?.addEventListener("change", updatePreview);
-
-  saveBtn?.addEventListener("click", () => {
-    const user = load();
-    if (!user || !window.AugustProfile) return;
-    user.homepage = currentPrefs();
-    window.AugustProfile.save(user);
-    flashSaved(saveBtn, "Save");
   });
 
   hydratePrefs();
@@ -427,7 +417,7 @@ document.addEventListener("DOMContentLoaded", () => {
       c.getAttribute("data-value")
     );
     window.AugustProfile.save(user);
-    flashSaved(e.currentTarget, "Save brands");
+    flashSaved(e.currentTarget, "Save");
   });
 
   hydrateBrands();

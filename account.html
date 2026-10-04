@@ -206,7 +206,7 @@
                   <strong data-stat-likes>0</strong>
                   <span>Likes</span>
                 </button>
-                <button type="button" class="account-stat" data-account-tab="shop">
+                <button type="button" class="account-stat" data-account-scroll="brands">
                   <strong data-stat-following>0</strong>
                   <span>Following</span>
                 </button>
@@ -218,97 +218,59 @@
             </div>
           </header>
 
-          <div class="account-tabs" data-account-tabs role="tablist" aria-label="Account">
-            <button type="button" class="account-tabs__btn is-active" role="tab" id="account-tab-shop" data-account-tab="shop" aria-controls="account-panel-shop" aria-selected="true">Shop</button>
-            <button type="button" class="account-tabs__btn" role="tab" id="account-tab-liked" data-account-tab="liked" aria-controls="account-panel-liked" aria-selected="false">Liked</button>
-            <button type="button" class="account-tabs__btn" role="tab" id="account-tab-less" data-account-tab="less" aria-controls="account-panel-less" aria-selected="false">Less</button>
-            <button type="button" class="account-tabs__btn" role="tab" id="account-tab-orders" data-account-tab="orders" aria-controls="account-panel-orders" aria-selected="false">Orders</button>
-          </div>
-
-          <div class="account-panel" data-account-panel="shop" id="account-panel-shop" role="tabpanel" aria-labelledby="account-tab-shop">
-            <!-- My feed — Shopify port: customer metafields. -->
-            <section class="glass-panel account-feed" aria-labelledby="homepage-heading">
-              <div class="account-feed__controls">
-                <h2 id="homepage-heading">My feed</h2>
-                <p class="account-card__hint">Tune August to what you shop for. The looks on the right update as you pick.</p>
-                <p class="account-feed__nudge" data-feed-nudge hidden>Your homepage is still the standard mix. Pick a department or category so August opens on what you shop.</p>
-
-                <label class="pref-toggle account-feed-default">
-                  <input type="checkbox" data-home-enabled />
-                  <span class="pref-toggle__track"><span class="pref-toggle__thumb"></span></span>
-                  Open August to my feed
-                </label>
-
-                <p class="pref-label">Department</p>
+          <section class="account-prefs" aria-label="Feed and alerts">
+            <div class="account-prefs__block">
+              <p class="account-prefs__label">Homepage</p>
+              <p class="account-prefs__hint">One choice. Everything is the full shop. My feed is only what you pick next.</p>
+              <div class="feed-toggle account-prefs__mode" data-home-mode role="group" aria-label="Homepage">
+                <button type="button" class="feed-toggle__opt" data-home-mode-opt="off">Everything</button>
+                <button type="button" class="feed-toggle__opt" data-home-mode-opt="on">My feed</button>
+              </div>
+              <div class="account-prefs__filters" data-home-filters hidden>
+                <p class="account-prefs__sub">Who it’s for</p>
                 <div class="pref-options" data-home-dept>
-                  <button type="button" class="pref-chip" data-value="all">Everything</button>
+                  <button type="button" class="pref-chip" data-value="all">Everyone</button>
                   <button type="button" class="pref-chip" data-value="men">Men</button>
                   <button type="button" class="pref-chip" data-value="women">Women</button>
                 </div>
-
-                <p class="pref-label">Category</p>
+                <p class="account-prefs__sub">What to show</p>
                 <div class="pref-options" data-home-cat>
                   <button type="button" class="pref-chip" data-value="all">All</button>
                   <button type="button" class="pref-chip" data-value="shoes">Shoes</button>
                   <button type="button" class="pref-chip" data-value="apparel">Apparel</button>
                   <button type="button" class="pref-chip" data-value="accessories">Accessories</button>
                 </div>
-
-                <label class="pref-toggle">
-                  <input type="checkbox" data-home-sale />
-                  <span class="pref-toggle__track"><span class="pref-toggle__thumb"></span></span>
-                  Sale items only
-                </label>
-
-                <div class="account-feed__row">
-                  <p class="account-feed__preview" data-home-preview></p>
-                  <button class="btn btn--primary" type="button" data-home-save>Save</button>
+                <div class="pref-options" data-home-sale>
+                  <button type="button" class="pref-chip" data-value="all">Full price and sale</button>
+                  <button type="button" class="pref-chip" data-value="sale">On sale only</button>
                 </div>
               </div>
-              <div class="account-feed__stage" data-home-stage aria-live="polite"></div>
-            </section>
-
-            <div class="account-layout">
-              <div class="account-main">
-                <div class="glass-panel account-card">
-                  <h2>Brands I follow</h2>
-                  <div class="pref-options pref-options--wrap" data-account-brands>
-                    <button type="button" class="pref-chip" data-value="vans">Vans</button>
-                    <button type="button" class="pref-chip" data-value="hoka">Hoka</button>
-                    <button type="button" class="pref-chip" data-value="lady-white">Lady White Co.</button>
-                    <button type="button" class="pref-chip" data-value="puma">Puma</button>
-                    <button type="button" class="pref-chip" data-value="saucony">Saucony</button>
-                    <button type="button" class="pref-chip" data-value="dr-martens">Dr. Martens</button>
-                    <button type="button" class="pref-chip" data-value="velva-sheen">Velva Sheen</button>
-                  </div>
-                  <button class="btn btn--ghost btn--block account-card__btn" type="button" data-brands-save>Save brands</button>
-                </div>
-              </div>
-
-              <aside class="account-side">
-                <div class="glass-panel account-card">
-                  <h2>Details</h2>
-                  <label class="account-detail account-detail--edit">
-                    <span>Name</span>
-                    <input type="text" data-account-name-input autocomplete="name" />
-                  </label>
-                  <div class="cart-divider"></div>
-                  <div class="account-detail"><span>Email</span><span data-account-email-2></span></div>
-                  <button class="btn btn--ghost btn--block account-card__btn" type="button" data-details-save>Save details</button>
-                </div>
-
-                <div class="glass-panel account-card">
-                  <h2>Pickup store</h2>
-                  <p class="account-card__text">August<br />218 State St<br />Madison, WI 53703</p>
-                  <p class="account-card__text account-card__text--muted">Mon–Sat 11–7 · Sun 12–5</p>
-                </div>
-
-                <button class="btn btn--ghost btn--block account-signout" type="button" data-profile-action="signout">Sign out</button>
-              </aside>
+              <p class="account-prefs__preview" data-home-preview></p>
             </div>
+
+            <div class="account-prefs__block" id="account-brands">
+              <p class="account-prefs__label">Brands I follow</p>
+              <p class="account-prefs__hint">We’ll notify you every time they upload a product.</p>
+              <div class="pref-options pref-options--wrap" data-account-brands>
+                <button type="button" class="pref-chip" data-value="vans">Vans</button>
+                <button type="button" class="pref-chip" data-value="hoka">Hoka</button>
+                <button type="button" class="pref-chip" data-value="lady-white">Lady White Co.</button>
+                <button type="button" class="pref-chip" data-value="puma">Puma</button>
+                <button type="button" class="pref-chip" data-value="saucony">Saucony</button>
+                <button type="button" class="pref-chip" data-value="dr-martens">Dr. Martens</button>
+                <button type="button" class="pref-chip" data-value="velva-sheen">Velva Sheen</button>
+              </div>
+              <button class="btn btn--ghost account-prefs__save" type="button" data-brands-save>Save</button>
+            </div>
+          </section>
+
+          <div class="account-tabs" data-account-tabs role="tablist" aria-label="Account">
+            <button type="button" class="account-tabs__btn is-active" role="tab" id="account-tab-liked" data-account-tab="liked" aria-controls="account-panel-liked" aria-selected="true">Liked</button>
+            <button type="button" class="account-tabs__btn" role="tab" id="account-tab-less" data-account-tab="less" aria-controls="account-panel-less" aria-selected="false">Less</button>
+            <button type="button" class="account-tabs__btn" role="tab" id="account-tab-orders" data-account-tab="orders" aria-controls="account-panel-orders" aria-selected="false">Orders</button>
           </div>
 
-          <div class="account-panel" data-account-panel="liked" id="account-panel-liked" role="tabpanel" aria-labelledby="account-tab-liked" hidden>
+          <div class="account-panel" data-account-panel="liked" id="account-panel-liked" role="tabpanel" aria-labelledby="account-tab-liked">
             <p class="account-swipe-hint">Swipe right to like, left to show less — it trains Your feed. Change it here anytime.</p>
             <div class="account-mosaic" data-liked-grid></div>
           </div>
@@ -352,6 +314,29 @@
                 <span class="order-row__price">$190.00</span>
               </a>
             </section>
+          </div>
+
+          <div class="account-layout">
+            <aside class="account-side">
+              <div class="account-card">
+                <h2>Details</h2>
+                <label class="account-detail account-detail--edit">
+                  <span>Name</span>
+                  <input type="text" data-account-name-input autocomplete="name" />
+                </label>
+                <div class="cart-divider"></div>
+                <div class="account-detail"><span>Email</span><span data-account-email-2></span></div>
+                <button class="btn btn--ghost btn--block account-card__btn" type="button" data-details-save>Save details</button>
+              </div>
+
+              <div class="account-card">
+                <h2>Pickup store</h2>
+                <p class="account-card__text">August<br />218 State St<br />Madison, WI 53703</p>
+                <p class="account-card__text account-card__text--muted">Mon–Sat 11–7 · Sun 12–5</p>
+              </div>
+
+              <button class="btn btn--ghost btn--block account-signout" type="button" data-profile-action="signout">Sign out</button>
+            </aside>
           </div>
         </div>
 

@@ -30,7 +30,7 @@
 
 .header-island {
   height: 60px;
-  border-radius: var(--radius-chrome);
+  border-radius: var(--radius-pill);
   background: var(--color-island);
   border: 0.5px solid var(--color-island-border);
   box-shadow: var(--shadow-island);
@@ -815,7 +815,7 @@ a.brand-dir__head {
   right: var(--footer-inset);
   bottom: var(--footer-inset);
   height: var(--footer-h);
-  border-radius: var(--radius-chrome);
+  border-radius: var(--radius-pill);
   background: var(--color-island);
   border: 0.5px solid var(--color-island-border);
   box-shadow: var(--shadow-island);

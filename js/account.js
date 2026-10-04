@@ -140,11 +140,12 @@ document.addEventListener("DOMContentLoaded", () => {
 
     set("[data-account-name-display]", user.name);
     set("[data-account-email]", user.email);
-    set("[data-account-email-2]", user.email);
     set("[data-account-since]", monthYear(user.createdAt));
 
     const nameInput = page.querySelector("[data-account-name-input]");
-    if (nameInput && document.activeElement !== nameInput) nameInput.value = user.name;
+    const emailInput = page.querySelector("[data-account-email-input]");
+    if (nameInput && document.activeElement !== nameInput) nameInput.value = user.name || "";
+    if (emailInput && document.activeElement !== emailInput) emailInput.value = user.email || "";
 
     renderSwipeUI(user);
   };
@@ -369,55 +370,178 @@ document.addEventListener("DOMContentLoaded", () => {
   hydratePrefs();
   window.addEventListener("august:profile-changed", hydratePrefs);
 
-  /* ── Details (name) ──────────────────────────────────────── */
+  /* ── Details (name / email) ──────────────────────────────── */
 
-  page.querySelector("[data-details-save]")?.addEventListener("click", (e) => {
+  const settingsBtn = page.querySelector("[data-account-settings]");
+  const editForm = page.querySelector("[data-account-edit]");
+
+  const setEditOpen = (open) => {
+    if (editForm) editForm.hidden = !open;
+    if (settingsBtn) {
+      settingsBtn.classList.toggle("is-open", open);
+      settingsBtn.setAttribute("aria-expanded", String(open));
+    }
+    if (open) page.querySelector("[data-account-name-input]")?.focus();
+  };
+
+  settingsBtn?.addEventListener("click", () => {
+    setEditOpen(!!editForm?.hidden);
+  });
+
+  editForm?.addEventListener("submit", (e) => {
+    e.preventDefault();
     const user = load();
     if (!user || !window.AugustProfile) return;
     const nameInput = page.querySelector("[data-account-name-input]");
-    if (nameInput && nameInput.value.trim()) user.name = nameInput.value.trim();
+    const emailInput = page.querySelector("[data-account-email-input]");
+    const name = nameInput?.value.trim();
+    const email = emailInput?.value.trim();
+    if (name) user.name = name;
+    if (email) user.email = email;
     window.AugustProfile.save(user);
-    flashSaved(e.currentTarget, "Save details");
+    flashSaved(page.querySelector("[data-details-save]"), "Save");
+    setEditOpen(false);
   });
 
   /* ── Brands I follow ─────────────────────────────────────── */
 
-  const brandsEl = page.querySelector("[data-account-brands]");
+  const brandField = page.querySelector("[data-brand-field]");
+  const pickedEl = page.querySelector("[data-brand-picked]");
+  const queryEl = page.querySelector("[data-brand-query]");
+  const listEl = page.querySelector("[data-account-brands]");
+  const brandNames = window.AugustCatalog?.brands?.() || [];
+  const brandKey = window.AugustCatalog?.brandKey || ((s) => String(s || "").toLowerCase());
+  const SUGGEST_LIMIT = 8;
+  let brandListOpen = false;
 
-  if (brandsEl && window.AugustCatalog) {
-    const key = window.AugustCatalog.brandKey;
-    brandsEl.innerHTML = window.AugustCatalog
-      .brands()
-      .map((b) => `<button type="button" class="pref-chip" data-value="${b}">${b}</button>`)
-      .join("");
-  }
+  const canonicalBrand = (value) =>
+    brandNames.find((name) => brandKey(name) === brandKey(value)) || value;
 
-  const hydrateBrands = () => {
+  const selectedBrands = () => {
     const user = load();
-    const brands = (user && user.preferredBrands) || [];
-    const key = window.AugustCatalog?.brandKey || ((s) => s);
-    brandsEl?.querySelectorAll(".pref-chip").forEach((c) => {
-      const value = c.getAttribute("data-value");
-      c.classList.toggle(
-        "is-active",
-        brands.some((b) => key(b) === key(value))
-      );
-    });
+    const seen = new Set();
+    return (user?.preferredBrands || [])
+      .map(canonicalBrand)
+      .filter((name) => {
+        const k = brandKey(name);
+        if (!k || seen.has(k)) return false;
+        seen.add(k);
+        return true;
+      });
   };
 
-  brandsEl?.addEventListener("click", (e) => {
-    const chip = e.target.closest(".pref-chip");
-    if (chip) chip.classList.toggle("is-active");
-  });
-
-  page.querySelector("[data-brands-save]")?.addEventListener("click", (e) => {
+  const persistBrands = (brands) => {
     const user = load();
     if (!user || !window.AugustProfile) return;
-    user.preferredBrands = [...brandsEl.querySelectorAll(".pref-chip.is-active")].map((c) =>
-      c.getAttribute("data-value")
-    );
+    user.preferredBrands = brands;
     window.AugustProfile.save(user);
-    flashSaved(e.currentTarget, "Save");
+  };
+
+  const setBrandListOpen = (open) => {
+    brandListOpen = open;
+    brandField?.classList.toggle("is-open", open);
+    if (queryEl) queryEl.setAttribute("aria-expanded", String(open));
+    renderBrandList();
+  };
+
+  const renderPicked = () => {
+    if (!pickedEl) return;
+    const brands = selectedBrands();
+    pickedEl.innerHTML = brands
+      .map(
+        (name) =>
+          `<button type="button" class="brand-field__chip" data-brand-remove="${esc(name)}">${esc(name)}<span aria-hidden="true">×</span></button>`
+      )
+      .join("");
+  };
+
+  const availableBrands = () => {
+    const taken = new Set(selectedBrands().map(brandKey));
+    const q = (queryEl?.value || "").trim();
+    const qKey = brandKey(q);
+    let next = brandNames.filter((name) => !taken.has(brandKey(name)));
+    if (q) {
+      const qLower = q.toLowerCase();
+      next = next.filter(
+        (name) => name.toLowerCase().includes(qLower) || brandKey(name).includes(qKey)
+      );
+    } else {
+      next = next.slice(0, SUGGEST_LIMIT);
+    }
+    return next;
+  };
+
+  const renderBrandList = () => {
+    if (!listEl) return;
+    if (!brandListOpen) {
+      listEl.hidden = true;
+      listEl.innerHTML = "";
+      return;
+    }
+    const q = (queryEl?.value || "").trim();
+    const next = availableBrands();
+    listEl.hidden = false;
+    if (!next.length) {
+      const takenAll = selectedBrands().length >= brandNames.length;
+      listEl.innerHTML = `<p class="brand-field__empty">${
+        takenAll ? "You’re following every brand." : q ? "No matching brands." : "Type to find a brand."
+      }</p>`;
+      return;
+    }
+    listEl.innerHTML = next
+      .map((name) => `<button type="button" class="pref-chip" data-brand-add="${esc(name)}">${esc(name)}</button>`)
+      .join("");
+  };
+
+  const addBrand = (name) => {
+    const next = canonicalBrand(name);
+    if (!next || !brandNames.some((b) => brandKey(b) === brandKey(next))) return;
+    const brands = selectedBrands();
+    if (brands.some((b) => brandKey(b) === brandKey(next))) return;
+    if (queryEl) queryEl.value = "";
+    persistBrands([...brands, next]);
+  };
+
+  const removeBrand = (name) => {
+    persistBrands(selectedBrands().filter((b) => brandKey(b) !== brandKey(name)));
+  };
+
+  const hydrateBrands = () => {
+    renderPicked();
+    renderBrandList();
+  };
+
+  pickedEl?.addEventListener("click", (e) => {
+    const chip = e.target.closest("[data-brand-remove]");
+    if (!chip) return;
+    removeBrand(chip.getAttribute("data-brand-remove"));
+  });
+
+  listEl?.addEventListener("click", (e) => {
+    const chip = e.target.closest("[data-brand-add]");
+    if (!chip) return;
+    addBrand(chip.getAttribute("data-brand-add"));
+    queryEl?.focus();
+  });
+
+  queryEl?.addEventListener("focus", () => setBrandListOpen(true));
+  queryEl?.addEventListener("input", () => setBrandListOpen(true));
+  queryEl?.addEventListener("keydown", (e) => {
+    if (e.key === "Escape") {
+      setBrandListOpen(false);
+      queryEl.blur();
+      return;
+    }
+    if (e.key !== "Enter") return;
+    e.preventDefault();
+    const first = availableBrands()[0];
+    if (first) addBrand(first);
+  });
+
+  document.addEventListener("pointerdown", (e) => {
+    if (!brandListOpen) return;
+    if (e.target.closest("#account-brands")) return;
+    setBrandListOpen(false);
   });
 
   hydrateBrands();

@@ -1010,10 +1010,8 @@
   padding: 24px;
 }
 
-.account-orders h2,
-[data-account-brands] {
-  max-height: 240px;
-  overflow-y: auto;
+.account-orders h2 {
+  max-height: none;
 }
 
 .account-card h2 {
@@ -1331,11 +1329,6 @@
   margin-top: 8px;
   font-size: 11px;
   color: var(--color-muted);
-}
-
-.account-signout {
-  color: #b3392e;
-  border-color: rgba(179, 57, 46, 0.25);
 }
 
 /* ========== Responsive ========== */

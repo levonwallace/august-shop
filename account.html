@@ -37,6 +37,7 @@
     <link rel="stylesheet" href="css/offer.css" />
     <link rel="stylesheet" href="css/search.css" />
     <link rel="stylesheet" href="css/account.css" />
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin />
   </head>
   <body>
     <a class="skip-link" href="#main">Skip to content</a>
@@ -198,9 +199,28 @@
               <img class="account-head__avatar" src="assets/account-fit.jpg" alt="" />
             </div>
             <div class="account-head__meta">
-              <h1 data-account-name-display></h1>
+              <div class="account-head__title">
+                <h1 data-account-name-display></h1>
+                <button type="button" class="account-head__settings" data-account-settings aria-label="Edit account details" aria-expanded="false" aria-controls="account-edit">
+                  <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                    <circle cx="12" cy="12" r="3" stroke="currentColor" stroke-width="1.5"/>
+                    <path d="M12 3.6 13.1 6a6.8 6.8 0 0 1 1.5.6l2.4-1.1 1.5 1.5-1.1 2.4c.3.5.5 1 .6 1.5L20.4 12 18 13.1c-.1.5-.3 1-.6 1.5l1.1 2.4-1.5 1.5-2.4-1.1a6.8 6.8 0 0 1-1.5.6L12 20.4 10.9 18a6.8 6.8 0 0 1-1.5-.6l-2.4 1.1-1.5-1.5 1.1-2.4a6.8 6.8 0 0 1-.6-1.5L3.6 12 6 10.9c.1-.5.3-1 .6-1.5L5.5 7l1.5-1.5 2.4 1.1c.5-.3 1-.5 1.5-.6L12 3.6Z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/>
+                  </svg>
+                </button>
+              </div>
               <p class="account-sub" data-account-email></p>
               <p class="account-sub account-sub--since">Member since <span data-account-since></span></p>
+              <form class="account-head__edit" id="account-edit" data-account-edit hidden>
+                <label class="account-head__field">
+                  <span>Name</span>
+                  <input type="text" data-account-name-input autocomplete="name" />
+                </label>
+                <label class="account-head__field">
+                  <span>Email</span>
+                  <input type="email" data-account-email-input autocomplete="email" />
+                </label>
+                <button class="btn btn--ghost account-head__save" type="submit" data-details-save>Save</button>
+              </form>
               <div class="account-stats">
                 <button type="button" class="account-stat" data-account-tab="liked">
                   <strong data-stat-likes>0</strong>
@@ -251,16 +271,11 @@
             <div class="account-prefs__block" id="account-brands">
               <p class="account-prefs__label">Brands I follow</p>
               <p class="account-prefs__hint">We’ll notify you every time they upload a product.</p>
-              <div class="pref-options pref-options--wrap" data-account-brands>
-                <button type="button" class="pref-chip" data-value="vans">Vans</button>
-                <button type="button" class="pref-chip" data-value="hoka">Hoka</button>
-                <button type="button" class="pref-chip" data-value="lady-white">Lady White Co.</button>
-                <button type="button" class="pref-chip" data-value="puma">Puma</button>
-                <button type="button" class="pref-chip" data-value="saucony">Saucony</button>
-                <button type="button" class="pref-chip" data-value="dr-martens">Dr. Martens</button>
-                <button type="button" class="pref-chip" data-value="velva-sheen">Velva Sheen</button>
+              <div class="brand-field" data-brand-field>
+                <div class="brand-field__picked" data-brand-picked></div>
+                <input class="brand-field__input" type="search" placeholder="Add a brand" data-brand-query autocomplete="off" spellcheck="false" aria-label="Add a brand" aria-controls="account-brand-list" aria-expanded="false" aria-autocomplete="list" />
               </div>
-              <button class="btn btn--ghost account-prefs__save" type="button" data-brands-save>Save</button>
+              <div class="brand-field__list" id="account-brand-list" data-account-brands hidden></div>
             </div>
           </section>
 
@@ -318,24 +333,19 @@
 
           <div class="account-layout">
             <aside class="account-side">
-              <div class="account-card">
-                <h2>Details</h2>
-                <label class="account-detail account-detail--edit">
-                  <span>Name</span>
-                  <input type="text" data-account-name-input autocomplete="name" />
-                </label>
-                <div class="cart-divider"></div>
-                <div class="account-detail"><span>Email</span><span data-account-email-2></span></div>
-                <button class="btn btn--ghost btn--block account-card__btn" type="button" data-details-save>Save details</button>
-              </div>
-
-              <div class="account-card">
+              <div class="account-card account-pickup">
                 <h2>Pickup store</h2>
-                <p class="account-card__text">August<br />218 State St<br />Madison, WI 53703</p>
-                <p class="account-card__text account-card__text--muted">Mon–Sat 11–7 · Sun 12–5</p>
+                <div class="account-pickup__row">
+                  <div class="account-pickup__map">
+                    <div class="account-pickup__map-el" data-pickup-map role="img" aria-label="Map of August at 414 State St, Madison"></div>
+                    <a class="account-pickup__map-link" href="https://maps.google.com/?q=August+414+State+St+Madison+WI+53703" target="_blank" rel="noopener noreferrer">Open map</a>
+                  </div>
+                  <div class="account-pickup__copy">
+                    <p class="account-card__text">August<br />414 State St<br />Madison, WI 53703</p>
+                    <p class="account-card__text account-card__text--muted">Mon–Sat 11–7 · Sun 12–5</p>
+                  </div>
+                </div>
               </div>
-
-              <button class="btn btn--ghost btn--block account-signout" type="button" data-profile-action="signout">Sign out</button>
             </aside>
           </div>
         </div>
@@ -389,6 +399,7 @@
     <script src="js/sheet.js"></script>
     <script src="js/segmented.js"></script>
     <script src="js/profile.js"></script>
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin></script>
     <script src="js/account.js"></script>
     <script src="js/offer.js"></script>
   </body>

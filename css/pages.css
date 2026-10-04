@@ -32,6 +32,38 @@
   line-height: 1.08;
 }
 
+.home-lockup {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  text-align: right;
+  margin: 0 0 24px;
+  font-size: clamp(40px, 4.6vw, 62px);
+  font-weight: 300;
+  letter-spacing: -0.055em;
+  line-height: 0.92;
+}
+
+.home-lockup__word {
+  display: block;
+}
+
+.home-lockup__word:nth-child(2) {
+  padding-right: 0.08em;
+}
+
+.home-lockup__word:nth-child(3) {
+  font-size: 0.78em;
+  letter-spacing: -0.04em;
+  padding-right: 0.42em;
+}
+
+.home-lockup__word:nth-child(4),
+.home-lockup__word--kicker {
+  font-size: 0.78em;
+  letter-spacing: -0.04em;
+}
+
 /* Accent words — colors sampled from the product photography:
    citrus from the Speedgoat, denim navy from the Vans Souvenir,
    plus near-ink tints of the Mafate leather and Vans shadow */
@@ -1677,6 +1709,10 @@
   .home-copy h1 {
     font-size: clamp(28px, 7vw, 34px);
     letter-spacing: -0.5px;
+  }
+
+  .home-lockup {
+    font-size: clamp(34px, 9vw, 44px);
   }
 
   .home-grid {

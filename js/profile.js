@@ -729,9 +729,10 @@ document.addEventListener("DOMContentLoaded", () => {
     const labelNoSale = feedLabel({ ...hp, saleOnly: false });
 
     if (heroTitle) {
+      heroTitle.classList.add("home-lockup");
       heroTitle.innerHTML = hp.saleOnly
-        ? `${labelNoSale},<br />on sale.`
-        : `${labelNoSale},<br />new weekly.`;
+        ? `<span class="home-lockup__word">${labelNoSale},</span><span class="home-lockup__word home-lockup__word--kicker">on sale.</span>`
+        : `<span class="home-lockup__word">${labelNoSale},</span><span class="home-lockup__word home-lockup__word--kicker">new weekly.</span>`;
     }
     if (heroSub) {
       heroSub.innerHTML = `Your homepage is set to ${label.toLowerCase()} — <a href="account.html">change it</a> anytime.`;

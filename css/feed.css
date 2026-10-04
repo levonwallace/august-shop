@@ -174,6 +174,11 @@
     margin-bottom: 0;
   }
 
+  .page--home .card-stack .home-copy h1.home-lockup {
+    font-size: clamp(40px, 4.8vw, 64px);
+    letter-spacing: -0.055em;
+  }
+
   .page--home[data-home-mode="everything"] .card-stack .home-copy .announce-chip--hero {
     display: none;
   }

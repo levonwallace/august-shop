@@ -312,6 +312,18 @@
   const mixByNo = (no) => MIXES.find((m) => m.no === String(no).padStart(3, "0"));
   const eventById = (id) => EVENTS.find((e) => e.id === id);
 
+  const posterFor = (ev) => {
+    if (ev?.image) return ev.image;
+    const idx = EVENTS.findIndex((e) => e.id === ev?.id);
+    const i = idx < 0 ? 0 : idx;
+    const match = String(ev?.title || "").match(/(\d{2,3})/);
+    if (match) {
+      const no = match[1].padStart(3, "0");
+      if (ART_BY_NO[no]) return ART_BY_NO[no];
+    }
+    return ART_POOL[i % ART_POOL.length];
+  };
+
   const relatedMixes = (mix, n = 6) => {
     const idx = MIXES.findIndex((m) => m.no === mix.no);
     if (idx === -1) return MIXES.slice(0, n);
@@ -338,6 +350,7 @@
     artFor,
     mixByNo,
     eventById,
+    posterFor,
     relatedMixes,
     relatedEvents,
   };

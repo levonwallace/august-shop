@@ -1122,18 +1122,96 @@ window.AugustCatalog = (() => {
         ? ["S", "M", "L", "XL"]
         : ["OS"];
 
-  /* Filter by homepage prefs. Unisex items belong to every department. */
+  /* Swipe / profile prefs. Missing profile → empty sets, shop stays full.
+     Fall back to the persisted user so PLP ranking works on first paint
+     (profile.js assigns AugustProfile after main.js renders). */
+  const loadUser = () => {
+    const fromApi = window.AugustProfile?.load?.();
+    if (fromApi) return fromApi;
+    try {
+      const raw = localStorage.getItem("august_user");
+      return raw ? JSON.parse(raw) : null;
+    } catch {
+      return null;
+    }
+  };
+
+  const swipeState = () => {
+    const user = loadUser();
+    return {
+      user,
+      likes: new Set((user?.swipes?.likes || []).map(brandKey)),
+      skips: new Set((user?.swipes?.skips || []).map(brandKey)),
+      preferred: new Set((user?.preferredBrands || []).map(brandKey)),
+    };
+  };
+
+  const hiddenIds = () => {
+    const Profile = window.AugustProfile;
+    if (typeof Profile?.hiddenIds === "function") {
+      try {
+        return [...(Profile.hiddenIds() || [])].filter(Boolean).map(String);
+      } catch {
+        return [];
+      }
+    }
+    if (Array.isArray(Profile?.hiddenIds)) {
+      return Profile.hiddenIds.filter(Boolean).map(String);
+    }
+    const items = loadUser()?.swipes?.items || [];
+    const ids = new Set();
+    items.forEach((item) => {
+      if (item?.dir !== "skip") return;
+      if (item.id) ids.add(String(item.id));
+      if (item.handle) ids.add(String(item.handle));
+    });
+    return [...ids];
+  };
+
+  const isHidden = (p) => {
+    if (!p) return false;
+    const hidden = new Set(hiddenIds());
+    if (!hidden.size) return false;
+    if (p.id && hidden.has(String(p.id))) return true;
+    if (p.handle && hidden.has(String(p.handle))) return true;
+    return false;
+  };
+
+  const visible = (list) => (list || UNIQUE).filter((p) => !isHidden(p));
+
+  /* Liked / preferred brands rise; skipped brands sink. Does not drop
+     other products of a skipped brand — feed() may do that. */
+  const prefer = (list) => {
+    const { likes, skips, preferred } = swipeState();
+    const rank = (p) => {
+      const key = brandKey(p.brand);
+      let score = 0;
+      if (likes.has(key)) score += 4;
+      else if (preferred.has(key)) score += 2;
+      if (skips.has(key)) score -= 4;
+      return score;
+    };
+    return [...(list || UNIQUE)].sort((a, b) => rank(b) - rank(a));
+  };
+
+  /* Filter by homepage prefs. Unisex items belong to every department.
+     Swipe likes / preferred brands rise; skipped brands sink. */
   const feed = (hp, limit) => {
     const dept = (hp && hp.department) || "all";
     const cat = (hp && hp.category) || "all";
     const saleOnly = !!(hp && hp.saleOnly);
+    const { skips } = swipeState();
     const out = UNIQUE.filter((p) => {
+      if (isHidden(p)) return false;
+      if (skips.has(brandKey(p.brand))) return false;
       if (dept !== "all" && p.dept !== dept && p.dept !== "unisex") return false;
       if (cat !== "all" && p.cat !== cat) return false;
       if (saleOnly && !p.sale) return false;
       return true;
     });
-    return limit ? out.slice(0, limit) : out;
+
+    const ranked = prefer(out);
+    return limit ? ranked.slice(0, limit) : ranked;
   };
 
   const money = (n) => "$" + n.toFixed(2);
@@ -1145,7 +1223,7 @@ window.AugustCatalog = (() => {
 
   /* Matches the PLP/home .product-card markup exactly */
   const cardHtml = (p) => `
-    <a class="product-card" href="${href(p)}">
+    <a class="product-card" data-swipe-card href="${href(p)}" data-product-id="${p.id || ""}">
       <div class="product-card__media"><img src="${p.img}" alt="${p.title}" loading="lazy" /></div>
       <div class="product-card__meta">
         <div class="product-card__brand">${p.brand}</div>
@@ -1179,6 +1257,10 @@ window.AugustCatalog = (() => {
     typeLabel,
     related,
     sizesFor,
+    hiddenIds,
+    isHidden,
+    visible,
+    prefer,
     feed,
     money,
     priceHtml,

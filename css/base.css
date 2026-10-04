@@ -15,6 +15,7 @@ html {
   -webkit-font-smoothing: antialiased;
   text-rendering: optimizeLegibility;
   height: 100%;
+  background: #fff;
   /* Prevent iOS Safari from rescaling body text after orientation change */
   -webkit-text-size-adjust: 100%;
   text-size-adjust: 100%;
@@ -82,6 +83,7 @@ p {
   margin: 0 auto;
   position: relative;
   overflow: hidden;
+  background: #fff;
 }
 
 /* Desktop: render at 75% (25% smaller) without rewriting every px token.
@@ -122,137 +124,6 @@ p {
 /* Text selection — faded madder from the rug */
 ::selection {
   background: rgba(168, 67, 46, 0.26);
-}
-
-/* Page washes — light through the storefront glass. Radial tints at 4–6%
-   opacity echo the rug's sun-faded reds/greens and the maple's warmth
-   without ever reading as "a colored background". */
-.page--home {
-  background: #fcfcfa;
-}
-
-.page--plp,
-.page--pdp,
-.page--cart {
-  background: #fcfcfa;
-}
-
-/* ── Ambient animated background (mirrors the home hero) ─────
-   Lighter wells, tighter falloff, faster roam — same idea as the
-   home field: airy, not creamy, with motion that still reads. */
-.page--plp::before,
-.page--pdp::before,
-.page--cart::before {
-  content: "";
-  position: absolute;
-  inset: -10%;
-  pointer-events: none;
-  z-index: 0;
-  will-change: filter, transform;
-  animation: page-hue-drift 22s ease-in-out infinite;
-}
-
-.page--plp::before {
-  background:
-    radial-gradient(36% 28% at 90% 4%, rgba(176, 112, 58, 0.018), transparent 56%),
-    radial-gradient(30% 32% at 8% 96%, rgba(43, 85, 168, 0.016), transparent 54%);
-}
-
-.page--pdp::before {
-  background:
-    radial-gradient(36% 30% at 86% 6%, rgba(74, 111, 94, 0.018), transparent 56%),
-    radial-gradient(32% 28% at 6% 94%, rgba(176, 112, 58, 0.014), transparent 54%);
-  animation-duration: 24s;
-}
-
-.page--cart::before {
-  background:
-    radial-gradient(34% 28% at 88% 6%, rgba(168, 67, 46, 0.016), transparent 54%),
-    radial-gradient(32% 30% at 8% 94%, rgba(74, 111, 94, 0.014), transparent 54%);
-  animation-duration: 20s;
-}
-
-.page--plp::after,
-.page--pdp::after,
-.page--cart::after {
-  content: "";
-  position: absolute;
-  top: -120px;
-  right: -100px;
-  width: 380px;
-  height: 380px;
-  pointer-events: none;
-  z-index: 0;
-  will-change: transform;
-  animation: page-glow-roam 26s ease-in-out infinite;
-}
-
-.page--plp::after {
-  background: radial-gradient(closest-side, rgba(43, 85, 168, 0.028) 0%, rgba(74, 111, 94, 0.01) 40%, transparent 64%);
-}
-
-.page--pdp::after {
-  background: radial-gradient(closest-side, rgba(74, 111, 94, 0.028) 0%, rgba(217, 163, 38, 0.01) 40%, transparent 64%);
-  animation-duration: 30s;
-}
-
-.page--cart::after {
-  background: radial-gradient(closest-side, rgba(168, 67, 46, 0.022) 0%, rgba(176, 112, 58, 0.01) 40%, transparent 64%);
-  animation-duration: 24s;
-}
-
-@keyframes page-hue-drift {
-  0%,
-  100% {
-    filter: hue-rotate(0deg) saturate(1.04);
-    transform: translate3d(0, 0, 0);
-  }
-  33% {
-    filter: hue-rotate(14deg) saturate(1.08);
-    transform: translate3d(-5%, 4%, 0);
-  }
-  66% {
-    filter: hue-rotate(-10deg) saturate(1.05);
-    transform: translate3d(4%, -5%, 0);
-  }
-}
-
-@keyframes page-glow-roam {
-  0%,
-  100% {
-    transform: translate3d(0, 0, 0) scale(1);
-  }
-  24% {
-    transform: translate3d(-68vw, 30vh, 0) scale(1.28);
-  }
-  48% {
-    transform: translate3d(-10vw, 74vh, 0) scale(0.78);
-  }
-  74% {
-    transform: translate3d(-58vw, 4vh, 0) scale(1.18);
-  }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .page--plp::before,
-  .page--pdp::before,
-  .page--cart::before,
-  .page--plp::after,
-  .page--pdp::after,
-  .page--cart::after {
-    animation: none;
-  }
-}
-
-@media (max-width: 900px) {
-  .page--plp::after,
-  .page--pdp::after,
-  .page--cart::after {
-    width: 340px;
-    height: 340px;
-    top: -80px;
-    right: -80px;
-  }
 }
 
 /* ── Skip-to-content link (visually hidden until focused) ─── */

@@ -7,19 +7,33 @@
   --color-body: #404540;
   --color-placeholder: #9ea199;
   --color-surface: #ffffff;
-  --color-page: #fcfcfa;
-  --color-page-plp: #fcfcfa;
-  --color-page-plp-end: #fcfcfa;
+  --color-page: #ffffff;
+  --color-page-plp: #ffffff;
+  --color-page-plp-end: #ffffff;
   --color-chip: #f4f2ec;
   --color-border: rgba(0, 0, 0, 0.18);
   --color-border-soft: rgba(0, 0, 0, 0.06);
   --color-border-mid: rgba(0, 0, 0, 0.14);
   --color-link: #2b55a8;
-  --color-island: rgba(255, 255, 255, 0.86);
-  --color-island-border: rgba(255, 255, 255, 0.9);
-  --color-glass: rgba(255, 255, 255, 0.88);
+  --color-island: rgba(255, 255, 255, 0.28);
+  --color-island-border: rgba(0, 0, 0, 0.14);
+  --color-glass: rgba(255, 255, 255, 0.32);
   --color-footer: rgba(0, 0, 0, 0.4);
   --color-dot: #4fbf7a;
+
+  /* Liquid Glass — frost + refraction. Dark hairline so it silhouettes
+     on white; saturate/contrast so photos smear through the chrome. */
+  --glass-blur: 48px;
+  --glass-saturate: 200%;
+  --glass-brightness: 1.06;
+  --glass-contrast: 1.08;
+  --glass-filter: blur(var(--glass-blur)) saturate(var(--glass-saturate)) brightness(var(--glass-brightness)) contrast(var(--glass-contrast));
+  --glass-sheen: linear-gradient(
+    180deg,
+    rgba(255, 255, 255, 0.72) 0%,
+    rgba(255, 255, 255, 0.18) 18%,
+    rgba(255, 255, 255, 0) 42%
+  );
 
   /* ─── Storefront palette — lifted from the shop itself ───
      madder    → the vintage rug + painting reds, sun-faded
@@ -45,8 +59,13 @@
   --checker-ink: rgba(46, 50, 56, 0.1);
   --checker-paper: rgba(255, 255, 255, 0.055);
 
-  --font: "Geist", "Helvetica Neue", Helvetica, Arial, sans-serif;
-  --shadow-island: 0 4px 10.6px rgba(0, 0, 0, 0.07);
+  --font: "Helvetica Neue", Helvetica, Arial, sans-serif;
+  --shadow-island:
+    inset 0 1.5px 0 rgba(255, 255, 255, 0.95),
+    inset 0 -8px 16px -10px rgba(80, 110, 160, 0.12),
+    0 0 0 0.5px rgba(0, 0, 0, 0.18),
+    0 1px 2px rgba(0, 0, 0, 0.06),
+    0 16px 40px -12px rgba(0, 0, 0, 0.24);
   --shadow-card: 0 18px 40px -4px rgba(0, 0, 0, 0.08);
   --shadow-soft: 0 12px 28px -8px rgba(0, 0, 0, 0.07);
   --shadow-player: 0 20px 48px -10px rgba(0, 0, 0, 0.18);
@@ -57,7 +76,7 @@
 
   --radius-pill: 100px;
   --radius-chip: 999px;
-  --radius-card: 16px;
+  --radius-card: 6px;
   --radius-panel: 28px;
   --radius-panel-sm: 22px;
   /* Header islands + footer — same corner on every chrome bar */

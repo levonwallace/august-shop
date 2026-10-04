@@ -217,16 +217,17 @@
       </button>
     </div>`;
 
+  let fulfill = "pickup";
+
   const lineHtml = (item, product, index) => `
     <div class="cart-swipe" data-cart-swipe data-cart-index="${index}">
       ${ACTIONS_HTML}
       <div class="cart-swipe__row cart-line">
-        <div class="cart-line__left">
-          <div class="cart-line__thumb"><img src="${product.img}" alt="" /></div>
-          <div>
-            <div class="cart-line__title">${product.title}</div>
-            <div class="cart-line__meta">${product.brand} · Size ${item.size} · Qty ${item.qty}</div>
-          </div>
+        <div class="cart-line__thumb"><img src="${product.img}" alt="" /></div>
+        <div class="cart-line__info">
+          <div class="cart-line__brand">${product.brand}</div>
+          <div class="cart-line__title">${product.title}</div>
+          <div class="cart-line__meta">${item.size} · Qty ${item.qty}</div>
         </div>
         <div class="cart-line__price">${window.AugustCatalog.money(product.price * item.qty)}</div>
       </div>
@@ -253,20 +254,37 @@
       })
       .filter(Boolean);
     list.innerHTML =
-      rows.join('<div class="cart-divider"></div>') +
-      '<p class="cart-lines__hint">Swipe left on any item to save or remove.</p>';
+      rows.join("") +
+      '<p class="cart-lines__hint">Swipe left to save or remove</p>';
 
     list.querySelectorAll("[data-cart-swipe]").forEach(wireSwipe);
 
-    // Totals
+    paintSummary();
+  };
+
+  const paintSummary = () => {
+    if (!window.AugustCart || !window.AugustCatalog) return;
     const subtotal = window.AugustCart.subtotal();
     const sub = document.querySelector("[data-cart-subtotal]");
     const total = document.querySelector("[data-cart-total]");
     if (sub) sub.textContent = window.AugustCatalog.money(subtotal);
     if (total) total.textContent = window.AugustCatalog.money(subtotal);
 
+    const note = document.querySelector("[data-cart-fulfill-note]");
+    const shipLabel = document.querySelector("[data-cart-ship-label]");
+    const shipValue = document.querySelector("[data-cart-ship-value]");
+    if (fulfill === "ship") {
+      if (note) note.textContent = "1–2 business days from 414 State St.";
+      if (shipLabel) shipLabel.textContent = "Shipping";
+      if (shipValue) shipValue.textContent = "At checkout";
+    } else {
+      if (note) note.textContent = "Ready at 414 State St. Usually same day.";
+      if (shipLabel) shipLabel.textContent = "Pickup";
+      if (shipValue) shipValue.textContent = "Free";
+    }
+
     const checkout = document.querySelector("[data-cart-checkout]");
-    if (checkout) checkout.classList.toggle("is-disabled", items.length === 0);
+    if (checkout) checkout.classList.toggle("is-disabled", window.AugustCart.items().length === 0);
   };
 
   /* ── Checkout: place the order, show confirmation ─────────── */
@@ -293,7 +311,7 @@
           <svg viewBox="0 0 48 48" fill="none"><circle cx="24" cy="24" r="21" stroke="currentColor" stroke-width="1.5"/><path d="M15 24l6 6 12-12" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
         </div>
         <h2 class="cart-empty__title">Order placed</h2>
-        <p class="cart-empty__sub">${order.no} · ${order.items.reduce((s, i) => s + i.qty, 0)} item${order.items.length === 1 ? "" : "s"} · ${window.AugustCatalog.money(order.total)}<br />On the way from August, 414 State St.</p>
+        <p class="cart-empty__sub">${order.no} · ${order.items.reduce((s, i) => s + i.qty, 0)} item${order.items.reduce((s, i) => s + i.qty, 0) === 1 ? "" : "s"} · ${window.AugustCatalog.money(order.total)}<br />${fulfill === "pickup" ? "Pick up at 414 State St." : "On the way from August, 414 State St."}</p>
         <a class="btn btn--primary" href="order.html?o=${encodeURIComponent(order.no)}">Track your order</a>
       `;
       main?.appendChild(confirm);
@@ -302,6 +320,13 @@
   };
 
   document.addEventListener("DOMContentLoaded", () => {
+    const fulfillRoot = document.querySelector("[data-cart-fulfill]");
+    if (fulfillRoot) {
+      fulfillRoot.addEventListener("segmented:change", (e) => {
+        fulfill = e.detail?.value === "ship" ? "ship" : "pickup";
+        paintSummary();
+      });
+    }
     renderCart();
     wireCheckout();
 

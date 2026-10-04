@@ -350,18 +350,21 @@ document.addEventListener("DOMContentLoaded", () => {
     if (query) location.href = `collection.html?q=${encodeURIComponent(query)}`;
   };
 
-  const paintSuggest = (host, products, q) => {
+  const paintSuggest = (host, products, q, opts = {}) => {
     if (!host) return;
-    if (!products.length) {
-      host.innerHTML = q
-        ? `<p class="search-suggest__empty">No matches for “${q}”</p>`
-        : "";
+    const Shop = window.AugustShop;
+    const chips = Shop?.suggestChipsHtml?.(q) || "";
+    const rows = products.length && Shop ? products.map((p) => Shop.resultRow(p)).join("") : "";
+    const seeAll =
+      opts.seeAll === false
+        ? ""
+        : `<a class="sheet-list__row" href="collection.html?q=${encodeURIComponent(q)}">See all results</a>`;
+    if (!chips && !products.length) {
+      host.innerHTML =
+        opts.pending || !q ? "" : `<p class="search-suggest__empty">No matches for “${q}”</p>`;
       return;
     }
-    const Shop = window.AugustShop;
-    host.innerHTML =
-      products.map((p) => Shop.resultRow(p)).join("") +
-      `<a class="sheet-list__row" href="collection.html?q=${encodeURIComponent(q)}">See all results</a>`;
+    host.innerHTML = chips + rows + seeAll;
   };
 
   const bindLiveSearch = (input, panel) => {
@@ -382,17 +385,19 @@ document.addEventListener("DOMContentLoaded", () => {
         return;
       }
       const ticket = ++seq;
-      const products = await window.AugustShop.search(q, 8);
-      if (ticket !== seq) return;
       if (panel) {
         panel.hidden = false;
-        paintSuggest(panel, products, q);
+        paintSuggest(panel, [], q, { pending: true });
       }
       const results = document.querySelector("[data-search-results]");
-      if (results) paintSuggest(results, products, q);
+      if (results) paintSuggest(results, [], q, { seeAll: false, pending: true });
       if (all) all.href = `collection.html?q=${encodeURIComponent(q)}`;
       if (live) live.hidden = false;
       if (idle) idle.hidden = true;
+      const products = await window.AugustShop.search(q, 8);
+      if (ticket !== seq) return;
+      if (panel) paintSuggest(panel, products, q);
+      if (results) paintSuggest(results, products, q, { seeAll: false });
     };
     input.addEventListener("input", () => {
       clearTimeout(timer);
@@ -498,6 +503,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     let liveHits = null;
+    let liveHitsRaw = null;
 
     const matches = (p) => {
       if (state.q && !liveHits && !(`${p.brand} ${p.title}`.toLowerCase().includes(state.q))) return false;
@@ -605,10 +611,12 @@ document.addEventListener("DOMContentLoaded", () => {
     };
 
     const renderPLP = () => {
-      const pool = liveHits || window.AugustCatalog.PRODUCTS;
-      const items = sorted(pool.filter(matches));
+      const Cat = window.AugustCatalog;
+      const pool = Cat.visible(liveHitsRaw || liveHits || Cat.PRODUCTS);
+      let items = pool.filter(matches);
+      items = state.sort === "featured" ? Cat.prefer(items) : sorted(items);
       grid.innerHTML = items.length
-        ? items.map(window.AugustCatalog.cardHtml).join("")
+        ? items.map(Cat.cardHtml).join("")
         : '<p class="plp-empty">Nothing matches — try another search or clear a filter.</p>';
       const island = document.querySelector(".plp-intro__island p");
       if (island) island.textContent = islandText(items.length);
@@ -643,17 +651,54 @@ document.addEventListener("DOMContentLoaded", () => {
       return out;
     };
 
+    const cardMatchesPref = (card, detail) => {
+      const id = card.getAttribute("data-product-id") || "";
+      const href = card.getAttribute("href") || "";
+      let pid = "";
+      let handle = "";
+      try {
+        const params = new URL(href, location.href).searchParams;
+        pid = params.get("p") || "";
+        handle = params.get("h") || "";
+      } catch {}
+      const keys = [
+        detail?.id,
+        detail?.handle,
+        detail?.product?.id,
+        detail?.product?.handle,
+        detail?.item?.id,
+        detail?.item?.handle,
+      ]
+        .filter(Boolean)
+        .map(String);
+      if (keys.length && keys.some((k) => k === id || k === pid || k === handle)) return true;
+      return window.AugustCatalog.isHidden({ id: id || pid, handle });
+    };
+
+    const refreshFromPrefs = (e) => {
+      const detail = e?.detail;
+      grid.querySelectorAll(".product-card").forEach((card) => {
+        if (cardMatchesPref(card, detail)) card.remove();
+      });
+      renderPLP();
+    };
+
+    window.addEventListener("august:swipe", refreshFromPrefs);
+    window.addEventListener("august:profile-changed", refreshFromPrefs);
+
     if (state.q && window.AugustShop) {
       grid.innerHTML = '<p class="plp-empty">Searching the shop…</p>';
       window.AugustShop.search(state.q, 48).then((hits) => {
-        liveHits = hits.length ? hits : null;
+        liveHitsRaw = hits.length ? hits : null;
+        liveHits = liveHitsRaw ? window.AugustCatalog.visible(hits) : null;
         hits.forEach((p) => window.AugustShop.remember(p));
         renderPLP();
       });
     } else if (state.brands.length && window.AugustShop?.byBrand) {
       grid.innerHTML = '<p class="plp-empty">Loading this brand…</p>';
       window.AugustShop.byBrand(state.brands[0], 48).then((hits) => {
-        liveHits = mergeBrandHits(hits);
+        liveHitsRaw = mergeBrandHits(hits);
+        liveHits = window.AugustCatalog.visible(liveHitsRaw);
         renderPLP();
       });
     } else {

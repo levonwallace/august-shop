@@ -8,7 +8,19 @@ document.addEventListener("DOMContentLoaded", () => {
   // Dots live outside .card-stack (which has overflow:hidden) so they can
   // render in the gap below the card on desktop. Search from .page instead.
   const dotsContainer = stack.parentElement || document;
+  const dotsBar = dotsContainer.querySelector("[data-card-dots]");
   const dots = [...dotsContainer.querySelectorAll("[data-dot]")];
+
+  /* Dots rest small + translucent; swell while the stack or a card is scrolling. */
+  let restTimer = 0;
+  const wakeDots = () => {
+    if (!dotsBar) return;
+    dotsBar.classList.add("is-awake");
+    clearTimeout(restTimer);
+    restTimer = window.setTimeout(() => {
+      dotsBar.classList.remove("is-awake");
+    }, 1100);
+  };
   const total = cards.length;
   if (!total) return;
 
@@ -16,6 +28,46 @@ document.addEventListener("DOMContentLoaded", () => {
   let animating = false;
   let queued = null;
   const LOCK_MS = 380;
+  /* After a flip, eat leftover wheel/touch inertia so the new card
+     lands at the top instead of inheriting the previous page's flick. */
+  let absorbUntil = 0;
+  const ABSORB_MS = 640;
+  let wheelAccum = 0;
+  let lastWheelAt = 0;
+  let flippedThisStream = false;
+
+  const scrollerOf = (card) => {
+    if (!card) return null;
+    if (card.hasAttribute("data-card-scroll")) return card;
+    return card.querySelector("[data-card-scroll]");
+  };
+
+  const pinScroller = (card) => {
+    const s = scrollerOf(card);
+    if (!s) return;
+    s.scrollTop = 0;
+    s.classList.add("is-pinned");
+    requestAnimationFrame(() => {
+      s.scrollTop = 0;
+    });
+  };
+
+  const releaseScroller = (card) => {
+    const s = scrollerOf(card);
+    if (!s) return;
+    s.scrollTop = 0;
+    s.classList.remove("is-pinned");
+  };
+
+  const absorbMomentum = (card) => {
+    pinScroller(card);
+    absorbUntil = performance.now() + ABSORB_MS;
+    wheelAccum = 0;
+    flippedThisStream = true;
+    queued = null;
+  };
+
+  const isAbsorbing = () => performance.now() < absorbUntil;
 
   /* ── Haptic ─────────────────────────────────────────────── */
   const haptic = (ms = 10) => {
@@ -67,6 +119,7 @@ document.addEventListener("DOMContentLoaded", () => {
   };
 
   const goTo = (idx, dir) => {
+    wakeDots();
     if (animating) {
       queued = { idx, dir };
       return;
@@ -79,6 +132,7 @@ document.addEventListener("DOMContentLoaded", () => {
     active = target;
     animating = true;
     haptic(12);
+    absorbMomentum(cards[target]);
 
     // Ensure no stale inline transforms are fighting the CSS transition
     cards.forEach((c) => {
@@ -108,13 +162,15 @@ document.addEventListener("DOMContentLoaded", () => {
     syncTabs();
 
     setTimeout(() => {
+      pinScroller(cards[active]);
       renderAll();
       animating = false;
+      window.setTimeout(() => releaseScroller(cards[active]), Math.max(0, absorbUntil - performance.now()));
 
       if (queued) {
         const q = queued;
         queued = null;
-        goTo(q.idx, q.dir);
+        if (!isAbsorbing()) goTo(q.idx, q.dir);
       }
     }, LOCK_MS);
   };
@@ -122,23 +178,23 @@ document.addEventListener("DOMContentLoaded", () => {
   const next = () => goTo(active + 1, 1);
   const prev = () => goTo(active - 1, -1);
 
-  /* ── Wheel: continuous scroll rotates the stack ──────────
-     A fresh gesture flips a card quickly (small threshold). Keeping the
-     scroll going flips the next card as soon as each animation settles —
-     no need to stop and re-scroll between cards. A single flick's inertia
-     tail won't double-flip: repeat flips inside the same event stream
-     need a much larger accumulated delta, which decaying inertia rarely
-     reaches, while a deliberate sustained scroll easily does. */
-  let wheelAccum = 0;
-  let lastWheelAt = 0;
-  let flippedThisStream = false;
+  /* ── Wheel: inner scroll first, then a distinct flip ─────
+     A card with [data-card-scroll] owns the wheel until it hits an edge.
+     Crossing the edge flips once; leftover inertia is absorbed so the
+     incoming card stays pinned at the top. A new gesture is required
+     to flip again or to start scrolling that page. */
   const WHEEL_THRESHOLD = 80;   // fresh gesture
   const WHEEL_REPEAT = 260;     // continued scroll in the same stream
   const WHEEL_GAP_MS = 140;     // pause that separates gestures
 
   stack.addEventListener("wheel", (e) => {
+    wakeDots();
+    if (isAbsorbing()) {
+      e.preventDefault();
+      return;
+    }
     const scroller = e.target.closest("[data-card-scroll]");
-    if (scroller) {
+    if (scroller && !scroller.classList.contains("is-pinned")) {
       const atTop = scroller.scrollTop <= 1;
       const atBottom = scroller.scrollTop + scroller.clientHeight >= scroller.scrollHeight - 2;
       if ((e.deltaY < 0 && !atTop) || (e.deltaY > 0 && !atBottom)) return;
@@ -154,9 +210,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }
     lastWheelAt = now;
 
-    // Don't bank deltas while a flip animates — a long scroll should
-    // advance one card per animation, not queue a burst of them.
-    if (animating) {
+    if (animating || isAbsorbing()) {
       wheelAccum = 0;
       return;
     }
@@ -185,7 +239,7 @@ document.addEventListener("DOMContentLoaded", () => {
      movement still clicks through; a confirmed drag suppresses the click. */
   const skipDrag = (el) =>
     el.closest(
-      "input, select, textarea, .waveform, .audio-player__queue, .profile-drop, .profile-modal, .sheet, .tabbar, .home-tile, .product-card, a.btn, .aux-event, .aux-tile"
+      "input, select, textarea, .waveform, .audio-player__queue, .profile-drop, .profile-modal, .sheet, .tabbar, .home-tile, .product-card, [data-swipe-card], a.btn, .aux-event, .aux-tile"
     );
 
   let startY = 0;
@@ -299,6 +353,7 @@ document.addEventListener("DOMContentLoaded", () => {
       return;
     }
     if (Math.abs(rawDy) < 16) return; // keep taps on product tiles clickable
+    wakeDots();
 
     // Inside a scrollable card region: let native scroll run until the
     // scroller hits its edge in the gesture's direction, then card-drag.
@@ -366,6 +421,8 @@ document.addEventListener("DOMContentLoaded", () => {
   stack.addEventListener(
     "click",
     (e) => {
+      // Product-card / home-tile swipes own their own click-suppress.
+      if (e.target.closest(".product-card, .home-tile, [data-swipe-card]")) return;
       if (!suppressClick) return;
       suppressClick = false;
       e.preventDefault();
@@ -387,6 +444,7 @@ document.addEventListener("DOMContentLoaded", () => {
      instead of dead-ending — no more tapping dots to advance. */
   const EDGE_SWIPE = 56; // px past the edge before the card flips
   stack.querySelectorAll("[data-card-scroll]").forEach((scroller) => {
+    scroller.addEventListener("scroll", wakeDots, { passive: true });
     let startTouchY = 0;
     let atTopAtStart = false;
     let atBottomAtStart = false;
@@ -406,6 +464,10 @@ document.addEventListener("DOMContentLoaded", () => {
     scroller.addEventListener(
       "touchmove",
       (e) => {
+        if (isAbsorbing()) {
+          e.preventDefault();
+          return;
+        }
         if (consumed || animating) return;
         const dy = e.touches[0].clientY - startTouchY;
         const atTop = scroller.scrollTop <= 1;

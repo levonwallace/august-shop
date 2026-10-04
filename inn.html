@@ -23,10 +23,7 @@
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:title" content="August Inn — Friendship, WI" />
     <meta name="twitter:description" content="A rustic-modern cabin in Friendship, Wisconsin — across the street from Castle Rock Lake." />
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link rel="preconnect" href="https://august-shop.com" />
-    <link href="https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600&display=swap" rel="stylesheet" />
     <link rel="stylesheet" href="css/tokens.css" />
     <link rel="stylesheet" href="css/base.css" />
     <link rel="stylesheet" href="css/components.css" />
@@ -35,6 +32,8 @@
     <link rel="stylesheet" href="css/sheet.css" />
     <link rel="stylesheet" href="css/tabbar.css" />
     <link rel="stylesheet" href="css/segmented.css" />
+    <link rel="stylesheet" href="css/offer.css" />
+    <link rel="stylesheet" href="css/search.css" />
   </head>
   <body>
     <a class="skip-link" href="#main">Skip to content</a>
@@ -158,8 +157,8 @@
       <div class="page-scroll">
       <main class="story story--inn" id="main">
         <p class="story__kicker">August Inn</p>
-        <h1 class="story__title">Friendship, Wisconsin</h1>
-        <p class="story__lead">A rustic-modern cabin across the street from Castle Rock Lake.</p>
+        <h1 class="story__title">The shop’s cabin</h1>
+        <p class="story__lead">2095 Wigwam St, Friendship, WI. Across the street from Castle Rock Lake.</p>
 
         <figure class="inn-hero">
           <img
@@ -170,9 +169,16 @@
           />
         </figure>
 
+        <dl class="inn-facts">
+          <div class="inn-facts__item"><dt>Bedrooms</dt><dd>4</dd></div>
+          <div class="inn-facts__item"><dt>Beds</dt><dd>5</dd></div>
+          <div class="inn-facts__item"><dt>Baths</dt><dd>2.5</dd></div>
+          <div class="inn-facts__item"><dt>Sleeps</dt><dd>8</dd></div>
+        </dl>
+
         <div class="story__body">
-          <p>August Inn is a physical space where you can enjoy the luxury of being surrounded by the signature August curation for your next getaway.</p>
-          <p>Escape to this charming rustic yet modern cabin in Friendship, WI, just minutes from Castle Rock Lake. Enjoy the cozy wood interiors with stylish modern touches, a full kitchen, comfy beds, hot tub, recreation room, and a fire pit for starlit nights. Perfect for relaxing getaways or outdoor adventures — boating, fishing, hiking, and more await nearby. Unplug, unwind, and make memories in this serene woodland retreat.</p>
+          <p>Same people who run the floor at 414 State. The cabin is the overnight version — wood rooms, a deck hot tub, game room downstairs.</p>
+          <p>Castle Rock is across the street. Beach and food are five minutes. Full kitchen. Fire pit. Book it on Airbnb or VRBO when you want the lake, not a hotel.</p>
         </div>
 
         <div class="inn-book">
@@ -181,18 +187,16 @@
         </div>
 
         <section class="inn-amenities" aria-labelledby="inn-amenities-title">
-          <h2 id="inn-amenities-title">Amenities</h2>
+          <h2 id="inn-amenities-title">On site</h2>
           <ul>
-            <li>4 bedrooms</li>
-            <li>5 beds</li>
-            <li>2.5 bathrooms</li>
-            <li>Sleeps 8 comfortably</li>
+            <li>4 bedrooms, 5 beds, 2.5 baths</li>
+            <li>Sleeps 8</li>
             <li>Across the street from Castle Rock Lake</li>
-            <li>5 min to a public beach and restaurants</li>
-            <li>Gameroom — pool, shuffleboard, arcade, foosball</li>
-            <li>BBQ &amp; outdoor dining</li>
-            <li>Patio &amp; balcony</li>
-            <li>Hot tub</li>
+            <li>5 min to public beach and restaurants</li>
+            <li>Game room — pool, shuffleboard, arcade, foosball</li>
+            <li>BBQ and outdoor dining</li>
+            <li>Patio and balcony</li>
+            <li>Hot tub on the deck</li>
           </ul>
         </section>
 
@@ -247,7 +251,6 @@
         </div>
         <nav class="footer-links" aria-label="Footer">
           <a href="collection.html">Shop</a>
-          <a href="collection.html">Explore</a>
           <a href="#">Help</a>
           <a href="#">Shipping and returns</a>
           <a href="inn.html" aria-current="page">August Inn</a>
@@ -286,5 +289,6 @@
     <script src="js/sheet.js"></script>
     <script src="js/segmented.js"></script>
     <script src="js/profile.js"></script>
+    <script src="js/offer.js"></script>
   </body>
 </html>

@@ -12,13 +12,57 @@ document.addEventListener("DOMContentLoaded", () => {
     avatar: "",
     homepage: { enabled: true, department: "all", category: "all", saleOnly: false },
     preferredBrands: [],
+    swipes: { likes: [], skips: [], items: [] },
     createdAt: null,
   });
+
+  const snapshotFromCatalog = (id) =>
+    (id && window.AugustCatalog?.byId?.(id)) || (id && window.AugustShop?.cached?.(id)) || null;
+
+  const normalizeItem = (item) => {
+    if (!item || typeof item !== "object") return null;
+    const id = item.id || item.handle || "";
+    if (!id) return null;
+    const dir = item.dir === "skip" ? "skip" : item.dir === "like" ? "like" : null;
+    if (!dir) return null;
+    const cat = snapshotFromCatalog(id);
+    return {
+      id,
+      handle: item.handle || cat?.handle || "",
+      brand: item.brand || cat?.brand || "",
+      title: item.title || cat?.title || "",
+      img: item.img || cat?.img || "",
+      dir,
+      t: Number(item.t) || 0,
+    };
+  };
+
+  /* Last write wins per product id; newest stays at the end. */
+  const normalizeSwipes = (raw) => {
+    const likes = Array.isArray(raw?.likes) ? raw.likes.filter(Boolean) : [];
+    const skips = Array.isArray(raw?.skips) ? raw.skips.filter(Boolean) : [];
+    const map = new Map();
+    (Array.isArray(raw?.items) ? raw.items : []).forEach((item) => {
+      const n = normalizeItem(item);
+      if (!n) return;
+      map.delete(n.id);
+      map.set(n.id, n);
+    });
+    return { likes, skips, items: [...map.values()] };
+  };
 
   const load = () => {
     try {
       const raw = localStorage.getItem(STORAGE_KEY);
-      return raw ? { ...defaults(), ...JSON.parse(raw) } : null;
+      if (!raw) return null;
+      const parsed = JSON.parse(raw);
+      return {
+        ...defaults(),
+        ...parsed,
+        homepage: { ...defaults().homepage, ...(parsed.homepage || {}) },
+        preferredBrands: parsed.preferredBrands || [],
+        swipes: normalizeSwipes(parsed.swipes),
+      };
     } catch {
       return null;
     }
@@ -68,8 +112,106 @@ document.addEventListener("DOMContentLoaded", () => {
     !hp ||
     ((hp.department || "all") === "all" && (hp.category || "all") === "all" && !hp.saleOnly);
 
-  // Shared with account.js
-  window.AugustProfile = { load, save, feedLabel, feedIsDefault };
+  const brandKeyOf = (name) =>
+    window.AugustCatalog?.brandKey?.(name) ||
+    String(name || "")
+      .toLowerCase()
+      .replace(/[^a-z0-9]+/g, "");
+
+  /* Tinder swipe → profile. Right = like (and follow the brand);
+     left = show less. Brand arrays stay; product snapshots upsert by id. */
+  const recordSwipe = (product, dir) => {
+    if (!product || (dir !== "like" && dir !== "skip")) return null;
+    const user = load();
+    if (!user) return null;
+
+    const key = brandKeyOf(product.brand);
+    const swipes = normalizeSwipes(user.swipes);
+    const id = product.id || product.handle || "";
+    if (!id) return null;
+    const cat = snapshotFromCatalog(id);
+
+    if (dir === "like") {
+      if (key && !swipes.likes.includes(key)) swipes.likes.push(key);
+      swipes.skips = swipes.skips.filter((k) => k !== key);
+      const brands = [...(user.preferredBrands || [])];
+      if (key && product.brand && !brands.some((b) => brandKeyOf(b) === key)) {
+        brands.push(product.brand);
+      }
+      user.preferredBrands = brands;
+    } else {
+      if (key && !swipes.skips.includes(key)) swipes.skips.push(key);
+      swipes.likes = swipes.likes.filter((k) => k !== key);
+    }
+
+    swipes.items = swipes.items.filter((item) => item.id !== id);
+    swipes.items.push({
+      id,
+      handle: product.handle || cat?.handle || "",
+      brand: product.brand || cat?.brand || "",
+      title: product.title || cat?.title || "",
+      img: product.img || cat?.img || "",
+      dir,
+      t: Date.now(),
+    });
+    if (swipes.items.length > 80) swipes.items = swipes.items.slice(-80);
+
+    user.swipes = swipes;
+    save(user);
+    window.dispatchEvent(new CustomEvent("august:swipe", { detail: { product, dir, user } }));
+    return user;
+  };
+
+  const undoSwipe = (id) => {
+    if (!id) return null;
+    const user = load();
+    if (!user) return null;
+
+    const swipes = normalizeSwipes(user.swipes);
+    const item = swipes.items.find((entry) => entry.id === id);
+    swipes.items = swipes.items.filter((entry) => entry.id !== id);
+    if (item?.dir === "skip") {
+      const key = brandKeyOf(item.brand);
+      const stillSkip =
+        key && swipes.items.some((entry) => entry.dir === "skip" && brandKeyOf(entry.brand) === key);
+      if (key && !stillSkip) swipes.skips = swipes.skips.filter((k) => k !== key);
+    }
+
+    user.swipes = swipes;
+    save(user);
+    return user;
+  };
+
+  const hiddenIds = () => {
+    const user = load();
+    return new Set(
+      (user?.swipes?.items || []).filter((item) => item.dir === "skip" && item.id).map((item) => item.id)
+    );
+  };
+
+  const swipeItems = (dir) => {
+    if (dir !== "like" && dir !== "skip") return [];
+    const seen = new Set();
+    const out = [];
+    (load()?.swipes?.items || []).forEach((item) => {
+      if (item.dir !== dir || !item.id || seen.has(item.id)) return;
+      seen.add(item.id);
+      out.push(item);
+    });
+    return out;
+  };
+
+  // Shared with account.js / swipe.js
+  window.AugustProfile = {
+    load,
+    save,
+    feedLabel,
+    feedIsDefault,
+    recordSwipe,
+    undoSwipe,
+    hiddenIds,
+    swipeItems,
+  };
 
   const initials = (name) => {
     if (!name) return "?";
@@ -95,9 +237,9 @@ document.addEventListener("DOMContentLoaded", () => {
       <div class="profile-drop" data-profile-drop hidden>
         <div class="profile-drop__signed-out" data-profile-signed-out>
           <p class="profile-drop__greeting">Account</p>
-          <p class="profile-drop__sub">Orders, saved items, faster checkout.</p>
-          <button class="profile-drop__btn profile-drop__btn--primary" type="button" data-profile-action="signin">Sign in</button>
-          <button class="profile-drop__btn" type="button" data-profile-action="create">Create account</button>
+          <p class="profile-drop__sub">Save a feed, track orders.</p>
+          <button class="profile-drop__btn profile-drop__btn--primary" type="button" data-profile-action="create">Create account</button>
+          <button class="profile-drop__btn" type="button" data-profile-action="signin">Sign in</button>
         </div>
         <div class="profile-drop__signed-in" data-profile-signed-in hidden>
           <div class="profile-drop__user">
@@ -130,6 +272,7 @@ document.addEventListener("DOMContentLoaded", () => {
           </button>
 
           <p class="auth-wordmark">August</p>
+          <p class="profile-modal__sub">Save a feed, track orders.</p>
 
           <div class="auth-tabs" role="tablist" aria-label="Sign in or create account">
             <button type="button" class="auth-tab is-active" role="tab" aria-selected="true" data-auth-mode="signin">Sign in</button>
@@ -184,9 +327,14 @@ document.addEventListener("DOMContentLoaded", () => {
     btn.type = "button";
     btn.className = "avatar-btn";
     btn.setAttribute("aria-label", "Account");
+    btn.setAttribute("title", "Account");
     btn.setAttribute("data-avatar-trigger", "");
     img.replaceWith(btn);
     btn.appendChild(img);
+    const label = document.createElement("span");
+    label.className = "avatar-btn__label";
+    label.textContent = "Account";
+    btn.appendChild(label);
   });
 
   /* ── Render state ───────────────────────────────────────── */
@@ -223,9 +371,12 @@ document.addEventListener("DOMContentLoaded", () => {
       `;
     } else {
       profileSheetBody.innerHTML = `
-        <p class="profile-sheet__hint">Orders, saved items, faster checkout.</p>
-        <button class="btn btn--primary btn--block" type="button" data-profile-action="signin">Sign in</button>
-        <button class="btn btn--ghost btn--block" type="button" data-profile-action="create">Create account</button>
+        <div class="profile-sheet__hero">
+          <p class="profile-sheet__hero-title">Account</p>
+          <p class="profile-sheet__hero-sub">Save a feed, track orders.</p>
+        </div>
+        <button class="btn btn--primary btn--block profile-sheet__cta" type="button" data-profile-action="create">Create account</button>
+        <button class="btn btn--ghost btn--block" type="button" data-profile-action="signin">Sign in</button>
         <div class="sheet-section">
           <p class="sheet-section__label">Quick links</p>
           <div class="sheet-list">
@@ -258,6 +409,9 @@ document.addEventListener("DOMContentLoaded", () => {
       const badge = btn.querySelector(".avatar-initials");
       if (badge) badge.hidden = true;
     });
+
+    const nudge = document.querySelector("[data-feed-nudge]");
+    if (nudge) nudge.hidden = !(user && feedIsDefault(user.homepage));
 
     if (user) {
       signedOut.hidden = true;
@@ -397,6 +551,7 @@ document.addEventListener("DOMContentLoaded", () => {
       closeDrop();
       logout();
       render();
+      if (document.querySelector(".page--home")) location.reload();
     }
   });
 
@@ -432,6 +587,7 @@ document.addEventListener("DOMContentLoaded", () => {
     render();
     closeModal(modal);
     form.reset();
+    if (document.querySelector(".page--home")) location.reload();
   });
 
   /* ── Close buttons ──────────────────────────────────────── */
@@ -452,18 +608,125 @@ document.addEventListener("DOMContentLoaded", () => {
      Liquid conditional on customer metafields rendering an alternate
      hero section — same data, server-side. */
 
-  const applyHomepagePrefs = () => {
-    const user = load();
-    if (!document.querySelector(".page--home")) return;
+  const esc = (s) =>
+    String(s || "")
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/"/g, "&quot;");
 
-    const hp = user?.homepage;
-    // Takeover only when a feed is configured AND switched on
-    // (missing `enabled` = true, for profiles saved before the toggle existed)
-    if (!user || feedIsDefault(hp) || hp.enabled === false) return;
+  const productHref = (p) =>
+    window.AugustCatalog?.href?.(p) || `product.html?p=${p?.id || ""}`;
+
+  const dropHidden = (list) => {
+    if (!list || !list.length) return list || [];
+    const hidden = hiddenIds();
+    if (!hidden.size) return list;
+    return list.filter((p) => p && !hidden.has(p.id) && !hidden.has(String(p.id)));
+  };
+
+  const availability = () => {
+    let catalog = [];
+    const visible = window.AugustCatalog?.visible;
+    if (typeof visible === "function") catalog = visible() || [];
+    else if (Array.isArray(visible)) catalog = visible.slice();
+    else if (window.AugustCatalog?.PRODUCTS) catalog = window.AugustCatalog.PRODUCTS.slice();
+    // AugustShop is the live search client — no list-all. Catalog is the floor.
+    if (!catalog.length && !(window.AugustShop || window.AugustCatalog)) return [];
+    return dropHidden(catalog);
+  };
+
+  const cardMarkup = (p) => {
+    const Cat = window.AugustCatalog;
+    if (!Cat || !p) return "";
+    const set = Cat.srcset(p.img);
+    return `<a class="product-card" data-swipe-card href="${productHref(p)}" data-product-id="${esc(p.id)}">
+      <div class="product-card__media"><img src="${esc(p.img)}" alt="${esc(p.title)}" loading="lazy"${set ? ` srcset="${set}" sizes="(min-width: 901px) 22vw, 45vw"` : ""} /></div>
+      <div class="product-card__meta">
+        <div class="product-card__brand">${esc(p.brand)}</div>
+        <div class="product-card__title">${esc(p.title)}</div>
+        <div class="product-card__price">${Cat.priceHtml(p)}</div>
+      </div>
+    </a>`;
+  };
+
+  const paintMedia = (el, p, sizes) => {
+    const img = el.querySelector("img");
+    if (!img || !p) return;
+    img.src = p.img;
+    img.alt = p.title;
+    const set = window.AugustCatalog?.srcset?.(p.img);
+    if (set) {
+      img.srcset = set;
+      img.sizes = sizes;
+    }
+  };
+
+  const paintProductCard = (card, p) => {
+    if (!card || !p) return;
+    card.href = productHref(p);
+    card.setAttribute("data-swipe-card", "");
+    if (p.id) card.setAttribute("data-product-id", p.id);
+    paintMedia(card, p, "(min-width: 901px) 24vw, 45vw");
+    const brand = card.querySelector(".product-card__brand");
+    const title = card.querySelector(".product-card__title");
+    const price = card.querySelector(".product-card__price");
+    if (brand) brand.textContent = p.brand;
+    if (title) title.textContent = p.title;
+    if (price && window.AugustCatalog) price.innerHTML = window.AugustCatalog.priceHtml(p);
+  };
+
+  const tagSwipeCards = (root) => {
+    (root || document).querySelectorAll(".product-card, .home-tile").forEach((el) => {
+      el.setAttribute("data-swipe-card", "");
+    });
+  };
+
+  /* Everything = standardized shop of current availability.
+     Used when logged out, or when the feed toggle is off. */
+  const applyEverythingHero = () => {
+    const page = document.querySelector(".page--home");
+    if (!page) return;
+    page.setAttribute("data-home-mode", "everything");
+
+    const products = availability();
+    if (!products.length) {
+      tagSwipeCards(page);
+      return;
+    }
+
+    const gridTitle = document.querySelector(".home-grid__title");
+    const gridTag = document.querySelector(".home-grid__tag");
+    if (gridTitle) gridTitle.textContent = "In stock now";
+    if (gridTag) gridTag.textContent = "Available";
+
+    const grid = document.querySelector(".home-grid");
+    if (grid && !grid.hasAttribute("data-everything-grid")) {
+      grid.setAttribute("data-everything-grid", "");
+      grid.innerHTML = products.slice(0, 16).map(cardMarkup).join("");
+    }
+
+    const shelves = document.querySelectorAll(".home-statement__grid");
+    const apparel = products.filter((p) => p.cat === "apparel" || p.cat === "accessories");
+    const shoes = products.filter((p) => p.cat === "shoes");
+    const sale = products.filter((p) => p.sale);
+    const pools = [apparel, shoes, sale];
+    shelves.forEach((shelf, s) => {
+      const pool = pools[s]?.length ? pools[s] : products;
+      shelf.querySelectorAll(".product-card").forEach((card, i) => {
+        paintProductCard(card, pool[i % pool.length]);
+      });
+    });
+
+    tagSwipeCards(page);
+  };
+
+  const applyFeedHero = (hp) => {
+    const page = document.querySelector(".page--home");
+    if (!page) return;
+    page.setAttribute("data-home-mode", "feed");
 
     const heroTitle = document.querySelector(".home-copy h1");
     const heroSub = document.querySelector(".home-copy p");
-    // Prefer the hero's own chip; fall back to the header promo chip
     const badge =
       document.querySelector(".announce-chip--hero") || document.querySelector(".announce-chip");
 
@@ -477,6 +740,14 @@ document.addEventListener("DOMContentLoaded", () => {
     }
     if (heroSub) {
       heroSub.innerHTML = `Your homepage is set to ${label.toLowerCase()} — <a href="account.html">change it</a> anytime.`;
+    } else {
+      const copy = document.querySelector(".home-copy");
+      if (copy && !copy.querySelector("[data-feed-sub]")) {
+        const p = document.createElement("p");
+        p.setAttribute("data-feed-sub", "");
+        p.innerHTML = `Your homepage is set to ${label.toLowerCase()} — <a href="account.html">change it</a> anytime.`;
+        copy.appendChild(p);
+      }
     }
     if (badge) {
       const dot = badge.querySelector(".dot");
@@ -485,62 +756,65 @@ document.addEventListener("DOMContentLoaded", () => {
       badge.append(`Your feed · ${label}`);
     }
 
-    /* Swap the actual product imagery for the user's feed (real products
-       from august-shop.com via js/catalog.js). Hero tiles first, then the
-       first shelf below becomes "More of your feed". */
-    if (window.AugustCatalog) {
-      const items = window.AugustCatalog.feed(hp);
-      if (items.length) {
-        const tiles = document.querySelectorAll(".home-grid .home-tile");
-        tiles.forEach((tile, i) => {
-          const p = items[i % items.length];
-          tile.href = `product.html?p=${p.id}`;
-          const img = tile.querySelector("img");
-          if (img) {
-            img.src = p.img;
-            img.alt = p.title;
-            const set = window.AugustCatalog.srcset(p.img);
-            if (set) {
-              img.srcset = set;
-              img.sizes = tile.classList.contains("home-tile--hero")
-                ? "(min-width: 901px) 62vw, 75vw"
-                : "(min-width: 901px) 24vw, 70vw";
-            }
-          }
-        });
+    if (!window.AugustCatalog) {
+      tagSwipeCards(page);
+      return;
+    }
 
-        const gridTitle = document.querySelector(".home-grid__title");
-        if (gridTitle) gridTitle.textContent = `Your feed — ${label.toLowerCase()}`;
+    const items = dropHidden(window.AugustCatalog.feed(hp));
+    if (!items.length) {
+      tagSwipeCards(page);
+      return;
+    }
 
-        const shelfTitle = document.querySelector(".home-statement__title");
-        const shelfGrid = document.querySelector(".home-statement__grid");
-        if (shelfTitle && shelfGrid) {
-          shelfTitle.textContent = "More of your feed";
-          // Continue past the hero tiles; wrap around if the feed is short
-          const pool = items.slice(tiles.length).concat(items);
-          [...shelfGrid.querySelectorAll(".product-card")].forEach((card, i) => {
-            const p = pool[i % pool.length];
-            card.href = `product.html?p=${p.id}`;
-            const img = card.querySelector(".product-card__media img");
-            const brand = card.querySelector(".product-card__brand");
-            const title = card.querySelector(".product-card__title");
-            const price = card.querySelector(".product-card__price");
-            if (img) {
-              img.src = p.img;
-              img.alt = p.title;
-              const set = window.AugustCatalog.srcset(p.img);
-              if (set) {
-                img.srcset = set;
-                img.sizes = "(min-width: 901px) 24vw, 45vw";
-              }
-            }
-            if (brand) brand.textContent = p.brand;
-            if (title) title.textContent = p.title;
-            if (price) price.innerHTML = window.AugustCatalog.priceHtml(p);
-          });
+    const tiles = document.querySelectorAll(".home-grid .home-tile");
+    tiles.forEach((tile, i) => {
+      const p = items[i % items.length];
+      tile.href = productHref(p);
+      tile.setAttribute("data-swipe-card", "");
+      if (p.id) tile.setAttribute("data-product-id", p.id);
+      paintMedia(
+        tile,
+        p,
+        tile.classList.contains("home-tile--hero")
+          ? "(min-width: 901px) 36vw, 75vw"
+          : "(min-width: 901px) 22vw, 70vw"
+      );
+    });
+
+    const gridTitle = document.querySelector(".home-grid__title");
+    if (gridTitle) gridTitle.textContent = `Your feed — ${label.toLowerCase()}`;
+
+    const shelfTitle = document.querySelector(".home-statement__title");
+    const shelfGrid = document.querySelector(".home-statement__grid");
+    if (shelfTitle && shelfGrid) {
+      shelfTitle.textContent = "More of your feed";
+      const pool = items.slice(tiles.length).concat(items);
+      const cards = [...shelfGrid.querySelectorAll(".product-card")];
+      cards.forEach((card, i) => paintProductCard(card, pool[i % pool.length]));
+      if (!shelfGrid.hasAttribute("data-feed-shelf")) {
+        shelfGrid.setAttribute("data-feed-shelf", "");
+        const want = 12;
+        for (let i = cards.length; i < want; i++) {
+          shelfGrid.insertAdjacentHTML("beforeend", cardMarkup(pool[i % pool.length]));
         }
       }
     }
+
+    tagSwipeCards(page);
+  };
+
+  const applyHomepagePrefs = () => {
+    const page = document.querySelector(".page--home");
+    if (!page) return;
+
+    const user = load();
+    const hp = user?.homepage;
+    // Your feed only when signed in, configured, and switched on
+    // (missing `enabled` = true, for profiles saved before the toggle existed)
+    const feedOn = !!(user && !feedIsDefault(hp) && hp.enabled !== false);
+    if (feedOn) applyFeedHero(hp);
+    else applyEverythingHero();
   };
 
   /* ── Feed toggle (top of home) ────────────────────────────
@@ -585,6 +859,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
   window.addEventListener("august:profile-changed", () => {
     render();
-    applyHomepagePrefs();
+    // Swipe saves should not rebuild the hero; ranking applies on next load.
   });
 });

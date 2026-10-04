@@ -1,14 +1,14 @@
 /* August — Account page
-   One unified account surface: profile header, feed customizer (with the
-   "open to my feed" default), orders, editable details, followed brands.
-   Everything reads/writes the same localStorage profile the auth modal
-   uses (→ Shopify customer + metafields at port time). */
+   Instagram-style profile: fit-pic header, swipe stats, Shop / Liked /
+   Less / Orders tabs. Feed chips, brands, and details still read/write
+   the same localStorage profile (→ Shopify customer + metafields). */
 document.addEventListener("DOMContentLoaded", () => {
   const page = document.querySelector(".account-page");
   if (!page) return;
 
   const gate = page.querySelector("[data-account-signed-out]");
   const dash = page.querySelector("[data-account-signed-in]");
+  const TABS = ["shop", "liked", "less", "orders"];
 
   const load = () => {
     try {
@@ -38,6 +38,92 @@ document.addEventListener("DOMContentLoaded", () => {
     }, 1400);
   };
 
+  const esc = (value) =>
+    String(value ?? "")
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;")
+      .replace(/"/g, "&quot;");
+
+  const brandKeyOf = (name) =>
+    window.AugustCatalog?.brandKey?.(name) ||
+    String(name || "")
+      .toLowerCase()
+      .replace(/[^a-z0-9]+/g, "");
+
+  /* Newest first, unique by id. Counts come from these lists — not
+     the brand-key like/skip arrays. */
+  const uniqueByDir = (items, dir) => {
+    const list = (items || [])
+      .filter((it) => it && it.dir === dir && (it.id || it.handle))
+      .slice()
+      .sort((a, b) => (b.t || 0) - (a.t || 0));
+    const seen = new Set();
+    const out = [];
+    for (const it of list) {
+      const key = String(it.id || it.handle);
+      if (seen.has(key)) continue;
+      seen.add(key);
+      out.push(it);
+    }
+    return out;
+  };
+
+  const hydrateItem = (it) => {
+    const cat =
+      (!it.img || !it.title || !it.brand || !it.handle) && it.id
+        ? window.AugustCatalog?.byId?.(it.id)
+        : null;
+    return {
+      id: it.id || cat?.id || it.handle || "",
+      handle: it.handle || cat?.handle || "",
+      brand: it.brand || cat?.brand || "",
+      title: it.title || cat?.title || "",
+      img: it.img || cat?.img || "",
+    };
+  };
+
+  const itemHref = (item) => {
+    if (window.AugustCatalog?.href) return window.AugustCatalog.href(item);
+    if (item.handle) return `product.html?h=${encodeURIComponent(item.handle)}`;
+    return `product.html?p=${encodeURIComponent(item.id || "")}`;
+  };
+
+  /* ── Tabs + hash deep-links ──────────────────────────────── */
+
+  const tabFromHash = () => {
+    const raw = (location.hash || "").replace(/^#/, "").toLowerCase();
+    return TABS.includes(raw) ? raw : "shop";
+  };
+
+  const applyTab = (name) => {
+    const tab = TABS.includes(name) ? name : "shop";
+    page.querySelectorAll("[data-account-tabs] [data-account-tab]").forEach((btn) => {
+      const on = btn.getAttribute("data-account-tab") === tab;
+      btn.classList.toggle("is-active", on);
+      btn.setAttribute("aria-selected", String(on));
+    });
+    page.querySelectorAll("[data-account-panel]").forEach((panel) => {
+      panel.hidden = panel.getAttribute("data-account-panel") !== tab;
+    });
+  };
+
+  const goTab = (name) => {
+    const tab = TABS.includes(name) ? name : "shop";
+    applyTab(tab);
+    const next = `#${tab}`;
+    if (location.hash !== next) history.replaceState(null, "", next);
+  };
+
+  page.querySelector("[data-account-signed-in]")?.addEventListener("click", (e) => {
+    const btn = e.target.closest("button[data-account-tab]");
+    if (!btn || !dash?.contains(btn)) return;
+    goTab(btn.getAttribute("data-account-tab"));
+  });
+
+  window.addEventListener("hashchange", () => applyTab(tabFromHash()));
+  applyTab(tabFromHash());
+
   /* ── Page state ──────────────────────────────────────────── */
 
   const render = () => {
@@ -53,7 +139,90 @@ document.addEventListener("DOMContentLoaded", () => {
 
     const nameInput = page.querySelector("[data-account-name-input]");
     if (nameInput && document.activeElement !== nameInput) nameInput.value = user.name;
+
+    renderSwipeUI(user);
   };
+
+  const renderSwipeUI = (user) => {
+    const items = user?.swipes?.items || [];
+    const likes = uniqueByDir(items, "like");
+    const skips = uniqueByDir(items, "skip");
+    set("[data-stat-likes]", String(likes.length));
+    set("[data-stat-following]", String((user?.preferredBrands || []).length));
+    set("[data-stat-less]", String(skips.length));
+    renderMosaic(page.querySelector("[data-liked-grid]"), likes, {
+      empty: `Swipe right on the shop to save likes here.`,
+      shopLink: true,
+    });
+    renderMosaic(page.querySelector("[data-less-grid]"), skips, {
+      empty: `Nothing hidden. Swipe left on a product to show less of it.`,
+      showAgain: true,
+    });
+  };
+
+  const renderMosaic = (grid, items, opts) => {
+    if (!grid) return;
+    if (!items.length) {
+      const link = opts.shopLink
+        ? ` <a href="index.html">Open the shop</a>`
+        : "";
+      grid.innerHTML = `<p class="account-mosaic__empty">${opts.empty}${link}</p>`;
+      return;
+    }
+    grid.innerHTML = items
+      .map((raw) => {
+        const item = hydrateItem(raw);
+        const again = opts.showAgain
+          ? `<button type="button" class="account-mosaic__again" data-show-again="${esc(item.id)}">Show again</button>`
+          : "";
+        const img = item.img
+          ? `<img src="${esc(item.img)}" alt="${esc(item.title)}" />`
+          : "";
+        return `<figure class="account-mosaic__tile">
+          <a class="account-mosaic__link" href="${esc(itemHref(item))}">${img}</a>
+          ${again}
+        </figure>`;
+      })
+      .join("");
+  };
+
+  const showAgain = (id) => {
+    if (!id) return;
+    if (typeof window.AugustProfile?.undoSwipe === "function") {
+      window.AugustProfile.undoSwipe(id);
+      renderSwipeUI(load());
+      return;
+    }
+    const user = load();
+    if (!user || !window.AugustProfile) return;
+    const swipes = {
+      likes: [...(user.swipes?.likes || [])],
+      skips: [...(user.swipes?.skips || [])],
+      items: [...(user.swipes?.items || [])],
+    };
+    const removed = swipes.items.filter((it) => String(it.id || it.handle) === String(id));
+    swipes.items = swipes.items.filter((it) => String(it.id || it.handle) !== String(id));
+    removed.forEach((it) => {
+      const brand = it.brand || window.AugustCatalog?.byId?.(it.id)?.brand;
+      if (!brand) return;
+      const key = brandKeyOf(brand);
+      const stillSkip = swipes.items.some((other) => {
+        if (other.dir !== "skip") return false;
+        const otherBrand = other.brand || window.AugustCatalog?.byId?.(other.id)?.brand;
+        return otherBrand && brandKeyOf(otherBrand) === key;
+      });
+      if (!stillSkip) swipes.skips = swipes.skips.filter((k) => brandKeyOf(k) !== key);
+    });
+    user.swipes = swipes;
+    window.AugustProfile.save(user);
+  };
+
+  page.querySelector("[data-less-grid]")?.addEventListener("click", (e) => {
+    const btn = e.target.closest("[data-show-again]");
+    if (!btn) return;
+    e.preventDefault();
+    showAgain(btn.getAttribute("data-show-again"));
+  });
 
   render();
   window.addEventListener("august:profile-changed", render);

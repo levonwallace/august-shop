@@ -27,9 +27,6 @@
     <meta name="twitter:image" content="https://raw.githubusercontent.com/levonwallace/august-shop/master/assets/og-image.jpg" />
     <meta name="twitter:title" content="August AUX archive — August" />
     <meta name="twitter:description" content="The full August AUX mix archive." />
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link href="https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600&display=swap" rel="stylesheet" />
     <link rel="stylesheet" href="css/tokens.css" />
     <link rel="stylesheet" href="css/base.css" />
     <link rel="stylesheet" href="css/components.css" />
@@ -38,6 +35,8 @@
     <link rel="stylesheet" href="css/sheet.css" />
     <link rel="stylesheet" href="css/tabbar.css" />
     <link rel="stylesheet" href="css/segmented.css" />
+    <link rel="stylesheet" href="css/offer.css" />
+    <link rel="stylesheet" href="css/search.css" />
   </head>
   <body>
     <a class="skip-link" href="#main">Skip to content</a>
@@ -181,10 +180,12 @@
 
       
       <div class="page-scroll">
-      <main class="story story--index" id="main" data-story="aux-index">
-        <p class="story__kicker">August AUX</p>
-        <h1 class="story__title">Mixes</h1>
-        <p class="story__lead">SoundCloud mixes and Spotify playlists curated by our staff and DJs from Madison and around the world.</p>
+      <main class="story story--index story--aux" id="main" data-story="aux-index">
+        <header class="story__mast">
+          <p class="story__kicker">August AUX</p>
+          <h1 class="story__title">Mixes</h1>
+          <p class="story__lead">Staff and guest sessions from 414 State Street. Play from the archive.</p>
+        </header>
         <div class="story__grid story__grid--archive" data-story-index></div>
       </main>
       </div>
@@ -196,7 +197,6 @@
         </div>
         <nav class="footer-links" aria-label="Footer">
           <a href="collection.html">Shop</a>
-          <a href="collection.html">Explore</a>
           <a href="#">Help</a>
           <a href="#">Shipping and returns</a>
           <a href="inn.html">August Inn</a>
@@ -238,5 +238,6 @@
     <script src="js/sheet.js"></script>
     <script src="js/segmented.js"></script>
     <script src="js/profile.js"></script>
+    <script src="js/offer.js"></script>
   </body>
 </html>

@@ -54,13 +54,16 @@ Alex will keep a private preview link so Mason’s team does not have to live in
 
 ## Production follow-through
 
-- [ ] Routed homepage (feed vs everything), mega menu scale, account onboarding, events + mix pages
-- [ ] Prototype Tinder-style swipe on product cards to train Your feed (right = similar, left = less)
-- [ ] Everything feed = live Shopify availability; Your feed derives from that catalog
-- [ ] Search typeahead: category / brand jumps above SKU hits (ASICS, jeans)
-- [ ] Collapse Explore, polish Inn + bag, design 10% off popup + newsletter
-- [ ] Decide ambient background: push nostalgic motion or kill it after one more staff look
-- [ ] Spin up draft theme, private preview link, do not publish over live
+- [x] Mega menu scale + account onboarding
+- [x] Routed homepage (feed vs everything)
+- [x] Prototype Tinder-style swipe on product cards to train Your feed (right = similar, left = less)
+- [ ] Everything feed = live Shopify availability (waiting on draft theme)
+- [x] Events + mix pages
+- [x] Search typeahead: category / brand jumps above SKU hits (ASICS, jeans)
+- [x] Collapse Explore + 10% popup + newsletter (`august_offer_dismissed`)
+- [x] Polish Inn + bag
+- [x] Ambient background: pushed nostalgic corner-to-corner roam (still paper-clear; can kill later)
+- [x] Draft-theme plan written in `shopify-draft.md` — do not publish over live
 - [ ] Alex updates the production document and the demo once more, then move notes onto the draft theme
 
 ---

@@ -1,0 +1,272 @@
+/* August — signed-in account profile
+   Instagram structure (stats, tabs, 3-col mosaic) with August iOS glass.
+   Pages.css still owns the fit-pic header, feed customizer, orders, cards. */
+
+.account-head {
+  margin-bottom: 22px;
+}
+
+.account-stats {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 28px;
+  margin-top: 18px;
+}
+
+.account-stat {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 6px;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: none;
+  font: inherit;
+  color: inherit;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.account-stat strong {
+  font-size: 16px;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  font-variant-numeric: tabular-nums;
+  line-height: 1.2;
+}
+
+.account-stat span {
+  font-size: 13px;
+  font-weight: 400;
+  color: var(--color-muted);
+  line-height: 1.2;
+}
+
+@media (hover: hover) {
+  .account-stat:hover span {
+    color: var(--color-ink);
+  }
+}
+
+.account-stat:active {
+  opacity: 0.55;
+}
+
+/* iOS segmented / Instagram underline tab bar */
+.account-tabs {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  margin: 0 0 20px;
+  padding: 0 4px;
+  height: 40px;
+  border-radius: var(--radius-chrome);
+  background: rgba(15, 15, 15, 0.05);
+  box-shadow: inset 0 0 0 0.5px rgba(15, 15, 15, 0.06);
+  overflow: hidden;
+}
+
+.account-tabs__btn {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  margin: 0;
+  padding: 0 8px;
+  border: 0;
+  background: none;
+  font: inherit;
+  font-size: 13px;
+  font-weight: 500;
+  letter-spacing: 0.2px;
+  color: var(--color-muted);
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.account-tabs__btn.is-active {
+  color: var(--color-ink);
+  font-weight: 600;
+}
+
+.account-tabs__btn::after {
+  content: "";
+  position: absolute;
+  left: 18%;
+  right: 18%;
+  bottom: 0;
+  height: 2px;
+  border-radius: 2px 2px 0 0;
+  background: var(--color-ink);
+  opacity: 0;
+  transform: scaleX(0.4);
+  transition: opacity 0.18s ease, transform 0.18s ease;
+}
+
+.account-tabs__btn.is-active::after {
+  opacity: 1;
+  transform: scaleX(1);
+}
+
+.account-tabs__btn:active {
+  transform: scale(0.97);
+}
+
+.account-panel {
+  min-width: 0;
+}
+
+.account-swipe-hint {
+  margin: 0 0 14px;
+  font-size: 13px;
+  line-height: 1.45;
+  color: var(--color-muted);
+}
+
+/* 3-column Instagram mosaic */
+.account-mosaic {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 2px;
+}
+
+.account-mosaic__tile {
+  position: relative;
+  aspect-ratio: 1;
+  overflow: hidden;
+  border-radius: var(--radius-card);
+  background: #eceae4;
+}
+
+.account-mosaic__link {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.account-mosaic__link img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+}
+
+@media (hover: hover) {
+  .account-mosaic__link:hover img {
+    transform: scale(1.04);
+  }
+  .account-mosaic__link img {
+    transition: transform 0.35s ease;
+  }
+}
+
+.account-mosaic__again {
+  position: absolute;
+  left: 6px;
+  right: 6px;
+  bottom: 6px;
+  z-index: 1;
+  height: 28px;
+  padding: 0 8px;
+  border: 0;
+  border-radius: var(--radius-chrome);
+  background: var(--color-island);
+  box-shadow: var(--shadow-island);
+  backdrop-filter: var(--glass-filter);
+  -webkit-backdrop-filter: var(--glass-filter);
+  font: inherit;
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.01em;
+  color: var(--color-ink);
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+
+@media (hover: hover) {
+  .account-mosaic__again:hover {
+    background: #fff;
+  }
+}
+
+.account-mosaic__again:active {
+  transform: scale(0.97);
+}
+
+.account-mosaic__empty {
+  grid-column: 1 / -1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  min-height: 220px;
+  margin: 0;
+  padding: 36px 24px;
+  border-radius: var(--radius-chrome);
+  background: var(--color-glass);
+  box-shadow: var(--shadow-island), var(--shadow-card);
+  backdrop-filter: var(--glass-filter);
+  -webkit-backdrop-filter: var(--glass-filter);
+  color: var(--color-muted);
+  font-size: 14px;
+  line-height: 1.5;
+  text-align: center;
+}
+
+.account-mosaic__empty a {
+  color: var(--color-ink);
+  font-weight: 500;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+@media (max-width: 560px) {
+  .account-stats {
+    width: 100%;
+    justify-content: space-between;
+    gap: 8px 12px;
+    margin-top: 16px;
+    padding-top: 14px;
+    border-top: 1px solid rgba(15, 15, 15, 0.06);
+  }
+
+  .account-stat {
+    flex: 1 1 0;
+    flex-direction: column;
+    align-items: center;
+    gap: 3px;
+  }
+
+  .account-stat strong {
+    font-size: 17px;
+  }
+
+  .account-stat span {
+    font-size: 12px;
+  }
+
+  .account-tabs {
+    margin-left: calc(var(--gutter) * -1);
+    margin-right: calc(var(--gutter) * -1);
+    border-radius: 0;
+    background: transparent;
+    box-shadow: inset 0 1px 0 rgba(15, 15, 15, 0.08);
+    height: 44px;
+  }
+
+  .account-mosaic {
+    margin-left: calc(var(--gutter) * -1);
+    margin-right: calc(var(--gutter) * -1);
+    gap: 1px;
+  }
+
+  .account-mosaic__tile {
+    border-radius: 0;
+  }
+
+  .account-mosaic__empty {
+    margin: 0 var(--gutter);
+    border-radius: var(--radius-chrome);
+  }
+}

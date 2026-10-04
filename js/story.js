@@ -21,6 +21,84 @@ document.addEventListener("DOMContentLoaded", () => {
       .replace(/>/g, "&gt;")
       .replace(/"/g, "&quot;");
 
+  const splitDate = (str) => {
+    const d = new Date(str);
+    if (Number.isNaN(d.getTime())) {
+      return { mon: "", day: "", yr: "", weekday: "", pretty: str, upcoming: false };
+    }
+    const mon = d.toLocaleDateString("en-US", { month: "short" }).toUpperCase();
+    const day = String(d.getDate());
+    const yr = String(d.getFullYear());
+    const weekday = d.toLocaleDateString("en-US", { weekday: "short" });
+    const pretty = d.toLocaleDateString("en-US", {
+      weekday: "long",
+      month: "long",
+      day: "numeric",
+      year: "numeric",
+    });
+    const end = new Date(d);
+    end.setHours(23, 59, 59, 999);
+    return { mon, day, yr, weekday, pretty, upcoming: end >= new Date() };
+  };
+
+  const cleanTitle = (ev) => {
+    const t = ev.title
+      .replace(/^AUGUST\s+AUX\s*::\s*/i, "")
+      .replace(/^AUGUST\s+ART\s+COLLECTIVE\s*:{0,2}\s*/i, "")
+      .replace(/^AUGUST\s+HOMEGROWN\s*:{0,2}\s*/i, "")
+      .replace(/^EACH ONE,\s*TEACH ONE\s*:{0,2}\s*/i, "")
+      .replace(/^AUXILIARY\s+\d+\s*/i, "")
+      .replace(/^0*\d{1,3}\s+/i, "")
+      .trim();
+    return t || ev.title;
+  };
+
+  const shortVenue = (venue) => {
+    if (!venue) return "414 State St";
+    if (/side door/i.test(venue)) return "The Side Door";
+    if (/peace park/i.test(venue)) return "Lisa Link Peace Park";
+    return "414 State St";
+  };
+
+  const mapsHref = (venue) => {
+    const q = /side door/i.test(venue || "")
+      ? "The Side Door, Madison WI"
+      : /peace park/i.test(venue || "")
+        ? "Lisa Link Peace Park, Madison WI"
+        : "414 State St, Madison WI";
+    return `https://maps.google.com/?q=${encodeURIComponent(q)}`;
+  };
+
+  const posterFor = (ev) => (Aux.posterFor ? Aux.posterFor(ev) : ev.image || "");
+
+  const eventCard = (e, variant) => {
+    const when = splitDate(e.date);
+    const venue = shortVenue(e.venue);
+    const poster = posterFor(e);
+    const cta = when.upcoming ? "RSVP" : "Visit";
+    const extra = variant ? ` aux-event--${variant}` : "";
+    return `
+      <a class="aux-event${extra}" href="event.html?e=${e.id}">
+        <div class="aux-event__when" aria-hidden="true">
+          <span class="aux-event__mon">${escape(when.mon)}</span>
+          <span class="aux-event__day">${escape(when.day)}</span>
+          <span class="aux-event__yr">${escape(when.yr)}</span>
+        </div>
+        <div class="aux-event__poster">${
+          poster ? `<img src="${escape(poster)}" alt="" loading="lazy" />` : ""
+        }</div>
+        <div class="aux-event__copy">
+          <div class="aux-event__meta">
+            <span class="aux-event__series">${escape(e.series)}</span>
+            <span class="aux-event__venue">${escape(venue)}</span>
+          </div>
+          <h3 class="aux-event__title">${escape(cleanTitle(e))}</h3>
+          <p class="aux-event__excerpt">${escape(e.excerpt)}</p>
+          <span class="aux-event__cta">${cta}</span>
+        </div>
+      </a>`;
+  };
+
   /* ── Mix player (detail page only) ───────────────────────── */
   const bindPlayer = (src) => {
     const playBtn = document.querySelector("[data-story-play]");
@@ -86,14 +164,16 @@ document.addEventListener("DOMContentLoaded", () => {
   /* ── Mix detail ──────────────────────────────────────────── */
   if (kind === "mix") {
     const mix = Aux.mixByNo(params.get("m")) || Aux.MIXES[0];
-    document.title = `AUGUST AUX :: ${mix.no} — August`;
+    document.title = `${mix.name} — August AUX`;
     const img = document.querySelector("[data-story-art]");
     if (img) {
       img.src = mix.art;
-      img.alt = `AUGUST AUX :: ${mix.no}`;
+      img.alt = mix.name;
     }
+    setText("[data-story-kicker]", "August AUX");
     setText("[data-story-title]", mix.name);
-    setText("[data-story-meta]", `AUX :: ${mix.no} · ${mix.genre}`);
+    setText("[data-story-meta]", `${mix.no} · ${mix.genre}`);
+    setText("[data-story-context]", "Play from the archive — recorded for the shop floor at 414 State Street.");
     const body = document.querySelector("[data-story-body]");
     if (body) body.innerHTML = `<p>${escape(mix.body)}</p>`;
 
@@ -106,7 +186,7 @@ document.addEventListener("DOMContentLoaded", () => {
           (m) => `
         <a class="story-tile" href="mix.html?m=${m.no}">
           <div class="story-tile__art"><img src="${m.art}" alt="" loading="lazy" /></div>
-          <span class="story-tile__no">AUX :: ${m.no} · ${m.genre}</span>
+          <span class="story-tile__no">${m.no} · ${escape(m.genre)}</span>
           <span class="story-tile__title">${escape(m.name)}</span>
         </a>`
         )
@@ -118,17 +198,48 @@ document.addEventListener("DOMContentLoaded", () => {
   /* ── Event detail ────────────────────────────────────────── */
   if (kind === "event") {
     const ev = Aux.eventById(params.get("e")) || Aux.EVENTS[0];
-    document.title = `${ev.title} — August`;
+    const when = splitDate(ev.date);
+    const venue = shortVenue(ev.venue);
+    const headline = cleanTitle(ev);
+    document.title = `${headline} — August`;
     setText("[data-story-kicker]", ev.series);
-    setText("[data-story-title]", ev.title);
-    setText("[data-story-meta]", `${ev.date}${ev.venue ? ` · ${ev.venue}` : ""}`);
+    setText("[data-story-title]", headline);
+    setText("[data-story-meta]", `${when.pretty} · ${venue}`);
 
     const cover = document.querySelector("[data-story-cover]");
     const img = document.querySelector("[data-story-art]");
-    if (ev.image && cover && img) {
+    const poster = posterFor(ev);
+    if (cover && img && poster) {
       cover.hidden = false;
-      img.src = ev.image;
-      img.alt = ev.title;
+      img.src = poster;
+      img.alt = headline;
+    }
+
+    const facts = document.querySelector("[data-story-facts]");
+    if (facts) {
+      facts.innerHTML = `
+        <div class="story__fact">
+          <dt>When</dt>
+          <dd>${escape(when.pretty)}</dd>
+        </div>
+        <div class="story__fact">
+          <dt>Where</dt>
+          <dd>${escape(ev.venue || "August, 414 State St., Madison, WI")}</dd>
+        </div>
+        <div class="story__fact">
+          <dt>Series</dt>
+          <dd>${escape(ev.series)}</dd>
+        </div>`;
+    }
+
+    const actions = document.querySelector("[data-story-actions]");
+    if (actions) {
+      const rsvp = `mailto:hello@august-shop.com?subject=${encodeURIComponent("RSVP — " + headline)}`;
+      actions.innerHTML = when.upcoming
+        ? `<a class="btn btn--primary" href="${rsvp}">RSVP</a>
+           <a class="btn btn--ghost" href="${mapsHref(ev.venue)}" target="_blank" rel="noopener noreferrer">Get directions</a>`
+        : `<a class="btn btn--primary" href="${mapsHref(ev.venue)}" target="_blank" rel="noopener noreferrer">Visit</a>
+           <a class="btn btn--ghost" href="${rsvp}">Get on the list</a>`;
     }
 
     const body = document.querySelector("[data-story-body]");
@@ -137,14 +248,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const more = document.querySelector("[data-story-more]");
     if (more) {
       more.innerHTML = Aux.relatedEvents(ev, 4)
-        .map(
-          (e) => `
-        <a class="story-row" href="event.html?e=${e.id}">
-          <span class="story-row__series">${escape(e.series)}</span>
-          <span class="story-row__date">${escape(e.date)}</span>
-          <span class="story-row__title">${escape(e.title)}</span>
-        </a>`
-        )
+        .map((e) => eventCard(e, "compact"))
         .join("");
     }
     return;
@@ -158,7 +262,7 @@ document.addEventListener("DOMContentLoaded", () => {
       (m) => `
       <a class="story-tile" href="mix.html?m=${m.no}">
         <div class="story-tile__art"><img src="${m.art}" alt="" loading="lazy" /></div>
-        <span class="story-tile__no">AUX :: ${m.no} · ${m.genre}</span>
+        <span class="story-tile__no">${m.no} · ${escape(m.genre)}</span>
         <span class="story-tile__title">${escape(m.name)}</span>
       </a>`
     ).join("");
@@ -169,16 +273,6 @@ document.addEventListener("DOMContentLoaded", () => {
   if (kind === "events-index") {
     const list = document.querySelector("[data-story-index]");
     if (!list) return;
-    list.innerHTML = Aux.EVENTS.map(
-      (e) => `
-      <a class="aux-event" href="event.html?e=${e.id}">
-        <div class="aux-event__meta">
-          <span class="aux-event__series">${escape(e.series)}</span>
-          <span class="aux-event__date">${escape(e.date)}</span>
-        </div>
-        <h3 class="aux-event__title">${escape(e.title)}</h3>
-        <p class="aux-event__excerpt">${escape(e.excerpt)}</p>
-      </a>`
-    ).join("");
+    list.innerHTML = Aux.EVENTS.map((e, i) => eventCard(e, i === 0 ? "feature" : "")).join("");
   }
 });

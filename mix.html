@@ -27,9 +27,6 @@
     <meta name="twitter:image" content="https://raw.githubusercontent.com/levonwallace/august-shop/master/assets/og-image.jpg" />
     <meta name="twitter:title" content="August AUX — August" />
     <meta name="twitter:description" content="August AUX mixes from the shop in Madison, WI." />
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link href="https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600&display=swap" rel="stylesheet" />
     <link rel="stylesheet" href="css/tokens.css" />
     <link rel="stylesheet" href="css/base.css" />
     <link rel="stylesheet" href="css/components.css" />
@@ -38,6 +35,8 @@
     <link rel="stylesheet" href="css/sheet.css" />
     <link rel="stylesheet" href="css/tabbar.css" />
     <link rel="stylesheet" href="css/segmented.css" />
+    <link rel="stylesheet" href="css/offer.css" />
+    <link rel="stylesheet" href="css/search.css" />
   </head>
   <body>
     <a class="skip-link" href="#main">Skip to content</a>
@@ -181,7 +180,7 @@
 
       
       <div class="page-scroll">
-      <main class="story" id="main" data-story="mix">
+      <main class="story story--mix" id="main" data-story="mix">
         <a class="story__back" href="aux.html">← All mixes</a>
         <article class="story__hero">
           <div class="story__cover"><img data-story-art alt="" /></div>
@@ -189,6 +188,7 @@
             <p class="story__kicker" data-story-kicker>August AUX</p>
             <h1 class="story__title" data-story-title></h1>
             <p class="story__meta" data-story-meta></p>
+            <p class="story__context" data-story-context></p>
             <div class="story-player" data-story-player>
               <button class="story-player__play" type="button" aria-label="Play" data-story-play>
                 <svg class="story-player__play-icon" viewBox="0 0 48 48" fill="none"><circle cx="24" cy="24" r="23" stroke="currentColor" stroke-width="1.5"/><path d="M19 15.5L33 24L19 32.5V15.5Z" fill="currentColor"/></svg>
@@ -216,7 +216,6 @@
         </div>
         <nav class="footer-links" aria-label="Footer">
           <a href="collection.html">Shop</a>
-          <a href="collection.html">Explore</a>
           <a href="#">Help</a>
           <a href="#">Shipping and returns</a>
           <a href="inn.html">August Inn</a>
@@ -258,5 +257,6 @@
     <script src="js/sheet.js"></script>
     <script src="js/segmented.js"></script>
     <script src="js/profile.js"></script>
+    <script src="js/offer.js"></script>
   </body>
 </html>

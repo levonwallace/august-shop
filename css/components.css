@@ -29,12 +29,15 @@
 }
 
 .header-island {
-  height: 57px;
+  position: relative;
+  isolation: isolate;
+  height: 60px;
   border-radius: var(--radius-chrome);
   background: var(--color-island);
   border: 1px solid var(--color-island-border);
   box-shadow: var(--shadow-island);
-  backdrop-filter: blur(12px);
+  backdrop-filter: var(--glass-filter);
+  -webkit-backdrop-filter: var(--glass-filter);
 }
 
 .header-nav {
@@ -42,7 +45,7 @@
   align-items: center;
   gap: 32px;
   height: 100%;
-  padding: 0 22px 0 26px;
+  padding: 0 24px 0 28px;
   width: max-content;
   max-width: 100%;
 }
@@ -76,6 +79,7 @@
   border: 0;
   padding: 0;
   cursor: pointer;
+  flex-shrink: 0;
 }
 
 .nav-links a.is-active,
@@ -148,8 +152,11 @@
   height: 32px;
   padding: 0 14px;
   border-radius: var(--radius-pill);
-  background: rgba(255, 255, 255, 0.55);
-  border: 1px solid rgba(0, 0, 0, 0.08);
+  background: rgba(255, 255, 255, 0.28);
+  border: 1px solid rgba(255, 255, 255, 0.42);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.55);
+  backdrop-filter: blur(16px) saturate(160%);
+  -webkit-backdrop-filter: blur(16px) saturate(160%);
   min-width: 0;
 }
 
@@ -188,9 +195,11 @@
   overflow: auto;
   padding: 6px;
   border-radius: 16px;
-  background: rgba(255, 255, 255, 0.96);
-  border: 1px solid rgba(15, 15, 15, 0.08);
-  box-shadow: 0 16px 40px rgba(15, 15, 15, 0.12);
+  background: var(--color-glass);
+  border: 1px solid var(--color-island-border);
+  box-shadow: var(--shadow-island), 0 18px 40px -16px rgba(15, 15, 15, 0.22);
+  backdrop-filter: var(--glass-filter);
+  -webkit-backdrop-filter: var(--glass-filter);
 }
 
 .search-suggest .sheet-list__row {
@@ -297,17 +306,17 @@ body.mega-open .mega-backdrop {
   flex-direction: column;
   width: 100%;
   max-width: 1376px;
-  /* Exactly a quarter of the visible screen at every desktop/tablet width.
-     dvh is pre-zoom (visual) — divide by --ui-scale to get layout px,
-     same trick as the page stage in base.css. */
-  height: calc(25dvh / var(--ui-scale));
-  min-height: 240px; /* floor only for very short windows */
+  /* Shop-scale mega: ~42% of the visual viewport. dvh is pre-zoom,
+     so divide by --ui-scale to get layout px (same as the page stage). */
+  height: calc(42dvh / var(--ui-scale));
+  min-height: 380px;
   margin: 0 auto;
   border-radius: var(--radius-panel);
-  background: rgba(255, 255, 255, 0.94);
-  border: 1px solid rgba(255, 255, 255, 0.55);
-  box-shadow: var(--shadow-morph);
-  backdrop-filter: blur(14px);
+  background: var(--color-island);
+  border: 1px solid var(--color-island-border);
+  box-shadow: var(--shadow-island), var(--shadow-morph);
+  backdrop-filter: var(--glass-filter);
+  -webkit-backdrop-filter: var(--glass-filter);
   overflow: hidden;
   opacity: 0;
   visibility: hidden;
@@ -317,7 +326,8 @@ body.mega-open .mega-backdrop {
   transition:
     opacity 0.28s ease,
     transform 0.32s cubic-bezier(0.22, 1, 0.36, 1),
-    visibility 0.28s ease;
+    visibility 0.28s ease,
+    height 0.28s ease;
 }
 
 .morph-menu[aria-hidden="true"] {
@@ -351,34 +361,38 @@ body.mega-open .mega-backdrop {
   align-items: center;
   justify-content: space-between;
   gap: 24px;
-  min-height: 48px;
-  padding: 10px 16px 10px 22px;
-  background: #fff;
+  flex-shrink: 0;
+  min-height: 58px;
+  padding: 14px 22px 14px 32px;
+  background: rgba(255, 255, 255, 0.55);
 }
 
 .morph-menu__bar .wordmark {
-  font-size: 18px;
+  font-size: 20px;
+  flex-shrink: 0;
 }
 
 .morph-menu__cluster {
   display: flex;
   align-items: center;
-  gap: 36px;
+  gap: 40px;
   min-width: 0;
+  flex: 1;
 }
 
 .morph-menu__nav {
   display: flex;
   align-items: center;
-  gap: 28px;
+  flex-wrap: nowrap;
+  gap: 26px;
   min-width: 0;
 }
 
 .morph-menu__nav button {
   font: inherit;
-  font-size: 11px;
+  font-size: 13px;
   font-weight: 500;
-  letter-spacing: 1.32px;
+  letter-spacing: 1.1px;
   text-transform: lowercase;
   color: var(--color-ink);
   opacity: 0.55;
@@ -387,6 +401,7 @@ body.mega-open .mega-backdrop {
   padding: 0;
   cursor: pointer;
   white-space: nowrap;
+  flex-shrink: 0;
 }
 
 .morph-menu__nav button.is-active {
@@ -431,21 +446,20 @@ body.mega-open .mega-backdrop {
 
 .morph-menu__body {
   display: grid;
-  grid-template-columns: 148px minmax(0, 1fr) 176px;
-  gap: 28px;
+  grid-template-columns: 220px minmax(0, 1fr) 220px;
+  gap: 36px;
   align-items: stretch;
-  padding: 20px 24px 24px;
-  background: #fff;
-  /* Body fills whatever the fixed 25%-of-screen shell leaves and scrolls
-     if a panel (e.g. brand directory) needs more room. */
+  padding: 32px 40px 36px;
+  background: rgba(255, 255, 255, 0.28);
+  /* Body fills the taller shell and scrolls only if a directory needs it. */
   flex: 1;
   min-height: 0;
   overflow-y: auto;
 }
 
 .morph-links__label {
-  margin: 0 0 12px;
-  font-size: 9px;
+  margin: 0 0 16px;
+  font-size: 11px;
   font-weight: 600;
   letter-spacing: 1.4px;
   text-transform: uppercase;
@@ -456,12 +470,13 @@ body.mega-open .mega-backdrop {
 .morph-links__list {
   display: flex;
   flex-direction: column;
-  gap: 6px;
-  margin-bottom: 18px;
+  gap: 10px;
+  margin-bottom: 22px;
 }
 
 .morph-links__list a {
-  font-size: 12px;
+  font-size: 15px;
+  line-height: 1.35;
   color: var(--color-ink);
   opacity: 0.78;
 }
@@ -472,10 +487,15 @@ body.mega-open .mega-backdrop {
   }
 }
 
+.site-header.is-mega-open .morph-menu:has(.morph-menu__body.is-directory) {
+  height: calc(68dvh / var(--ui-scale));
+  min-height: 520px;
+}
+
 .morph-menu__body.is-directory {
   grid-template-columns: 1fr;
   align-items: start;
-  padding: 28px 40px 40px;
+  padding: 40px 52px 48px;
   overflow-y: auto;
 }
 
@@ -494,12 +514,20 @@ body.mega-open .mega-backdrop {
 .brand-dir {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 8px 56px;
+  gap: 18px 80px;
+}
+
+.morph-menu__body.is-directory .brand-dir {
+  gap: 18px 80px;
 }
 
 .brand-dir--cats {
   grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: 8px 40px;
+  gap: 18px 56px;
+}
+
+.morph-menu__body.is-directory .brand-dir--cats {
+  gap: 18px 56px;
 }
 
 a.brand-dir__head {
@@ -510,28 +538,28 @@ a.brand-dir__head {
 .brand-dir__col {
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 12px;
   min-width: 0;
 }
 
 .brand-dir__head {
-  margin: 0 0 10px;
-  padding-bottom: 10px;
+  margin: 0 0 14px;
+  padding-bottom: 12px;
   border-bottom: 1px solid rgba(15, 15, 15, 0.1);
-  font-size: 13px;
+  font-size: 16px;
   font-weight: 600;
   letter-spacing: 0.04em;
   color: var(--color-ink);
 }
 
 .brand-dir a {
-  font-size: 12px;
+  font-size: 14px;
   font-weight: 500;
-  letter-spacing: 0.14em;
+  letter-spacing: 0.12em;
   text-transform: uppercase;
   color: var(--color-ink);
   opacity: 0.82;
-  line-height: 1.35;
+  line-height: 1.4;
 }
 
 @media (hover: hover) {
@@ -559,7 +587,7 @@ a.brand-dir__head {
 }
 
 .morph-links__all {
-  font-size: 11px;
+  font-size: 13px;
   font-weight: 500;
   letter-spacing: 0.88px;
   color: var(--color-ink);
@@ -575,21 +603,21 @@ a.brand-dir__head {
 .morph-products {
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: 12px;
+  gap: 18px;
   min-width: 0;
 }
 
 .mega-product {
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 10px;
   min-width: 0;
 }
 
 .mega-product__media {
   width: 100%;
   aspect-ratio: 178 / 118;
-  border-radius: 12px;
+  border-radius: var(--radius-card);
   border: 1px solid var(--color-border);
   background: #fff;
   overflow: hidden;
@@ -603,13 +631,13 @@ a.brand-dir__head {
 }
 
 .mega-product__price {
-  font-size: 11px;
+  font-size: 13px;
   color: var(--color-ink);
   opacity: 0.85;
 }
 
 .mega-product__title {
-  font-size: 11px;
+  font-size: 13px;
   color: #666;
 }
 
@@ -617,11 +645,11 @@ a.brand-dir__head {
   display: flex;
   flex-direction: column;
   justify-content: flex-end;
-  gap: 8px;
+  gap: 10px;
   align-self: stretch;
   min-height: 0;
-  padding: 16px;
-  border-radius: 12px;
+  padding: 22px;
+  border-radius: 16px;
   /* Verdigris-leaning dark, like the copper trim above the door */
   background: linear-gradient(180deg, #3d5747 0%, #131a15 100%);
   color: #fff;
@@ -629,7 +657,7 @@ a.brand-dir__head {
 }
 
 .morph-editorial__label {
-  font-size: 9px;
+  font-size: 11px;
   font-weight: 500;
   letter-spacing: 1.4px;
   text-transform: uppercase;
@@ -638,14 +666,14 @@ a.brand-dir__head {
 
 .morph-editorial__title {
   margin-top: auto;
-  font-size: 22px;
+  font-size: 28px;
   font-weight: 300;
   letter-spacing: -0.44px;
   line-height: 1.1;
 }
 
 .morph-editorial__cta {
-  font-size: 11px;
+  font-size: 13px;
   font-weight: 500;
   letter-spacing: 0.88px;
   opacity: 0.7;
@@ -654,6 +682,14 @@ a.brand-dir__head {
 @media (hover: hover) {
   .morph-editorial:hover .morph-editorial__cta {
     opacity: 1;
+  }
+}
+
+/* Mid desktop — keep every nav item including “sale” on one row */
+@media (max-width: 1280px) {
+  .morph-menu__nav button {
+    font-size: 12px;
+    letter-spacing: 0.85px;
   }
 }
 
@@ -793,8 +829,8 @@ a.brand-dir__head {
   background: var(--color-island);
   border: 1px solid var(--color-island-border);
   box-shadow: var(--shadow-island);
-  backdrop-filter: blur(14px) saturate(160%);
-  -webkit-backdrop-filter: blur(14px) saturate(160%);
+  backdrop-filter: var(--glass-filter);
+  -webkit-backdrop-filter: var(--glass-filter);
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -887,10 +923,14 @@ a.brand-dir__head {
 
 /* —— Panels / cards —— */
 .glass-panel {
+  position: relative;
+  isolation: isolate;
   background: var(--color-glass);
-  backdrop-filter: blur(10px);
+  border: 1px solid var(--color-island-border);
+  backdrop-filter: var(--glass-filter);
+  -webkit-backdrop-filter: var(--glass-filter);
   border-radius: var(--radius-panel);
-  box-shadow: var(--shadow-card);
+  box-shadow: var(--shadow-island), var(--shadow-card);
 }
 
 .white-panel {
@@ -898,4 +938,52 @@ a.brand-dir__head {
   border: 1px solid var(--color-border-soft);
   border-radius: var(--radius-panel-sm);
   box-shadow: var(--shadow-soft);
+}
+
+/* —— Liquid Glass sheen — sits between the frosted fill and the type.
+   z-index: -1 stays inside isolation so it never covers copy, and
+   header overflow stays visible so search/suggest can drop out. */
+.header-island::before,
+.header-mobile::before,
+.site-footer::before,
+.tabbar::before,
+.morph-menu::before,
+.glass-panel::before,
+.offer__panel::before,
+.swipe-toast::before,
+.swipe-more::before,
+.profile-drop::before,
+.plp-intro__island::before,
+.plp-filter-btn::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  z-index: -1;
+  background: var(--glass-sheen);
+  opacity: 1;
+}
+
+.header-island::after,
+.header-mobile::after,
+.site-footer::after,
+.tabbar::after,
+.morph-menu::after,
+.glass-panel::after {
+  content: "";
+  position: absolute;
+  left: 8%;
+  right: 28%;
+  top: 0;
+  height: 46%;
+  border-radius: inherit;
+  pointer-events: none;
+  z-index: -1;
+  background: radial-gradient(
+    ellipse 90% 80% at 50% 0%,
+    rgba(255, 255, 255, 0.55),
+    transparent 70%
+  );
+  opacity: 0.9;
 }

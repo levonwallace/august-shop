@@ -880,15 +880,15 @@ a.brand-dir__head {
   align-self: start;
   flex: 0 0 auto;
   width: max-content;
-  padding: 3px;
+  padding: 2px;
   margin-bottom: 14px;
   background: rgba(15, 15, 15, 0.06);
   border-radius: var(--radius-pill);
 }
 
 .feed-toggle__opt {
-  padding: 0 16px;
-  height: 32px;
+  padding: 0 14px;
+  height: 26px;
   border-radius: var(--radius-pill);
   font-size: 12px;
   font-weight: 500;

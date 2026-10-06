@@ -715,13 +715,39 @@ document.addEventListener("DOMContentLoaded", () => {
     tagSwipeCards(page);
   };
 
+  const FEED_NOTICE_KEY = "august_feed_notice_seen";
+  const showFeedNotice = (label) => {
+    if (sessionStorage.getItem(FEED_NOTICE_KEY)) return;
+    sessionStorage.setItem(FEED_NOTICE_KEY, "1");
+
+    const el = document.createElement("div");
+    el.className = "swipe-toast swipe-toast--top";
+    el.setAttribute("data-feed-notice", "");
+    el.setAttribute("role", "status");
+    el.setAttribute("aria-live", "polite");
+    el.innerHTML = `
+      <p class="swipe-toast__title">Your homepage is set to ${label.toLowerCase()}.</p>
+      <a class="swipe-toast__action" href="account.html">Change it anytime</a>
+      <button type="button" class="swipe-toast__close" aria-label="Dismiss">&times;</button>
+    `;
+    document.body.appendChild(el);
+    setTimeout(() => el.classList.add("is-open"), 400);
+
+    const timer = setTimeout(() => dismiss(), 5000);
+    function dismiss() {
+      clearTimeout(timer);
+      el.classList.remove("is-open");
+      setTimeout(() => el.remove(), 220);
+    }
+    el.querySelector(".swipe-toast__close").addEventListener("click", dismiss);
+  };
+
   const applyFeedHero = (hp) => {
     const page = document.querySelector(".page--home");
     if (!page) return;
     page.setAttribute("data-home-mode", "feed");
 
     const heroTitle = document.querySelector(".home-copy h1");
-    const heroSub = document.querySelector(".home-copy p");
     const badge =
       document.querySelector(".announce-chip--hero") || document.querySelector(".announce-chip");
 
@@ -734,17 +760,7 @@ document.addEventListener("DOMContentLoaded", () => {
         ? `<span class="home-lockup__word">${labelNoSale},</span><span class="home-lockup__word home-lockup__word--kicker">on sale.</span>`
         : `<span class="home-lockup__word">${labelNoSale},</span><span class="home-lockup__word home-lockup__word--kicker">new weekly.</span>`;
     }
-    if (heroSub) {
-      heroSub.innerHTML = `Your homepage is set to ${label.toLowerCase()} — <a href="account.html">change it</a> anytime.`;
-    } else {
-      const copy = document.querySelector(".home-copy");
-      if (copy && !copy.querySelector("[data-feed-sub]")) {
-        const p = document.createElement("p");
-        p.setAttribute("data-feed-sub", "");
-        p.innerHTML = `Your homepage is set to ${label.toLowerCase()} — <a href="account.html">change it</a> anytime.`;
-        copy.appendChild(p);
-      }
-    }
+    showFeedNotice(label);
     if (badge) {
       const dot = badge.querySelector(".dot");
       badge.innerHTML = "";

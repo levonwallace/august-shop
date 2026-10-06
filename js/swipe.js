@@ -146,7 +146,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   let trayTimer = null;
   const showSimilar = (product) => {
-    if (!product) return;
+    if (!product) return false;
     const Cat = window.AugustCatalog;
     let similar = [];
     if (Cat?.PRODUCTS && product.brand) {
@@ -156,17 +156,17 @@ document.addEventListener("DOMContentLoaded", () => {
       const extra = Cat.related(product, 3).filter((p) => !similar.some((s) => s.id === p.id));
       similar = similar.concat(extra).slice(0, 3);
     }
-    if (!similar.length) return;
+    if (!similar.length) return false;
 
     let tray = document.querySelector("[data-swipe-more]");
-    const host = document.querySelector(".page--home") || document.querySelector(".page") || document.body;
     if (!tray) {
       tray = document.createElement("div");
       tray.className = "swipe-more";
       tray.setAttribute("data-swipe-more", "");
-      host.appendChild(tray);
+      tray.setAttribute("role", "dialog");
+      tray.setAttribute("aria-label", "More like this");
+      document.body.appendChild(tray);
     }
-    if (!host.classList?.contains?.("page--home")) tray.style.position = "fixed";
 
     const brandQ = encodeURIComponent(product.brand || "");
     const cards = similar
@@ -180,19 +180,24 @@ document.addEventListener("DOMContentLoaded", () => {
       .join("");
 
     tray.innerHTML = `
-      <div class="swipe-more__bar">
-        <p class="swipe-more__title">More like ${product.brand || "this"}</p>
-        ${brandQ ? `<a class="swipe-more__shop" href="collection.html?brand=${brandQ}">Shop brand</a>` : ""}
-        <button class="swipe-more__close" type="button" aria-label="Dismiss" data-swipe-more-close>
-          <svg width="12" height="12" viewBox="0 0 12 12" fill="none" aria-hidden="true"><path d="M1 1l10 10M11 1L1 11" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>
-        </button>
+      <button class="swipe-more__scrim" type="button" aria-label="Dismiss" data-swipe-more-close></button>
+      <div class="swipe-more__panel">
+        <div class="swipe-more__bar">
+          <p class="swipe-more__title">More like ${product.brand || "this"}</p>
+          ${brandQ ? `<a class="swipe-more__shop" href="collection.html?brand=${brandQ}">Shop brand</a>` : ""}
+          <button class="swipe-more__close" type="button" aria-label="Dismiss" data-swipe-more-close>
+            <svg width="12" height="12" viewBox="0 0 12 12" fill="none" aria-hidden="true"><path d="M1 1l10 10M11 1L1 11" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>
+          </button>
+        </div>
+        <div class="swipe-more__grid">${cards}</div>
+        <a class="swipe-more__liked" href="account.html#liked">Saved to Liked</a>
       </div>
-      <div class="swipe-more__grid">${cards}</div>
     `;
     tray.hidden = false;
     requestAnimationFrame(() => tray.classList.add("is-open"));
     clearTimeout(trayTimer);
     trayTimer = setTimeout(() => closeSimilar(), 5200);
+    return true;
   };
 
   const closeSimilar = () => {
@@ -270,8 +275,8 @@ document.addEventListener("DOMContentLoaded", () => {
       product && window.AugustProfile?.recordSwipe ? window.AugustProfile.recordSwipe(product, dir) : null;
     haptic(12);
     if (dir === "like") {
-      showSimilar(product);
-      if (user) {
+      const trayOpen = showSimilar(product);
+      if (user && !trayOpen) {
         showToast({
           title: "Saved to Liked",
           href: "account.html#liked",

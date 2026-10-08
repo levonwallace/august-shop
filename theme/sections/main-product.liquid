@@ -1,0 +1,48 @@
+{% comment %} Prototype: product.html + js/pdp.js — Ajax add via AugustCart / shopify-bridge {% endcomment %}
+<main class="pdp" id="main" data-product-handle="{{ product.handle }}">
+  <div class="pdp-media">
+    {% for image in product.images %}
+      <img
+        src="{{ image | image_url: width: 1400 }}"
+        alt="{{ image.alt | default: product.title | escape }}"
+        {% if forloop.first %}{% else %}loading="lazy"{% endif %}
+      >
+    {% endfor %}
+  </div>
+  <div class="pdp-info">
+    <p class="pdp-brand">{{ product.vendor }}</p>
+    <h1>{{ product.title }}</h1>
+    <p class="pdp-price">
+      {% if product.compare_at_price > product.price %}
+        <span class="price-was">{{ product.compare_at_price | money }}</span>
+      {% endif %}
+      {{ product.price | money }}
+    </p>
+    {% form 'product', product %}
+      {% unless product.has_only_default_variant %}
+        {% for option in product.options_with_values %}
+          <fieldset class="segmented" data-segmented>
+            <legend>{{ option.name }}</legend>
+            {% for value in option.values %}
+              <button type="button" class="segmented__opt{% if option.selected_value == value %} is-active{% endif %}" data-value="{{ value | escape }}">{{ value }}</button>
+            {% endfor %}
+          </fieldset>
+        {% endfor %}
+      {% endunless %}
+      <input type="hidden" name="id" value="{{ product.selected_or_first_available_variant.id }}">
+      <button class="btn btn--primary btn--block" type="submit" name="add"{% unless product.selected_or_first_available_variant.available %} disabled{% endunless %}>
+        Add to bag
+      </button>
+    {% endform %}
+    <div class="pdp-body">{{ product.description }}</div>
+  </div>
+</main>
+<script type="application/json" data-product>{{ product | json }}</script>
+<script src="{{ 'pdp.js' | asset_url }}" defer></script>
+
+{% schema %}
+{
+  "name": "Product",
+  "settings": []
+}
+{% endschema %}

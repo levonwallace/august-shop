@@ -1,6 +1,7 @@
 /* August — real catalog sample pulled from august-shop.com (Shopify products.json).
-   Images hotlink Shopify's CDN — fine for the prototype; at port time this
-   whole file disappears and Liquid iterates real collections instead. */
+   Prototype-only. liquid:replace — this file is not shipped on the draft theme
+   as the source of products. Liquid iterates collections; shopify-bridge.js
+   maps Ajax Cart onto AugustCart. Images already use Shopify CDN width params. */
 window.AugustCatalog = (() => {
   const PRODUCTS = [
   {

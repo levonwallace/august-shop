@@ -1,0 +1,9 @@
+<main class="account-gate" id="main">
+  <h1>Sign in</h1>
+  {% form 'customer_login' %}
+    <label>Email <input type="email" name="customer[email]" autocomplete="email"></label>
+    <label>Password <input type="password" name="customer[password]" autocomplete="current-password"></label>
+    <button class="btn btn--primary" type="submit">Sign in</button>
+  {% endform %}
+  <a href="{{ routes.account_register_url }}">Create account</a>
+</main>

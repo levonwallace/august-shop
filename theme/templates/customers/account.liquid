@@ -1,0 +1,21 @@
+{% comment %} Prototype: account.html — customer metafields under namespace august {% endcomment %}
+<main class="account-page" id="main">
+  {% if customer %}
+    <header class="account-head">
+      <div class="account-head__meta">
+        <h1>{{ customer.name }}</h1>
+        <p class="account-sub">{{ customer.email }}</p>
+      </div>
+    </header>
+    <p>Liked, Less, and homepage prefs hydrate from customer metafields via shopify-bridge.js.</p>
+    <a href="{{ routes.account_logout_url }}">Sign out</a>
+  {% else %}
+    <div class="account-gate">
+      <h1>Your August account</h1>
+      <p>Save a feed, track orders.</p>
+      <a class="btn btn--primary" href="{{ routes.account_register_url }}">Create account</a>
+      <a class="btn btn--ghost" href="{{ routes.account_login_url }}">Sign in</a>
+    </div>
+  {% endif %}
+</main>
+<script src="{{ 'account.js' | asset_url }}" defer></script>

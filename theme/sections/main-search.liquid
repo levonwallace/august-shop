@@ -1,0 +1,22 @@
+<main class="plp" id="main">
+  <h1>Search</h1>
+  <form action="{{ routes.search_url }}" method="get">
+    <input type="search" name="q" value="{{ search.terms | escape }}" placeholder="Search">
+  </form>
+  <div class="product-grid">
+    {% for item in search.results %}
+      {% if item.object_type == 'product' %}
+        {% render 'product-card', product: item %}
+      {% endif %}
+    {% else %}
+      <p>No results.</p>
+    {% endfor %}
+  </div>
+</main>
+
+{% schema %}
+{
+  "name": "Search",
+  "settings": []
+}
+{% endschema %}

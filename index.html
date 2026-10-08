@@ -44,7 +44,8 @@
   <body>
     <a class="skip-link" href="#main">Skip to content</a>
     <div class="mega-backdrop" data-mega-backdrop hidden></div>
-    <div class="page page--home">
+      <div class="page page--home">
+      <!-- liquid:section header → theme/sections/header.liquid -->
       <header class="site-header">
         <div class="header-mobile">
           <button class="nav-toggle" type="button" aria-label="Open menu" aria-expanded="false" aria-controls="mobile-nav" data-nav-toggle>Menu</button>
@@ -183,6 +184,7 @@
       </header>
 
       <div class="card-stack" id="main" data-card-stack>
+        <!-- liquid:section home-hero → theme/sections/home-hero.liquid -->
         <!-- Card 0: Hero -->
         <div class="card-stack__card" data-card="0">
           <main class="home-hero" data-card-scroll>
@@ -509,6 +511,7 @@
         <button class="card-stack__dot" data-dot="4" aria-label="August AUX"></button>
       </div>
 
+      <!-- liquid:section footer → theme/sections/footer.liquid -->
       <footer class="site-footer">
         <div class="footer-brand">
           <img class="footer-brand__logo" src="assets/footer-logo.svg" alt="august" />
@@ -549,6 +552,7 @@
       </nav>
     </div>
     <script src="js/catalog.js"></script>
+    <script src="js/shopify-bridge.js"></script>
     <script src="js/shopify.js"></script>
     <script src="js/auxdata.js"></script>
     <script src="js/main.js"></script>

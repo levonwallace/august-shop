@@ -1,0 +1,21 @@
+{% comment %} Prototype: collection.html PLP grid {% endcomment %}
+<main class="plp" id="main">
+  <header class="plp-intro">
+    <h1>{{ collection.title }}</h1>
+    <p>{{ collection.products_count }} products</p>
+  </header>
+  <div class="product-grid">
+    {% for product in collection.products %}
+      {% render 'product-card', product: product %}
+    {% else %}
+      <p>Nothing in this collection yet.</p>
+    {% endfor %}
+  </div>
+</main>
+
+{% schema %}
+{
+  "name": "Collection",
+  "settings": []
+}
+{% endschema %}

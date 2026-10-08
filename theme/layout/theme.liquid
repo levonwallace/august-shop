@@ -1,0 +1,71 @@
+{% comment %}
+  Prototype: index.html <head> + shared chrome.
+  Push unpublished only. See shopify-draft.md.
+{% endcomment %}
+<!DOCTYPE html>
+<html lang="{{ request.locale.iso_code }}">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+    <meta name="theme-color" content="{{ settings.color_page }}">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="apple-mobile-web-app-title" content="{{ shop.name }}">
+    <meta name="format-detection" content="telephone=no">
+    <title>{{ page_title }}{% unless page_title contains shop.name %} — {{ shop.name }}{% endunless %}</title>
+    {% if page_description %}
+      <meta name="description" content="{{ page_description | escape }}">
+    {% endif %}
+    <link rel="canonical" href="{{ canonical_url }}">
+    {% render 'css-variables' %}
+    {{ 'tokens.css' | asset_url | stylesheet_tag }}
+    {{ 'base.css' | asset_url | stylesheet_tag }}
+    {{ 'components.css' | asset_url | stylesheet_tag }}
+    {{ 'pages.css' | asset_url | stylesheet_tag }}
+    {{ 'profile.css' | asset_url | stylesheet_tag }}
+    {{ 'sheet.css' | asset_url | stylesheet_tag }}
+    {{ 'tabbar.css' | asset_url | stylesheet_tag }}
+    {{ 'segmented.css' | asset_url | stylesheet_tag }}
+    {{ 'search.css' | asset_url | stylesheet_tag }}
+    {{ 'offer.css' | asset_url | stylesheet_tag }}
+    {{ 'feed.css' | asset_url | stylesheet_tag }}
+    {{ 'account.css' | asset_url | stylesheet_tag }}
+    {{ 'cardstack.css' | asset_url | stylesheet_tag }}
+    {{ content_for_header }}
+  </head>
+  <body>
+    <a class="skip-link" href="#main">Skip to content</a>
+    <script>
+      window.AugustBootstrap = {
+        live: true,
+        customer: {% if customer %}{
+          id: {{ customer.id | json }},
+          name: {{ customer.name | json }},
+          email: {{ customer.email | json }},
+          homepage: {{ customer.metafields.august.homepage.value | json }},
+          preferredBrands: {{ customer.metafields.august.preferred_brands.value | json }},
+          swipes: {{ customer.metafields.august.swipes.value | json }}
+        }{% else %}null{% endif %},
+        cart: {{ cart | json }},
+        moneyFormat: {{ shop.money_format | json }}
+      };
+    </script>
+    {% section 'header' %}
+    <div class="page page--{{ request.page_type | handle }}">
+      {{ content_for_layout }}
+      {% section 'footer' %}
+      {% section 'tabbar' %}
+    </div>
+    {{ 'catalog.js' | asset_url | script_tag }}
+    {{ 'profile.js' | asset_url | script_tag }}
+    {{ 'shopify-bridge.js' | asset_url | script_tag }}
+    {{ 'shopify.js' | asset_url | script_tag }}
+    {{ 'main.js' | asset_url | script_tag }}
+    {{ 'sheet.js' | asset_url | script_tag }}
+    {{ 'segmented.js' | asset_url | script_tag }}
+    {{ 'cart.js' | asset_url | script_tag }}
+    {{ 'swipe.js' | asset_url | script_tag }}
+    {{ 'offer.js' | asset_url | script_tag }}
+  </body>
+</html>

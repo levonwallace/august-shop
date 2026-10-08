@@ -6,7 +6,9 @@
   "scripts": {
     "dev": "./scripts/dev.sh",
     "start": "serve . -l tcp://0.0.0.0:${PORT:-5173} --no-clipboard",
-    "open": "open http://localhost:5173/index.html"
+    "open": "open http://localhost:5173/index.html",
+    "theme:sync": "bash ./scripts/sync-theme-assets.sh",
+    "theme:push": "npm run theme:sync && shopify theme push --unpublished --path theme"
   },
   "dependencies": {
     "serve": "^14.2.4"

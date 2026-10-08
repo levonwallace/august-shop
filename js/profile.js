@@ -3,9 +3,12 @@ document.addEventListener("DOMContentLoaded", () => {
   const STORAGE_KEY = "august_user";
   const SIGNED_OUT_KEY = "august_signed_out";
 
-  /* Shopify port note: this object maps to `customer` + customer metafields
-     (namespace `august.homepage`). The homepage takeover below becomes a
-     Liquid section variant keyed off those metafields. */
+  /* Shopify port: customer + metafields namespace `august`
+       homepage          type json     { enabled, department, category, saleOnly }
+       preferred_brands  type json     ["Vans", "Hoka"]
+       swipes            type json     { likes, skips, items }
+     Storefront access must be enabled. Writes later go through an app proxy.
+     Homepage takeover = Liquid section variant keyed off those metafields. */
   const defaults = () => ({
     name: "",
     email: "",

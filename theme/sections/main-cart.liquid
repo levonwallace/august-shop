@@ -1,0 +1,35 @@
+{% comment %} Prototype: cart.html + js/cart.js swipe-to-reveal {% endcomment %}
+<main class="cart" id="main">
+  <h1>Bag</h1>
+  {% if cart.item_count == 0 %}
+    <p>Your bag is empty.</p>
+    <a class="btn btn--primary" href="{{ routes.all_products_collection_url }}">Shop</a>
+  {% else %}
+    <div class="cart-list">
+      {% for item in cart.items %}
+        <div class="cart-swipe" data-cart-swipe data-line="{{ item.key }}">
+          <div class="cart-swipe__row cart-line">
+            <a href="{{ item.url }}">
+              {% if item.image %}
+                <img src="{{ item.image | image_url: width: 200 }}" alt="{{ item.title | escape }}">
+              {% endif %}
+              <span>{{ item.product.title }}</span>
+            </a>
+            <span>{{ item.final_line_price | money }}</span>
+          </div>
+        </div>
+      {% endfor %}
+    </div>
+    <p>Subtotal {{ cart.total_price | money }}</p>
+    <form action="{{ routes.cart_url }}" method="post">
+      <button class="btn btn--primary btn--block" type="submit" name="checkout">Checkout</button>
+    </form>
+  {% endif %}
+</main>
+
+{% schema %}
+{
+  "name": "Cart",
+  "settings": []
+}
+{% endschema %}

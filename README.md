@@ -35,29 +35,14 @@ Everything is split into files that map 1:1 to Shopify snippets/sections
 when we port. Keep the split — it reduces diff surface during migration.
 
 ```
-css/
-  tokens.css      → theme settings / CSS variables (safe-area, colors, radii)
-  base.css        → theme base (reset, iOS taps, hover-guard, text-size-adjust)
-  components.css  → snippets: header, footer, product-card, announce-chip, …
-  pages.css       → per-template layout (home / plp / pdp / cart)
-  profile.css     → snippet: profile dropdown + settings modal
-  cardstack.css   → snippet: home 3D stack (Wallet-style)
-  sheet.css       → primitive: bottom sheet (filters, add-to-bag, profile)
-  tabbar.css      → snippet: mobile UITabBar
-  segmented.css   → primitive: UISegmentedControl (size, PDP tabs)
-
-js/
-  main.js         → sheet openers, tabs, mega menu, mobile nav
-  sheet.js        → bottom-sheet controller (drag, focus trap, safe-area)
-  segmented.js    → segmented-control controller (sliding thumb, keyboard)
-  cart.js         → cart swipe-to-reveal + remove/save
-  cardstack.js    → home card stack (drag, rubber-band, haptic)
-  player.js       → August Radio persistent player
-  profile.js      → profile state + mobile-sheet routing
-  radiocard.js    → radio card interactions
-
-page HTML         → Shopify template files (index / collection / product / cart)
-assets/           → theme assets (swap for Shopify CDN / Files at port time)
+css/              → theme/assets/*.css  (npm run theme:sync)
+js/               → theme/assets/*.js
+  catalog.js      → liquid:replace (collections). Cart API via shopify-bridge.js
+  shopify-bridge.js → Ajax Cart + customer metafields when Shopify.shop is set
+  sheet.js / swipe.js / cardstack.js / cart.js → liquid:keep
+theme/            → unpublished Online Store 2.0 draft (see theme/README.md)
+page HTML         → theme/templates/* + sections (class names stay)
+assets/           → theme/assets (chrome icons); product photos stay on Shopify CDN
 ```
 
 ## iOS conventions in play

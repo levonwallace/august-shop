@@ -6,13 +6,31 @@ This prototype is not a Shopify theme. Live august-shop.com stays on the current
 
 Do not replace the published Online Store theme. All Liquid work happens on a **draft theme**. Staff preview it. Customers never see it until a later cutover.
 
-## Setup (when theme repo exists)
+## Setup (when you have CLI access)
 
-1. Duplicate the live theme in Shopify Admin → Online Store → Themes → … → Duplicate. Rename the copy `August 2.0 draft`.
-2. Connect the theme via Shopify CLI (`shopify theme push --unpublished`) or GitHub integration onto that draft only.
-3. Share a **private preview link** (Theme → … → Preview) in the production doc. Staff do not need to live in Admin to review.
-4. Uploaders / art directors use **Edit default theme content** and the theme editor on the draft to try schemas.
-5. Page speed (milliseconds) is a separate track after first preview.
+```bash
+npm run theme:sync
+shopify theme push --unpublished --path theme
+```
+
+The scaffold lives in `/theme`. Duplicate nothing on the live theme. Share the **private preview link** from Theme → … → Preview.
+
+1. Duplicate is optional — `--unpublished` creates a draft. Rename it `August 2.0 draft`.
+2. Or connect GitHub integration onto that draft only.
+3. Uploaders / art directors use **Edit default theme content** and the theme editor on the draft to try schemas.
+4. Page speed (milliseconds) is a separate track after first preview.
+
+## Customer metafields (create in Admin before homepage prefs go live)
+
+Namespace `august`, storefront access on:
+
+| Key | Type |
+| --- | --- |
+| `homepage` | json |
+| `preferred_brands` | json |
+| `swipes` | json |
+
+Shape is documented in `theme/README.md`.
 
 ## What staff should expect
 

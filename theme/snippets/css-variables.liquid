@@ -1,0 +1,12 @@
+{% comment %} Prototype: css/tokens.css :root — theme settings override at runtime. {% endcomment %}
+{% style %}
+  :root {
+    --color-ink: {{ settings.color_ink }};
+    --color-page: {{ settings.color_page }};
+    --color-muted: {{ settings.color_muted }};
+    --color-link: {{ settings.color_link }};
+    --color-ink-verdigris: {{ settings.color_verdigris }};
+    --ui-scale: {{ settings.ui_scale }};
+    --radius-card: {{ settings.radius_card }}px;
+  }
+{% endstyle %}

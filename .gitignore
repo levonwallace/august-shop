@@ -1,2 +1,10 @@
 node_modules/
 .DS_Store
+
+# Copies from css/ js/ assets/ — run `npm run theme:sync` before theme push
+theme/assets/*.css
+theme/assets/*.js
+theme/assets/*.svg
+theme/assets/*.jpg
+theme/assets/*.png
+theme/assets/*.woff2

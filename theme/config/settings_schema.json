@@ -1,0 +1,148 @@
+[
+  {
+    "name": "theme_info",
+    "theme_name": "August 2.0",
+    "theme_version": "0.1.0",
+    "theme_author": "August",
+    "theme_documentation_url": "https://github.com/levonwallace/august-shop",
+    "theme_support_url": "https://august-shop.com"
+  },
+  {
+    "name": "Colors",
+    "settings": [
+      {
+        "type": "paragraph",
+        "content": "Maps to css/tokens.css. Prototype remains the visual source of truth until this schema is live on the draft theme."
+      },
+      {
+        "type": "color",
+        "id": "color_ink",
+        "label": "Ink",
+        "default": "#0f0f0f"
+      },
+      {
+        "type": "color",
+        "id": "color_page",
+        "label": "Page",
+        "default": "#ffffff"
+      },
+      {
+        "type": "color",
+        "id": "color_muted",
+        "label": "Muted",
+        "default": "#6b6b66"
+      },
+      {
+        "type": "color",
+        "id": "color_link",
+        "label": "Link",
+        "default": "#2b55a8"
+      },
+      {
+        "type": "color",
+        "id": "color_verdigris",
+        "label": "Verdigris",
+        "default": "#24382d"
+      }
+    ]
+  },
+  {
+    "name": "Announcement",
+    "settings": [
+      {
+        "type": "checkbox",
+        "id": "announce_enable",
+        "label": "Show announcement chip",
+        "default": true
+      },
+      {
+        "type": "text",
+        "id": "announce_text",
+        "label": "Announcement",
+        "default": "Back to school sale"
+      },
+      {
+        "type": "url",
+        "id": "announce_link",
+        "label": "Announcement link"
+      }
+    ]
+  },
+  {
+    "name": "Pickup store",
+    "settings": [
+      {
+        "type": "text",
+        "id": "store_name",
+        "label": "Store name",
+        "default": "August"
+      },
+      {
+        "type": "textarea",
+        "id": "store_address",
+        "label": "Address",
+        "default": "414 State St\nMadison, WI 53703"
+      },
+      {
+        "type": "text",
+        "id": "store_hours",
+        "label": "Hours",
+        "default": "Mon–Sat 11–7 · Sun 12–5"
+      },
+      {
+        "type": "text",
+        "id": "store_lat",
+        "label": "Latitude",
+        "default": "43.07492"
+      },
+      {
+        "type": "text",
+        "id": "store_lng",
+        "label": "Longitude",
+        "default": "-89.38755"
+      }
+    ]
+  },
+  {
+    "name": "Chrome",
+    "settings": [
+      {
+        "type": "range",
+        "id": "ui_scale",
+        "min": 0.6,
+        "max": 1,
+        "step": 0.05,
+        "unit": "x",
+        "label": "Desktop UI scale",
+        "default": 0.75
+      },
+      {
+        "type": "range",
+        "id": "radius_card",
+        "min": 0,
+        "max": 24,
+        "step": 1,
+        "unit": "px",
+        "label": "Card radius",
+        "default": 6
+      }
+    ]
+  },
+  {
+    "name": "Offer popup",
+    "settings": [
+      {
+        "type": "checkbox",
+        "id": "offer_enable",
+        "label": "Show 10% popup",
+        "default": true
+      },
+      {
+        "type": "text",
+        "id": "offer_heading",
+        "label": "Offer heading",
+        "default": "10% off"
+      }
+    ]
+  }
+]

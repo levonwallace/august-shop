@@ -1,0 +1,20 @@
+{
+  "current": {
+    "color_ink": "#0f0f0f",
+    "color_page": "#ffffff",
+    "color_muted": "#6b6b66",
+    "color_link": "#2b55a8",
+    "color_verdigris": "#24382d",
+    "announce_enable": true,
+    "announce_text": "Back to school sale",
+    "store_name": "August",
+    "store_address": "414 State St\nMadison, WI 53703",
+    "store_hours": "Mon–Sat 11–7 · Sun 12–5",
+    "store_lat": "43.07492",
+    "store_lng": "-89.38755",
+    "ui_scale": 0.75,
+    "radius_card": 6,
+    "offer_enable": true,
+    "offer_heading": "10% off"
+  }
+}

@@ -1,0 +1,35 @@
+{% comment %} Prototype: .site-footer {% endcomment %}
+<footer class="site-footer">
+  <div class="footer-brand">
+    <img class="footer-brand__logo" src="{{ 'footer-logo.svg' | asset_url }}" alt="{{ shop.name | escape }}">
+    <span class="footer-brand__tag">{{ section.settings.tagline }}</span>
+  </div>
+  <nav class="footer-links" aria-label="Footer">
+    {% for link in section.settings.menu.links %}
+      <a href="{{ link.url }}">{{ link.title }}</a>
+    {% else %}
+      <a href="{{ routes.all_products_collection_url }}">Shop</a>
+      <a href="{{ pages['august-inn'].url | default: '#' }}">August Inn</a>
+    {% endfor %}
+  </nav>
+</footer>
+
+{% schema %}
+{
+  "name": "Footer",
+  "settings": [
+    {
+      "type": "text",
+      "id": "tagline",
+      "label": "Tagline",
+      "default": "Streetwear, sneakers, art & music — Madison, WI."
+    },
+    {
+      "type": "link_list",
+      "id": "menu",
+      "label": "Footer menu",
+      "default": "footer"
+    }
+  ]
+}
+{% endschema %}

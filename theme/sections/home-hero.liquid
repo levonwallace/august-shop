@@ -1,0 +1,42 @@
+{% comment %}
+  Prototype: index.html .home-hero + .home-lockup
+  First Liquid pass renders live availability into the existing card markup.
+  Card-stack JS (cardstack.js) still layers the Wallet flip on top.
+{% endcomment %}
+<div class="card-stack" id="main" data-card-stack>
+  <div class="card-stack__card" data-card="0">
+    <main class="home-hero" data-card-scroll>
+      <div class="home-layout">
+        <div class="home-copy">
+          <h1 class="home-lockup">
+            <span class="home-lockup__word ink-leather">Streetwear,</span>
+            <span class="home-lockup__word ink-slate">sneakers,</span>
+            <span class="home-lockup__word ink-madder">art,</span>
+            <span class="home-lockup__word ink-cobalt">music.</span>
+          </h1>
+        </div>
+        <div class="home-grid">
+          {% assign feed = collections[section.settings.collection] %}
+          {% for product in feed.products limit: 8 %}
+            {% render 'product-card', product: product %}
+          {% endfor %}
+        </div>
+      </div>
+    </main>
+  </div>
+</div>
+<script src="{{ 'cardstack.js' | asset_url }}" defer></script>
+
+{% schema %}
+{
+  "name": "Home hero",
+  "settings": [
+    {
+      "type": "collection",
+      "id": "collection",
+      "label": "Everything collection",
+      "info": "Staff-maintained availability. Your feed is derived from this in JS until metafields land."
+    }
+  ]
+}
+{% endschema %}

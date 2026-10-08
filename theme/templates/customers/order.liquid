@@ -1,0 +1,6 @@
+<main class="account-page" id="main">
+  <h1>Order {{ order.name }}</h1>
+  <p>{{ order.created_at | date: '%b %d, %Y' }} · {{ order.financial_status_label }}</p>
+  <p>{{ order.total_price | money }}</p>
+  <a href="{{ routes.account_url }}">Back to account</a>
+</main>

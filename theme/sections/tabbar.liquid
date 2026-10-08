@@ -1,0 +1,23 @@
+{% comment %} Prototype: nav.tabbar in index.html {% endcomment %}
+<nav class="tabbar" aria-label="Primary" data-tabbar>
+  <a class="tabbar__item{% if request.page_type == 'index' %} is-active{% endif %}" href="{{ routes.root_url }}">
+    <span>Shop</span>
+  </a>
+  <a class="tabbar__item" href="{{ routes.search_url }}">
+    <span>Search</span>
+  </a>
+  <a class="tabbar__item" href="{{ routes.cart_url }}">
+    <span class="tabbar__badge"{% if cart.item_count == 0 %} hidden{% endif %}>{{ cart.item_count }}</span>
+    <span>Bag</span>
+  </a>
+  <a class="tabbar__item{% if request.page_type contains 'customers' %} is-active{% endif %}" href="{{ routes.account_url }}">
+    <span>Profile</span>
+  </a>
+</nav>
+
+{% schema %}
+{
+  "name": "Tab bar",
+  "settings": []
+}
+{% endschema %}

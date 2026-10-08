@@ -1,0 +1,114 @@
+/* August design tokens — map 1:1 to Shopify theme settings later */
+:root {
+  --color-ink: #0f0f0f;
+  --color-ink-soft: #1c1f1c;
+  --color-muted: #6b6b66;
+  --color-muted-2: #6b706b;
+  --color-body: #404540;
+  --color-placeholder: #9ea199;
+  --color-surface: #ffffff;
+  --color-page: #ffffff;
+  --color-page-plp: #ffffff;
+  --color-page-plp-end: #ffffff;
+  --color-chip: #f4f2ec;
+  --color-border: rgba(0, 0, 0, 0.18);
+  --color-border-soft: rgba(0, 0, 0, 0.06);
+  --color-border-mid: rgba(0, 0, 0, 0.14);
+  --color-link: #2b55a8;
+  --color-island: rgba(255, 255, 255, 0.62);
+  --color-island-border: rgba(0, 0, 0, 0.05);
+  --color-glass: rgba(255, 255, 255, 0.66);
+  --color-footer: rgba(0, 0, 0, 0.4);
+  --color-dot: #4fbf7a;
+
+  /* Liquid Glass — thin optical frost. Blur + a little saturate only;
+     no brightness/contrast (those read as processed plastic). */
+  --glass-blur: 24px;
+  --glass-saturate: 155%;
+  --glass-filter: blur(var(--glass-blur)) saturate(var(--glass-saturate));
+
+  /* ─── Storefront palette — lifted from the shop itself ───
+     madder    → the vintage rug + painting reds, sun-faded
+     verdigris → oxidized copper trim above the August sign
+     cobalt    → the painting's blue linework
+     cognac    → leather chair, maple shelving, cedar fascia
+     ochre     → the painting's yellow fragment
+     Solids are for small accents only; tints are ambient washes. */
+  --color-madder: #a8432e;
+  --color-verdigris: #4a6f5e;
+  --color-cobalt: #2b55a8;
+  --color-cognac: #b0703a;
+  --color-ochre: #d9a326;
+  /* Deep verdigris ink — primary action color (the sign trim, near-dark) */
+  --color-ink-verdigris: #24382d;
+  --color-ink-verdigris-hover: #2f4a3b;
+  --tint-madder: rgba(168, 67, 46, 0.1);
+  --tint-verdigris: rgba(74, 111, 94, 0.12);
+  --tint-cobalt: rgba(43, 85, 168, 0.09);
+  --tint-cognac: rgba(176, 112, 58, 0.12);
+  --tint-ochre: rgba(217, 163, 38, 0.09);
+  /* Mosaic checker — the black & white sidewalk tile */
+  --checker-ink: rgba(46, 50, 56, 0.1);
+  --checker-paper: rgba(255, 255, 255, 0.055);
+
+  --font: "Helvetica Neue", Helvetica, Arial, sans-serif;
+  --shadow-island:
+    inset 0 0.5px 0 rgba(255, 255, 255, 0.5),
+    0 6px 16px -8px rgba(0, 0, 0, 0.08);
+  --shadow-card: 0 18px 40px -4px rgba(0, 0, 0, 0.08);
+  --shadow-soft: 0 12px 28px -8px rgba(0, 0, 0, 0.07);
+  --shadow-player: 0 20px 48px -10px rgba(0, 0, 0, 0.18);
+  --shadow-banner: 0 24px 48px -12px rgba(0, 0, 0, 0.18);
+  --shadow-product: 0 4px 20px -4px rgba(0, 0, 0, 0.10);
+  --shadow-brand-banner: 0 20px 40px -10px rgba(0, 0, 0, 0.16);
+  --shadow-morph: 0 28px 64px -8px rgba(0, 0, 0, 0.28);
+
+  --radius-pill: 100px;
+  --radius-chip: 999px;
+  --radius-card: 6px;
+  --radius-panel: 28px;
+  --radius-panel-sm: 22px;
+  /* Header islands + footer — same corner on every chrome bar */
+  --radius-chrome: 8px;
+
+  --page-max: 1440px;
+  --gutter: 64px;
+
+  /* Desktop "resolution" scale — 0.75 = 25% smaller, like browser zoom.
+     Applied via html { zoom } so type, chrome, cards, and sheets all move together. */
+  --ui-scale: 0.75;
+
+  /* iOS safe-area insets — read from viewport-fit=cover.
+     Fallback to 0 for non-iOS / older browsers. */
+  --safe-top: env(safe-area-inset-top, 0px);
+  --safe-right: env(safe-area-inset-right, 0px);
+  --safe-bottom: env(safe-area-inset-bottom, 0px);
+  --safe-left: env(safe-area-inset-left, 0px);
+
+  /* Chrome offsets — safe-area baked in so header sits below the notch,
+     and footer/player sit above the home indicator. */
+  --header-top: calc(39px + var(--safe-top));
+  --header-h: 57px;
+  --footer-h: 48px;
+  --footer-inset: calc(24px + var(--safe-bottom));
+  /* space reserved under scroll content so last items clear chrome */
+  --chrome-bottom: calc(var(--footer-inset) + var(--footer-h) + 16px);
+  --chrome-top: calc(var(--header-top) + var(--header-h) + 24px);
+
+  /* ─── Motion tokens (shared across swipe surfaces) ───
+     Read this like: named curves + duration presets so card stack, cart
+     swipe, and sheet all feel like the same product. */
+  /* iOS "spring-out" — Apple's UISegmentedControl / SwiftUI default. Best for
+     content that "clicks" into place after a swipe or tap. */
+  --ease-swipe: cubic-bezier(0.32, 0.72, 0, 1);
+  /* Soft settle — for content that lands gently (sheet close, snap-back). */
+  --ease-spring: cubic-bezier(0.22, 1, 0.36, 1);
+  /* Ease-out for opacity/color transitions where a spring feels weird. */
+  --ease-out: cubic-bezier(0.25, 1, 0.5, 1);
+
+  /* Duration presets */
+  --dur-fast: 220ms;
+  --dur-swipe: 320ms;
+  --dur-med: 420ms;
+  --dur-slow: 520ms;
+}

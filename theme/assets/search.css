@@ -1,0 +1,95 @@
+/* Live search — brand / category chips above SKU rows */
+
+.search-suggest__chips {
+  display: flex;
+  flex-wrap: nowrap;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 4px 10px;
+  margin: 0 0 2px;
+  overflow-x: auto;
+  overflow-y: hidden;
+  scrollbar-width: none;
+  -webkit-overflow-scrolling: touch;
+  border-bottom: 1px solid rgba(15, 15, 15, 0.06);
+}
+
+.search-suggest__chips::-webkit-scrollbar {
+  display: none;
+}
+
+.search-suggest__chips:last-child {
+  border-bottom: 0;
+  margin-bottom: 0;
+  padding-bottom: 6px;
+}
+
+.search-suggest__chip {
+  flex: 0 0 auto;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: 32px;
+  padding: 0 14px;
+  border-radius: var(--radius-pill);
+  background: rgba(15, 15, 15, 0.06);
+  border: 0.5px solid rgba(15, 15, 15, 0.08);
+  font-size: 13px;
+  font-weight: 500;
+  letter-spacing: 0.01em;
+  color: var(--color-ink);
+  line-height: 1;
+  white-space: nowrap;
+  text-decoration: none;
+  -webkit-tap-highlight-color: transparent;
+  transition:
+    background 0.14s ease,
+    transform 0.14s ease,
+    border-color 0.14s ease;
+}
+
+.search-suggest__chip::after {
+  content: "";
+  width: 5px;
+  height: 5px;
+  margin-left: 1px;
+  border-right: 1.4px solid currentColor;
+  border-top: 1.4px solid currentColor;
+  transform: rotate(45deg);
+  opacity: 0.32;
+}
+
+.search-suggest__chip--brand {
+  background: var(--tint-verdigris);
+  border-color: rgba(74, 111, 94, 0.2);
+  color: var(--color-ink-verdigris);
+}
+
+.search-suggest__chip--cat,
+.search-suggest__chip--type {
+  background: #f2f2f7;
+  border-color: rgba(15, 15, 15, 0.06);
+}
+
+.search-suggest__chip:hover {
+  background: rgba(15, 15, 15, 0.1);
+}
+
+.search-suggest__chip--brand:hover {
+  background: rgba(74, 111, 94, 0.2);
+}
+
+.search-suggest__chip:active {
+  transform: scale(0.96);
+}
+
+/* Sheet live results: chips sit above product rows, not as list cells */
+.sheet-list > .search-suggest__chips {
+  padding: 10px 12px 12px;
+  margin: 0;
+  background: #fff;
+}
+
+.sheet-list > .search-suggest__chips + .sheet-list__row {
+  border-top: 1px solid rgba(15, 15, 15, 0.06);
+}

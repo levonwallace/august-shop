@@ -1,0 +1,420 @@
+/* August — homepage feed modes + Tinder swipe chrome.
+   Everything = availability grid. Your feed = denser mosaic shelf. */
+
+.product-card[data-swipe-card],
+.home-tile[data-swipe-card],
+[data-swipe-card] {
+  touch-action: pan-y;
+  -webkit-user-drag: none;
+}
+
+.product-card.is-swiping,
+.home-tile.is-swiping,
+[data-swipe-card].is-swiping {
+  z-index: 6;
+  will-change: transform;
+  user-select: none;
+}
+
+.product-card.is-swiping img,
+.home-tile.is-swiping img {
+  pointer-events: none;
+  -webkit-user-drag: none;
+}
+
+.swipe-stamp {
+  position: absolute;
+  top: 14px;
+  z-index: 2;
+  padding: 5px 10px;
+  border: 2.5px solid;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 1.5px;
+  line-height: 1;
+  opacity: 0;
+  pointer-events: none;
+  background: var(--color-glass);
+  backdrop-filter: var(--glass-filter);
+  -webkit-backdrop-filter: var(--glass-filter);
+}
+
+.swipe-stamp--like {
+  left: 12px;
+  color: var(--color-verdigris);
+  border-color: var(--color-verdigris);
+  transform: rotate(-11deg);
+}
+
+.swipe-stamp--less {
+  right: 12px;
+  color: var(--color-madder);
+  border-color: var(--color-madder);
+  transform: rotate(11deg);
+}
+
+/* ── Similar-after-like tray ───── */
+.swipe-more {
+  position: fixed;
+  inset: 0;
+  z-index: 85;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  padding: 16px 16px calc(var(--footer-inset, 24px) + var(--footer-h, 48px) + 16px);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.2s ease;
+}
+
+.swipe-more.is-open {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.swipe-more__scrim {
+  position: absolute;
+  inset: 0;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: rgba(12, 12, 12, 0.46);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  cursor: pointer;
+}
+
+.swipe-more__panel {
+  position: relative;
+  z-index: 1;
+  width: min(100%, 340px);
+  padding: 12px 12px 10px;
+  border-radius: 18px;
+  background: #fff;
+  border: 0.5px solid rgba(15, 15, 15, 0.12);
+  box-shadow: 0 18px 40px -10px rgba(0, 0, 0, 0.38);
+  transform: translateY(10px);
+  transition: transform 0.22s ease;
+}
+
+.swipe-more.is-open .swipe-more__panel {
+  transform: translateY(0);
+}
+
+.swipe-more__bar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 10px;
+}
+
+.swipe-more__title {
+  margin: 0;
+  flex: 1;
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.1px;
+  color: var(--color-ink);
+}
+
+.swipe-more__shop {
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.2px;
+  color: var(--color-link);
+}
+
+.swipe-more__close {
+  flex: 0 0 auto;
+  width: 28px;
+  height: 28px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 0;
+  background: rgba(15, 15, 15, 0.06);
+  border-radius: 100px;
+  color: var(--color-ink);
+  cursor: pointer;
+}
+
+.swipe-more__close:active {
+  background: rgba(15, 15, 15, 0.12);
+}
+
+.swipe-more__grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.swipe-more__card {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  min-width: 0;
+  color: inherit;
+}
+
+.swipe-more__card img {
+  width: 100%;
+  aspect-ratio: 1;
+  max-height: 92px;
+  object-fit: contain;
+  border-radius: var(--radius-card);
+  border: 0.5px solid rgba(15, 15, 15, 0.1);
+  background: #f3f2ee;
+}
+
+.swipe-more__card span {
+  font-size: 10px;
+  line-height: 1.3;
+  color: var(--color-ink);
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.swipe-more__liked {
+  display: block;
+  margin-top: 10px;
+  padding-top: 8px;
+  border-top: 0.5px solid rgba(15, 15, 15, 0.08);
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--color-link);
+  text-align: center;
+}
+
+/* ══════════════════════════════════════════════════════════
+   Everything — desktop availability grid (not a leftover hero)
+   ══════════════════════════════════════════════════════════ */
+@media (min-width: 901px) {
+  .page--home[data-home-mode="everything"] .card-stack .home-layout {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    height: auto;
+    min-height: 0;
+    gap: 18px;
+  }
+
+  .page--home[data-home-mode="everything"] .card-stack .home-copy {
+    max-width: 640px;
+    justify-content: flex-start;
+  }
+
+  .page--home[data-home-mode="everything"] .card-stack .home-copy h1 {
+    font-size: clamp(28px, 3vw, 34px);
+    letter-spacing: -0.5px;
+    margin-bottom: 0;
+  }
+
+  .page--home .card-stack .home-copy h1.home-lockup {
+    font-size: clamp(40px, 4.8vw, 64px);
+    letter-spacing: -0.055em;
+  }
+
+  .page--home[data-home-mode="everything"] .card-stack .home-copy .announce-chip--hero {
+    display: none;
+  }
+
+  .page--home[data-home-mode="everything"] .card-stack .home-grid__title {
+    display: block;
+    margin: 4px 0 0;
+    font-size: 12px;
+    font-weight: 500;
+    letter-spacing: 1.32px;
+    color: var(--color-ink);
+  }
+
+  .page--home[data-home-mode="everything"] .card-stack .home-grid__tag {
+    display: none;
+  }
+
+  .page--home[data-home-mode="everything"] .card-stack .home-grid {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 22px 16px;
+    height: auto;
+    width: 100%;
+    min-height: 0;
+  }
+
+  .page--home[data-home-mode="everything"] .card-stack .home-grid > .home-tile,
+  .page--home[data-home-mode="everything"] .card-stack .home-grid > .home-tile:not(.home-tile--hero),
+  .page--home[data-home-mode="everything"] .card-stack .home-tile--hero {
+    display: flex;
+    height: auto;
+    aspect-ratio: auto;
+  }
+
+  .page--home[data-home-mode="everything"] .card-stack .home-grid .product-card {
+    display: flex;
+  }
+}
+
+/* Mobile Everything: keep the strip, now filled with real product cards */
+@media (max-width: 900px) {
+  .page--home[data-home-mode="everything"] .card-stack .home-grid .product-card {
+    flex: 0 0 68%;
+    max-width: 280px;
+    scroll-snap-align: center;
+  }
+
+  .page--home[data-home-mode="everything"] .card-stack .home-grid .product-card__media {
+    aspect-ratio: 3 / 4;
+  }
+}
+
+/* ══════════════════════════════════════════════════════════
+   Your feed — denser Pinterest-like first shelf (desktop)
+   ══════════════════════════════════════════════════════════ */
+@media (min-width: 901px) {
+  .page--home[data-home-mode="feed"] .card-stack .home-grid {
+    display: grid;
+    grid-template-columns: 1.25fr 1fr;
+    grid-template-rows: 1fr 1fr;
+    gap: 12px;
+    height: 100%;
+  }
+
+  .page--home[data-home-mode="feed"] .card-stack .home-grid > .home-tile:not(.home-tile--hero) {
+    display: block;
+    height: auto;
+    min-height: 0;
+  }
+
+  .page--home[data-home-mode="feed"] .card-stack .home-tile--hero {
+    grid-column: 1;
+    grid-row: 1 / span 2;
+    height: 100%;
+    min-height: 0;
+    aspect-ratio: auto;
+  }
+
+  .page--home[data-home-mode="feed"] .card-stack .home-grid > .home-tile:nth-child(n + 4) {
+    display: none;
+  }
+
+  .page--home[data-home-mode="feed"] [data-feed-shelf] {
+    display: block;
+    columns: 3;
+    column-gap: 14px;
+  }
+
+  .page--home[data-home-mode="feed"] [data-feed-shelf] .product-card {
+    display: inline-block;
+    width: 100%;
+    margin: 0 0 16px;
+    break-inside: avoid;
+  }
+
+  .page--home[data-home-mode="feed"] [data-feed-shelf] .product-card--desktop {
+    display: inline-block;
+  }
+
+  .page--home[data-home-mode="feed"] [data-feed-shelf] .product-card:nth-child(3n + 1) .product-card__media {
+    aspect-ratio: 3 / 4;
+  }
+
+  .page--home[data-home-mode="feed"] [data-feed-shelf] .product-card:nth-child(3n + 2) .product-card__media {
+    aspect-ratio: 1 / 1;
+  }
+
+  .page--home[data-home-mode="feed"] [data-feed-shelf] .product-card:nth-child(3n) .product-card__media {
+    aspect-ratio: 4 / 5;
+  }
+}
+
+@media (max-width: 900px) {
+  .swipe-more {
+    padding: 12px 12px calc(var(--tabbar-top, 68px) + 12px);
+  }
+
+  .swipe-more__panel {
+    width: min(100%, 300px);
+  }
+
+  .swipe-more__card img {
+    max-height: 78px;
+  }
+}
+
+/* ── Skip / like toast (quiet iOS alert, offer glass) ───── */
+.swipe-toast {
+  position: fixed;
+  left: 16px;
+  right: 16px;
+  bottom: calc(var(--footer-inset, 24px) + var(--footer-h, 48px) + 16px);
+  z-index: 80;
+  width: min(100%, 400px);
+  margin: 0 auto;
+  padding: 14px 16px 13px;
+  border-radius: var(--radius-chrome);
+  overflow: hidden;
+  background: #fff;
+  border: 0.5px solid rgba(15, 15, 15, 0.12);
+  box-shadow: 0 12px 32px -8px rgba(0, 0, 0, 0.28);
+  transform: translate3d(0, 10px, 0);
+  opacity: 0;
+  pointer-events: none;
+  transition:
+    transform var(--dur-fast) var(--ease-spring),
+    opacity var(--dur-fast) var(--ease-out);
+}
+
+.swipe-toast.is-open {
+  transform: translate3d(0, 0, 0);
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.swipe-toast--quiet {
+  padding: 12px 16px;
+}
+
+.swipe-toast__title {
+  margin: 0;
+  font-size: 14px;
+  font-weight: 500;
+  letter-spacing: -0.01em;
+  color: var(--color-ink);
+}
+
+.swipe-toast__sub {
+  margin: 4px 0 0;
+  font-size: 12px;
+  line-height: 1.4;
+  color: var(--color-body);
+}
+
+.swipe-toast__action {
+  display: inline-block;
+  margin-top: 8px;
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: 0.1px;
+  color: var(--color-link);
+}
+
+.swipe-toast--quiet .swipe-toast__action {
+  margin-top: 6px;
+}
+
+@media (max-width: 900px) {
+  .swipe-toast {
+    left: 12px;
+    right: 12px;
+    bottom: calc(var(--footer-inset, 12px) + var(--footer-h, 48px) + 64px);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .swipe-toast {
+    transition: none;
+    transform: none;
+  }
+}

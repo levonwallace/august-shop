@@ -1,0 +1,158 @@
+/* August — iOS Segmented Control controller
+   Automatically wires every [data-segmented] element on the page.
+   The sliding thumb transforms to match the active segment's position + width.
+
+   Emits `segmented:change` on the root when the active segment changes:
+     detail: { value: <string|null>, index: <number>, previousIndex: <number> }
+   `value` is read from data-value on the segment, falling back to text content.
+   Programmatic API:  el.setActive(index) or el.setActive(valueString)
+*/
+(() => {
+  const wire = (root) => {
+    if (root.dataset.segmentedWired === "1") return;
+    root.dataset.segmentedWired = "1";
+
+    let thumb = root.querySelector(".segmented__thumb");
+    if (!thumb) {
+      thumb = document.createElement("span");
+      thumb.className = "segmented__thumb";
+      thumb.setAttribute("aria-hidden", "true");
+      root.insertBefore(thumb, root.firstChild);
+    }
+    const segments = [...root.querySelectorAll(".segmented__segment")];
+    if (!segments.length) return;
+
+    let activeIndex = Math.max(
+      0,
+      segments.findIndex((s) => s.classList.contains("is-active"))
+    );
+
+    const position = (index, animated = true) => {
+      const target = segments[index];
+      if (!target) return;
+      /* offsetLeft/Width are layout CSS pixels — the same space as
+         style.width and transform. getBoundingClientRect is visual and
+         disagrees with html { zoom: var(--ui-scale) }, which stretched
+         the thumb across neighboring segments. */
+      const x = target.offsetLeft;
+      const w = target.offsetWidth;
+      const apply = () => {
+        thumb.style.transform = `translate3d(${x}px, 0, 0)`;
+        thumb.style.width = `${w}px`;
+      };
+      if (!animated) {
+        const prev = thumb.style.transition;
+        thumb.style.transition = "none";
+        apply();
+        void thumb.offsetWidth;
+        thumb.style.transition = prev;
+      } else {
+        apply();
+      }
+    };
+
+    const setActive = (target, opts = {}) => {
+      const { silent = false, animated = true } = opts;
+      let idx;
+      if (typeof target === "number") idx = target;
+      else if (typeof target === "string") {
+        idx = segments.findIndex(
+          (s) =>
+            s.dataset.value === target ||
+            s.textContent.trim().toLowerCase() === target.toLowerCase()
+        );
+      } else if (target instanceof Element) {
+        idx = segments.indexOf(target);
+      }
+      if (idx == null || idx < 0 || idx >= segments.length) return;
+      if (idx === activeIndex) {
+        position(idx, animated);
+        return;
+      }
+      const prev = activeIndex;
+      activeIndex = idx;
+      segments.forEach((s, i) => {
+        const on = i === idx;
+        s.classList.toggle("is-active", on);
+        s.setAttribute("aria-checked", String(on));
+        // Keyboard focus follows selection for role="radio"
+        s.tabIndex = on ? 0 : -1;
+      });
+      position(idx, animated);
+
+      if (!silent) {
+        const seg = segments[idx];
+        // Subtle tick on segment change — Android fires; iOS no-op but harmless.
+        if (typeof navigator !== "undefined" && typeof navigator.vibrate === "function") {
+          try { navigator.vibrate(4); } catch {}
+        }
+        root.dispatchEvent(
+          new CustomEvent("segmented:change", {
+            bubbles: true,
+            detail: {
+              value: seg.dataset.value ?? seg.textContent.trim(),
+              index: idx,
+              previousIndex: prev,
+            },
+          })
+        );
+      }
+    };
+
+    // Click / tap
+    root.addEventListener("click", (e) => {
+      const seg = e.target.closest(".segmented__segment");
+      if (!seg || !root.contains(seg)) return;
+      setActive(seg);
+    });
+
+    // Keyboard support (arrow keys inside a radiogroup)
+    root.addEventListener("keydown", (e) => {
+      if (!["ArrowLeft", "ArrowRight", "Home", "End"].includes(e.key)) return;
+      e.preventDefault();
+      let next = activeIndex;
+      if (e.key === "ArrowLeft") next = (activeIndex - 1 + segments.length) % segments.length;
+      else if (e.key === "ArrowRight") next = (activeIndex + 1) % segments.length;
+      else if (e.key === "Home") next = 0;
+      else if (e.key === "End") next = segments.length - 1;
+      setActive(next);
+      segments[next].focus();
+    });
+
+    // Initial position + reflow on resize
+    const settle = () => {
+      position(activeIndex, false);
+      root.classList.add("is-ready");
+    };
+    if (document.readyState === "loading") {
+      document.addEventListener("DOMContentLoaded", settle, { once: true });
+    } else {
+      // Fonts may not be measured yet; wait for one frame
+      requestAnimationFrame(settle);
+    }
+
+    const ro = new ResizeObserver(() => position(activeIndex, false));
+    ro.observe(root);
+    segments.forEach((s) => ro.observe(s));
+    document.fonts?.ready?.then(() => position(activeIndex, false));
+
+    // Update tabIndex on load
+    segments.forEach((s, i) => (s.tabIndex = i === activeIndex ? 0 : -1));
+
+    // Expose per-element API
+    root.setActive = setActive;
+  };
+
+  const init = () => {
+    document.querySelectorAll("[data-segmented]").forEach(wire);
+  };
+
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", init);
+  } else {
+    init();
+  }
+
+  // Expose global for dynamically-added controls
+  window.Segmented = { wire, init };
+})();

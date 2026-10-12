@@ -201,7 +201,7 @@
   font-size: 12px;
   font-weight: 500;
   letter-spacing: 0.72px;
-  border-radius: var(--radius-pill);
+  border-radius: var(--radius-dock);
 }
 
 @media (hover: hover) {
@@ -1542,12 +1542,12 @@
     gap: 12px;
     height: 52px;
     padding: 0 10px 0 16px;
-    border-radius: var(--radius-chrome);
-    background: var(--color-island);
-    border: 0.5px solid var(--color-island-border);
-    box-shadow: var(--shadow-island);
-    backdrop-filter: var(--glass-filter);
-    -webkit-backdrop-filter: var(--glass-filter);
+    border-radius: var(--radius-dock);
+    background: var(--color-dock);
+    border: 0.5px solid var(--color-dock-border);
+    box-shadow: var(--shadow-dock);
+    backdrop-filter: var(--glass-dock-filter);
+    -webkit-backdrop-filter: var(--glass-dock-filter);
   }
 
   .header-mobile .wordmark {

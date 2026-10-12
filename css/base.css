@@ -92,6 +92,10 @@ p {
    100dvh is the *visual* viewport, so divide by --ui-scale or the stage only
    fills the top ~75% and chrome sits mid-screen. */
 @media (min-width: 900px) {
+  :root {
+    --ui-zoom: var(--ui-scale);
+  }
+
   html {
     zoom: var(--ui-scale);
     height: calc(100dvh / var(--ui-scale));

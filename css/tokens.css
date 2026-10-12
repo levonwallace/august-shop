@@ -27,6 +27,17 @@
   --glass-saturate: 155%;
   --glass-filter: blur(var(--glass-blur)) saturate(var(--glass-saturate));
 
+  /* Dock glass — mobile header + tab bar. Grey-frosted (iOS "regular"
+     material) so the bars still read against pure-white pages. */
+  --color-dock: rgba(236, 236, 238, 0.72);
+  --color-dock-border: rgba(0, 0, 0, 0.08);
+  --glass-dock-filter: blur(30px) saturate(180%);
+  --shadow-dock:
+    inset 0 0.5px 0 rgba(255, 255, 255, 0.75),
+    inset 0 0 0 0.5px rgba(255, 255, 255, 0.3),
+    0 1px 2px rgba(0, 0, 0, 0.04),
+    0 10px 28px -10px rgba(0, 0, 0, 0.2);
+
   /* ─── Storefront palette — lifted from the shop itself ───
      madder    → the vintage rug + painting reds, sun-faded
      verdigris → oxidized copper trim above the August sign
@@ -77,6 +88,11 @@
   /* Desktop "resolution" scale — 0.75 = 25% smaller, like browser zoom.
      Applied via html { zoom } so type, chrome, cards, and sheets all move together. */
   --ui-scale: 0.75;
+  /* Zoom actually in effect — base.css sets it to --ui-scale where html { zoom } applies */
+  --ui-zoom: 1;
+  /* Mobile header + tab bar corner: a constant 6px on screen at every
+     breakpoint, compensating for the desktop zoom. */
+  --radius-dock: calc(6px / var(--ui-zoom));
 
   /* iOS safe-area insets — read from viewport-fit=cover.
      Fallback to 0 for non-iOS / older browsers. */

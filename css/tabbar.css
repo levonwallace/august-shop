@@ -31,12 +31,12 @@
     justify-content: space-around;
     height: 56px;
     padding: 4px 6px;
-    border-radius: var(--radius-chrome);
-    background: var(--color-island);
-    border: 0.5px solid var(--color-island-border);
-    backdrop-filter: var(--glass-filter);
-    -webkit-backdrop-filter: var(--glass-filter);
-    box-shadow: var(--shadow-island);
+    border-radius: var(--radius-dock);
+    background: var(--color-dock);
+    border: 0.5px solid var(--color-dock-border);
+    backdrop-filter: var(--glass-dock-filter);
+    -webkit-backdrop-filter: var(--glass-dock-filter);
+    box-shadow: var(--shadow-dock);
     pointer-events: auto;
   }
 

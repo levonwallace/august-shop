@@ -1,6 +1,6 @@
 {% comment %}
   Derives mix number / name / genre for an AUX article, mirroring aux-json.
-  Outputs ONE field, chosen by `field`: 'no' | 'name' | 'genre'
+  Outputs ONE field, chosen by `field`: 'no' | 'name' | 'genre' | 'soundcloud'
 
     {% capture no %}{% render 'mix-meta', article: article, field: 'no', fallback_no: 12 %}{% endcapture %}
 {% endcomment %}
@@ -9,6 +9,14 @@
   assign tail = article.title
   if parts.size > 1
     assign tail = parts | last | strip
+  endif
+  comment
+    Live titles end in a bracketed genre: "078 TRANQUILITY JORDAN MIX [TECHNO]"
+  endcomment
+  assign bracket_genre = ''
+  if tail contains '['
+    assign bracket_genre = tail | split: '[' | last | split: ']' | first | strip
+    assign tail = tail | split: '[' | first | strip
   endif
   assign first_word = tail | split: ' ' | first | strip
   assign numeric = first_word | plus: 0
@@ -27,7 +35,23 @@
   if name == blank
     assign name = article.title
   endif
-  assign genre = article.metafields.august.genre | default: article.tags.first | default: ''
+  assign genre = article.metafields.august.genre | default: bracket_genre | default: article.tags.first | default: ''
+
+  comment
+    SoundCloud track id: metafield first, then the theme-setting map
+    ("078=1982757851" per line) so staff can wire players without metafields.
+  endcomment
+  assign soundcloud = article.metafields.august.soundcloud_track_id | default: ''
+  if soundcloud == blank and settings.soundcloud_map != blank
+    assign map_lines = settings.soundcloud_map | newline_to_br | split: '<br />'
+    for line in map_lines
+      assign pair = line | strip | split: '='
+      assign key = pair.first | strip | prepend: '00' | slice: -3, 3
+      if pair.size == 2 and key == no
+        assign soundcloud = pair.last | strip
+      endif
+    endfor
+  endif
 
   case field
     when 'no'
@@ -36,5 +60,7 @@
       echo name
     when 'genre'
       echo genre
+    when 'soundcloud'
+      echo soundcloud
   endcase
 -%}

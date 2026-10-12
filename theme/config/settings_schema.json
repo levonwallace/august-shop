@@ -29,7 +29,20 @@
       { "type": "header", "content": "Editorial" },
       { "type": "blog", "id": "aux_blog", "label": "AUX mixes blog" },
       { "type": "blog", "id": "events_blog", "label": "Events blog" },
-      { "type": "page", "id": "inn_page", "label": "August Inn page", "info": "Assign this page the “August Inn” template too." }
+      { "type": "page", "id": "inn_page", "label": "August Inn page", "info": "Assign this page the “August Inn” template too. Leave empty to use the blog below." },
+      { "type": "blog", "id": "inn_blog", "label": "August Inn blog", "info": "The live store runs the Inn as a blog on the “inn” template; this theme renders it with the Inn section." },
+      { "type": "textarea", "id": "soundcloud_map", "label": "SoundCloud track IDs", "info": "One per line, mix number = track id (078=1982757851). Used when an AUX article has no august.soundcloud_track_id metafield." }
+    ]
+  },
+  {
+    "name": "Social",
+    "settings": [
+      { "type": "url", "id": "social_instagram", "label": "Instagram" },
+      { "type": "url", "id": "social_facebook", "label": "Facebook" },
+      { "type": "url", "id": "social_twitter", "label": "X / Twitter" },
+      { "type": "url", "id": "social_vimeo", "label": "Vimeo" },
+      { "type": "url", "id": "social_soundcloud", "label": "SoundCloud" },
+      { "type": "url", "id": "social_spotify", "label": "Spotify" }
     ]
   },
   {

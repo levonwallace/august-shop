@@ -148,6 +148,22 @@ a.account-head__settings {
   color: var(--color-madder, #b4322a);
 }
 
+/* Footer social links (Theme settings → Social) */
+.footer-links--social {
+  gap: 16px;
+  margin-left: auto;
+  padding-left: 16px;
+  border-left: 0.5px solid var(--color-island-border);
+}
+.footer-links--social a {
+  opacity: 0.55;
+}
+@media (max-width: 900px) {
+  .footer-links--social {
+    display: none;
+  }
+}
+
 /* Theme editor: keep section wrappers from breaking the card stack */
 .shopify-section-home,
 .shopify-section-header,

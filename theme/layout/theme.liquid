@@ -21,6 +21,8 @@
         assign page_class = 'story page--aux'
       elsif blog.handle == settings.events_blog
         assign page_class = 'story page--events'
+      elsif blog.handle == settings.inn_blog
+        assign page_class = 'story page--inn'
       else
         assign page_class = 'story'
       endif
@@ -29,6 +31,8 @@
         assign page_class = 'story page--mix'
       elsif blog.handle == settings.events_blog
         assign page_class = 'story page--event'
+      elsif blog.handle == settings.inn_blog
+        assign page_class = 'story page--inn'
       else
         assign page_class = 'story'
       endif
@@ -48,6 +52,10 @@
   assign everything = collections[settings.everything_collection]
   if everything == blank or everything.handle == blank
     assign everything = collections.all
+  endif
+  assign inn_url = pages[settings.inn_page].url
+  if inn_url == blank
+    assign inn_url = blogs[settings.inn_blog].url
   endif
 -%}
 <!doctype html>
@@ -158,7 +166,7 @@
           },
           aux: {{ blogs[settings.aux_blog].url | default: '' | json }},
           events: {{ blogs[settings.events_blog].url | default: '' | json }},
-          inn: {{ pages[settings.inn_page].url | default: '' | json }}
+          inn: {{ inn_url | json }}
         },
         customer: {% if customer %}{
           id: {{ customer.id | json }},

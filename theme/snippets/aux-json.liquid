@@ -23,38 +23,18 @@
   {%- if kind == 'mixes' %}
   window.AugustBootstrap.mixes = (window.AugustBootstrap.mixes || []).concat([
     {%- for article in list -%}
-      {%- liquid
-        assign parts = article.title | split: '::'
-        assign tail = article.title
-        if parts.size > 1
-          assign tail = parts | last | strip
-        endif
-        assign first_word = tail | split: ' ' | first | strip
-        assign numeric = first_word | plus: 0
-        assign no = article.metafields.august.mix_number | strip
-        assign derived_name = tail
-        if no == blank
-          if numeric > 0 or first_word == '0' or first_word == '00' or first_word == '000'
-            assign no = first_word
-            assign derived_name = tail | remove_first: first_word | strip
-          else
-            assign no = list.size | minus: forloop.index0 | append: ''
-          endif
-        endif
-        assign no = no | prepend: '00' | slice: -3, 3
-        assign name = article.metafields.august.mix_title | default: derived_name | default: article.title
-        if name == blank
-          assign name = article.title
-        endif
-        assign genre = article.metafields.august.genre | default: article.tags.first | default: ''
-      -%}
+      {%- assign fallback_no = list.size | minus: forloop.index0 -%}
+      {%- capture no %}{% render 'mix-meta', article: article, field: 'no', fallback_no: fallback_no %}{% endcapture -%}
+      {%- capture name %}{% render 'mix-meta', article: article, field: 'name' %}{% endcapture -%}
+      {%- capture genre %}{% render 'mix-meta', article: article, field: 'genre' %}{% endcapture -%}
+      {%- capture soundcloud %}{% render 'mix-meta', article: article, field: 'soundcloud' %}{% endcapture -%}
       {
         "no": {{ no | json }},
         "name": {{ name | json }},
         "genre": {{ genre | json }},
         "art": {% if article.image %}{{ article.image | image_url: width: 600 | json }}{% else %}""{% endif %},
         "src": {{ article.metafields.august.audio_url | default: '' | json }},
-        "soundcloud": {{ article.metafields.august.soundcloud_track_id | default: '' | json }},
+        "soundcloud": {{ soundcloud | json }},
         "body": {{ article.excerpt_or_content | strip_html | truncate: 600 | json }},
         "date": {{ article.published_at | date: '%b %-d, %Y' | json }},
         "handle": {{ article.handle | json }},

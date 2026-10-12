@@ -3,13 +3,16 @@
     "main": {
       "type": "main-product",
       "blocks": {
-        "ask": { "type": "ask_ai", "settings": {} },
+        "ask": {
+          "type": "ask_ai",
+          "settings": {}
+        },
         "contact": {
           "type": "tab",
           "settings": {
             "title": "Contact us",
             "heading": "Customer service / order inquiries",
-            "body": "<p>Please contact us via email: <a href=\"mailto:info@august-shop.com\">info@august-shop.com</a></p><p>CS Hours: 11 AM – 7 PM Central Time</p>"
+            "body": "<p>Please contact us via email: <a href=\"mailto:info@august-shop.com\">info@august-shop.com</a><br>CS Hours: 11 AM – 7 PM Central Time</p>"
           }
         },
         "shipping": {
@@ -17,7 +20,7 @@
           "settings": {
             "title": "Shipping",
             "heading": "Shipping",
-            "body": "<p>Orders ship within 1–2 business days. Free local pickup available in Madison, WI.</p>"
+            "body": "<p>August aims to ship all orders out within two business days of order placement.</p><p>August uses USPS to ship both domestic and international orders. Free in-store pickup at 414 State St, Madison.</p>"
           }
         },
         "returns": {
@@ -25,13 +28,25 @@
           "settings": {
             "title": "Returns",
             "heading": "Returns",
-            "body": "<p>Unworn items can be returned within 14 days. See our full returns policy for details.</p>"
+            "body": "<p>Returns will be accepted only for store credit within 14 days of receipt. If 14 days have gone by since your purchase, unfortunately, we can’t offer you a credit or exchange.</p><p><strong>Special and limited releases are final sale – no returns.</strong></p><p><strong>Items bought on sale are final sale.</strong></p>"
           }
         }
       },
-      "block_order": ["ask", "contact", "shipping", "returns"],
-      "settings": {}
+      "block_order": [
+        "ask",
+        "contact",
+        "shipping",
+        "returns"
+      ],
+      "settings": {
+        "note": "Free local pickup in Madison  ·  Sale items are final sale",
+        "related_title": "Customers also bought",
+        "atb_label": "Add to bag",
+        "soldout_label": "Sold out"
+      }
     }
   },
-  "order": ["main"]
+  "order": [
+    "main"
+  ]
 }

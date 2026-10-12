@@ -15,11 +15,14 @@
           "settings": {
             "title": "New arrivals",
             "directory": "none",
-            "menu": "new-arrivals",
+            "menu": "",
             "all_label": "Shop all new arrivals →",
             "editorial_label": "Editorial",
             "editorial_title": "New\narrivals",
-            "editorial_cta": "Explore →"
+            "editorial_cta": "Explore →",
+            "all_link": "shopify://collections/new-arrivals",
+            "products_collection": "new-arrivals",
+            "editorial_link": "shopify://collections/new-arrivals"
           }
         },
         "brands": {
@@ -27,7 +30,9 @@
           "settings": {
             "title": "Brands",
             "directory": "brands",
-            "all_label": "View all brands →"
+            "all_label": "View all brands →",
+            "all_link": "shopify://collections/vendors",
+            "products_collection": "stussy"
           }
         },
         "categories": {
@@ -35,7 +40,9 @@
           "settings": {
             "title": "Categories",
             "directory": "categories",
-            "all_label": "Shop all categories →"
+            "all_label": "Shop all categories →",
+            "all_link": "shopify://collections/all",
+            "products_collection": "footwear"
           }
         },
         "color": {
@@ -43,11 +50,14 @@
           "settings": {
             "title": "Shop by color",
             "directory": "none",
-            "menu": "shop-by-color",
+            "menu": "",
             "all_label": "Browse all colors →",
             "editorial_label": "Editorial",
             "editorial_title": "Shop by\ncolor",
-            "editorial_cta": "Explore →"
+            "editorial_cta": "Explore →",
+            "all_link": "shopify://collections/all",
+            "products_collection": "apparel",
+            "editorial_link": "shopify://collections/all"
           }
         },
         "sale": {
@@ -55,24 +65,65 @@
           "settings": {
             "title": "Sale",
             "directory": "none",
-            "menu": "sale",
+            "menu": "",
             "all_label": "Shop all sale →",
             "editorial_label": "Editorial",
             "editorial_title": "Sale",
-            "editorial_cta": "Explore →"
+            "editorial_cta": "Explore →",
+            "all_link": "shopify://collections/sale",
+            "products_collection": "sale",
+            "editorial_link": "shopify://collections/sale"
           }
         },
         "promo_new": {
           "type": "promo",
-          "settings": { "label": "New arrivals" }
+          "settings": {
+            "label": "Stüssy",
+            "image": "shopify://shop_images/HOMEPAGE_MOBILE_ba9cb483-73cb-464c-b97e-930933496580.jpg",
+            "collection": "stussy",
+            "link": "shopify://collections/stussy"
+          }
         },
         "promo_sale": {
           "type": "promo",
-          "settings": { "label": "Sale" }
+          "settings": {
+            "label": "ASICS",
+            "image": "shopify://shop_images/HOMEPAGE_MOBILE_94045589-8f1e-449f-8b3b-b50fbca21b60.jpg",
+            "collection": "asics",
+            "link": "shopify://collections/asics"
+          }
+        },
+        "promo_aux": {
+          "type": "promo",
+          "settings": {
+            "label": "August AUX",
+            "image": "shopify://shop_images/soundcloud_cover_78_a7da4fcc-2384-4103-8718-55168b02a1ed.png",
+            "link": "shopify://blogs/august-aux"
+          }
+        },
+        "promo_inn": {
+          "type": "promo",
+          "settings": {
+            "label": "August Inn",
+            "image": "shopify://shop_images/2095_Wigwam_St-3.jpg",
+            "link": "shopify://blogs/august-inn"
+          }
         }
       },
-      "block_order": ["new", "brands", "categories", "color", "sale", "promo_new", "promo_sale"]
+      "block_order": [
+        "new",
+        "brands",
+        "categories",
+        "color",
+        "sale",
+        "promo_new",
+        "promo_sale",
+        "promo_aux",
+        "promo_inn"
+      ]
     }
   },
-  "order": ["header"]
+  "order": [
+    "header"
+  ]
 }

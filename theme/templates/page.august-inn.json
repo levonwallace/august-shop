@@ -3,32 +3,188 @@
     "inn": {
       "type": "page-inn",
       "blocks": {
-        "f1": { "type": "fact", "settings": { "label": "Bedrooms", "value": "4" } },
-        "f2": { "type": "fact", "settings": { "label": "Beds", "value": "5" } },
-        "f3": { "type": "fact", "settings": { "label": "Baths", "value": "2.5" } },
-        "f4": { "type": "fact", "settings": { "label": "Sleeps", "value": "8" } },
-        "b1": { "type": "book_link", "settings": { "label": "Book on Airbnb", "url": "https://www.airbnb.com/rooms/1411564861854692476" } },
-        "b2": { "type": "book_link", "settings": { "label": "Book on VRBO", "url": "https://www.vrbo.com/4567368" } },
-        "a1": { "type": "amenity", "settings": { "text": "4 bedrooms, 5 beds, 2.5 baths" } },
-        "a2": { "type": "amenity", "settings": { "text": "Sleeps 8" } },
-        "a3": { "type": "amenity", "settings": { "text": "Across the street from Castle Rock Lake" } },
-        "a4": { "type": "amenity", "settings": { "text": "5 min to public beach and restaurants" } },
-        "a5": { "type": "amenity", "settings": { "text": "Game room — pool, shuffleboard, arcade, foosball" } },
-        "a6": { "type": "amenity", "settings": { "text": "BBQ and outdoor dining" } },
-        "a7": { "type": "amenity", "settings": { "text": "Patio and balcony" } },
-        "a8": { "type": "amenity", "settings": { "text": "Hot tub on the deck" } },
-        "p1": { "type": "photo", "settings": { "alt": "August Inn living space" } },
-        "p2": { "type": "photo", "settings": { "alt": "August Inn interior" } },
-        "p3": { "type": "photo", "settings": { "alt": "August Inn bedroom" } },
-        "p4": { "type": "photo", "settings": { "alt": "August Inn game room" } }
+        "f1": {
+          "type": "fact",
+          "settings": {
+            "label": "Bedrooms",
+            "value": "4"
+          }
+        },
+        "f2": {
+          "type": "fact",
+          "settings": {
+            "label": "Beds",
+            "value": "5"
+          }
+        },
+        "f3": {
+          "type": "fact",
+          "settings": {
+            "label": "Baths",
+            "value": "2.5"
+          }
+        },
+        "f4": {
+          "type": "fact",
+          "settings": {
+            "label": "Sleeps",
+            "value": "8"
+          }
+        },
+        "b1": {
+          "type": "book_link",
+          "settings": {
+            "label": "Book on Airbnb",
+            "url": "https://www.airbnb.com/rooms/1411564861854692476"
+          }
+        },
+        "b2": {
+          "type": "book_link",
+          "settings": {
+            "label": "Book on VRBO",
+            "url": "https://www.vrbo.com/4567368"
+          }
+        },
+        "a1": {
+          "type": "amenity",
+          "settings": {
+            "text": "4 bedrooms with 5 beds — sleeps 8 comfortably"
+          }
+        },
+        "a2": {
+          "type": "amenity",
+          "settings": {
+            "text": "2.5 bathrooms"
+          }
+        },
+        "a3": {
+          "type": "amenity",
+          "settings": {
+            "text": "Across the street from Castle Rock Lake"
+          }
+        },
+        "a4": {
+          "type": "amenity",
+          "settings": {
+            "text": "5 min drive to a public beach and restaurants"
+          }
+        },
+        "a5": {
+          "type": "amenity",
+          "settings": {
+            "text": "Game room — pool table, shuffleboard, foosball, arcade games"
+          }
+        },
+        "a6": {
+          "type": "amenity",
+          "settings": {
+            "text": "BBQ & outdoor dining"
+          }
+        },
+        "a7": {
+          "type": "amenity",
+          "settings": {
+            "text": "Patio & balcony"
+          }
+        },
+        "a8": {
+          "type": "amenity",
+          "settings": {
+            "text": "Hot tub"
+          }
+        },
+        "a9": {
+          "type": "amenity",
+          "settings": {
+            "text": "Full kitchen · fire pit for starlit nights"
+          }
+        },
+        "p1": {
+          "type": "photo",
+          "settings": {
+            "image": "shopify://shop_images/a88ecd11-d88b-4caa-bea3-147e648b80cf.jpg",
+            "alt": "August Inn, Friendship WI"
+          }
+        },
+        "p2": {
+          "type": "photo",
+          "settings": {
+            "image": "shopify://shop_images/ab7162fa-aa17-4679-9169-5a1dfd881fbb.jpg",
+            "alt": "August Inn interior"
+          }
+        },
+        "p3": {
+          "type": "photo",
+          "settings": {
+            "image": "shopify://shop_images/3dc91745-9c46-4ef7-b3d5-cfbe24717cd3.jpg",
+            "alt": "August Inn interior"
+          }
+        },
+        "p4": {
+          "type": "photo",
+          "settings": {
+            "image": "shopify://shop_images/2095_Wigwam_St-12.jpg",
+            "alt": "August Inn"
+          }
+        },
+        "p5": {
+          "type": "photo",
+          "settings": {
+            "image": "shopify://shop_images/2095_Wigwam_St-19.jpg",
+            "alt": "August Inn"
+          }
+        },
+        "p6": {
+          "type": "photo",
+          "settings": {
+            "image": "shopify://shop_images/2095_Wigwam_St-39.jpg",
+            "alt": "August Inn"
+          }
+        },
+        "p7": {
+          "type": "photo",
+          "settings": {
+            "image": "shopify://shop_images/234b6d2b-8e53-4252-82c6-a06b2c49031d.jpg",
+            "alt": "August Inn amenities"
+          }
+        }
       },
-      "block_order": ["f1", "f2", "f3", "f4", "b1", "b2", "a1", "a2", "a3", "a4", "a5", "a6", "a7", "a8", "p1", "p2", "p3", "p4"],
+      "block_order": [
+        "f1",
+        "f2",
+        "f3",
+        "f4",
+        "b1",
+        "b2",
+        "a1",
+        "a2",
+        "a3",
+        "a4",
+        "a5",
+        "a6",
+        "a7",
+        "a8",
+        "a9",
+        "p1",
+        "p2",
+        "p3",
+        "p4",
+        "p5",
+        "p6",
+        "p7"
+      ],
       "settings": {
         "kicker": "August Inn",
-        "title": "The shop’s cabin",
-        "lead": "2095 Wigwam St, Friendship, WI. Across the street from Castle Rock Lake."
+        "title": "Friendship, Wisconsin",
+        "lead": "A physical space where you can enjoy the luxury of being surrounded by the signature August curation for your next getaway.",
+        "hero": "shopify://shop_images/2095_Wigwam_St-3.jpg",
+        "body": "<p>Escape to this charming rustic yet modern cabin in Friendship, WI, just minutes from Castle Rock Lake. Enjoy the cozy wood interiors with stylish modern touches, a full kitchen, comfy beds, hot tub, recreation room, and a fire pit for starlit nights.</p><p>Perfect for relaxing getaways or outdoor adventures — boating, fishing, hiking, and more await nearby. Unplug, unwind, and make memories in this serene woodland retreat.</p>",
+        "amenities_title": "Amenities",
+        "gallery_title": "The cabin"
       }
     }
   },
-  "order": ["inn"]
+  "order": [
+    "inn"
+  ]
 }

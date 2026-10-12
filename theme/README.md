@@ -33,17 +33,39 @@ The zip is built from the *contents* of this folder so `layout/theme.liquid`
 sits at the zip root. Zipping the folder in Finder adds a wrapper directory
 and Shopify rejects it (`missing template 'layout/theme.liquid'`).
 
-## First-time store setup (one time, in the editor)
+## Pre-loaded content
 
-1. **Theme settings → Catalog**: point the handles at real collections and
-   blogs. Defaults: `everything`, `new-arrivals`, `sale`, `footwear`,
-   `apparel`, `accessories`, `objects`; blogs `august-aux`, `events`;
-   page `august-inn`. The mega menu, tab bar, home hero and PLP filters all
-   read from these.
-2. **Pages → August Inn** → set the template to `page.august-inn`.
-3. **Theme settings → Pickup store** (address, hours, map link, lat/lng)
-   and **Offer popup** (10% code, copy, delay).
-4. Add the `footer` navigation menu (Shop · Help · August Inn).
+`config/settings_data.json` and the JSON templates are pre-filled from the
+live store's theme export (9 Oct 2026), so the theme renders with real
+content on first upload — no editor work needed to see it:
+
+- Catalog handles: `all`, `new-arrivals`, `sale`, `footwear`, `apparel`,
+  `accessories`, `objects`; blogs `august-aux` (mixes), `events`,
+  `august-inn` (the Inn runs as a blog on the live store — its `inn`
+  template is covered by `templates/blog.inn.json`).
+- Home: hero grid from New Arrivals; shelves New Arrivals / Nike / AIAIAI /
+  Sale; brand cards Stüssy, Saucony, Kardo, ASICS, Sorel × Needles, August
+  with the live homepage imagery (`shopify://shop_images/...`); AUX card
+  copy from the Mixtapes page; newsletter copy from the live footer.
+- Header: mega panels fed by collections; mobile promos Stüssy / ASICS /
+  AUX / Inn. Footer menu `shop`, social links from Theme settings → Social.
+- Product tabs: live Contact / Shipping / Returns copy; final-sale note.
+- Inn page: full copy, hero, amenities, Airbnb + VRBO links, 7 photos.
+- Announcement "Free shipping on orders $225+", favicon, offer popup
+  (`CLUB10`), store hours, SoundCloud ids for mixes 076–078.
+
+Images referenced as `shopify://shop_images/<file>` resolve from the
+store's Files library, so they only work on the August store itself.
+
+## One-time checks after upload
+
+1. Mixes 076–078 were posted to the `news` (Editorial) blog on the live
+   store; move them to `august-aux` so they show in the AUX archive.
+2. If a dedicated Inn *page* is preferred over the blog, create it, assign
+   `page.august-inn`, and set Theme settings → Catalog → August Inn page.
+3. **Theme settings → Pickup store** lat/lng and **Offer popup** code —
+   create the matching `CLUB10` discount under Discounts.
+4. Metafields (below) are optional; everything falls back to title parsing.
 
 ## What the content / sales team can edit
 
@@ -63,7 +85,7 @@ are per template; theme settings are global.
 | August Inn | **August Inn page** | kicker, title, lead, hero, body; `Fact`, `Book link`, `Amenity`, `Photo` blocks |
 | Footer | **Footer**, **Mobile tab bar** | logo, tagline, menu; tab labels, show radio |
 | 404 / Password / Collections list | own sections | all copy |
-| Theme settings | — | Brand (favicon, OG image, avatar), Catalog handles, Colors, Typography & chrome (`ui_scale` %, radii), Announcement bar, Pickup store, Offer popup |
+| Theme settings | — | Brand (favicon, OG image, avatar), Catalog handles + SoundCloud id map, Social links, Colors, Typography & chrome (`ui_scale` %, radii), Announcement bar, Pickup store, Offer popup |
 
 Hero grid tiles, shelves, mega-menu products and the PLP all come straight
 from collections — merchandise in Shopify, not in the theme.

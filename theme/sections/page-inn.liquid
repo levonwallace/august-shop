@@ -1,7 +1,9 @@
 {% comment %}
   Prototype: inn.html — the August Inn cabin page. Every piece of copy is a
   setting; facts, amenities, booking links and gallery photos are blocks.
-  Assign the "page.august-inn" template to the Inn page in Shopify admin.
+  Assign the "page.august-inn" template to the Inn page in Shopify admin —
+  or keep the live store's "August Inn" blog on its "inn" template
+  (templates/blog.inn.json renders this same section).
 {% endcomment %}
 {%- liquid
   assign s = section.settings
@@ -11,8 +13,9 @@
   assign photos = section.blocks | where: 'type', 'photo'
 -%}
 <main class="story story--inn" id="main" data-section-id="{{ section.id }}">
-  <p class="story__kicker">{{ s.kicker | default: page.title }}</p>
-  <h1 class="story__title">{{ s.title | default: page.title }}</h1>
+  {%- assign inn_title = page.title | default: blog.title -%}
+  <p class="story__kicker">{{ s.kicker | default: inn_title }}</p>
+  <h1 class="story__title">{{ s.title | default: inn_title }}</h1>
   {%- if s.lead != blank -%}<p class="story__lead">{{ s.lead }}</p>{%- endif -%}
 
   {%- if s.hero -%}
@@ -30,7 +33,7 @@
   {%- endif -%}
 
   <div class="story__body">
-    {%- if s.body != blank -%}{{ s.body }}{%- else -%}{{ page.content }}{%- endif -%}
+    {%- if s.body != blank -%}{{ s.body }}{%- elsif page -%}{{ page.content }}{%- elsif blog -%}{{ blog.articles.first.content }}{%- endif -%}
   </div>
 
   {%- if links.size > 0 -%}
@@ -119,6 +122,6 @@
       ]
     }
   ],
-  "enabled_on": { "templates": ["page"] }
+  "enabled_on": { "templates": ["page", "blog"] }
 }
 {% endschema %}

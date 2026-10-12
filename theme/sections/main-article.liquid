@@ -6,13 +6,40 @@
 {%- liquid
   assign s = section.settings
   assign is_events = false
+  assign is_plain = false
   if blog.handle == settings.events_blog
     assign is_events = true
+  elsif blog.handle == settings.inn_blog
+    assign is_plain = true
+  elsif blog.handle != settings.aux_blog
+    comment
+      Other blogs (e.g. the live "news" / Editorial blog): only titles that
+      look like a mix get the player layout.
+    endcomment
+    assign is_plain = true
+    if article.title contains 'AUX' or article.metafields.august.mix_number != blank
+      assign is_plain = false
+    endif
   endif
   assign street = settings.store_address | split: ',' | first
 -%}
 
-{%- if is_events -%}
+{%- if is_plain -%}
+  <main class="story story--plain" id="main" data-story="plain" data-section-id="{{ section.id }}">
+    <a class="story__back" href="{{ blog.url }}">← {{ blog.title }}</a>
+    <article class="story__hero">
+      {%- if article.image -%}
+        <div class="story__cover"><img src="{{ article.image | image_url: width: 1400 }}" alt="{{ article.image.alt | default: article.title | escape }}" width="{{ article.image.width }}" height="{{ article.image.height }}"></div>
+      {%- endif -%}
+      <div class="story__head">
+        <p class="story__kicker">{{ blog.title }}</p>
+        <h1 class="story__title">{{ article.title }}</h1>
+        <p class="story__meta">{{ article.published_at | date: '%b %-d, %Y' }}</p>
+      </div>
+    </article>
+    <div class="story__body rte">{{ article.content }}</div>
+  </main>
+{%- elsif is_events -%}
   {%- liquid
     assign series = article.metafields.august.series | default: article.tags.first | default: 'Event'
     assign when = article.metafields.august.event_date | default: article.published_at
@@ -84,7 +111,7 @@
   {%- capture name %}{% render 'mix-meta', article: article, field: 'name' %}{% endcapture -%}
   {%- capture genre %}{% render 'mix-meta', article: article, field: 'genre' %}{% endcapture -%}
   {%- assign src = article.metafields.august.audio_url -%}
-  {%- assign sc = article.metafields.august.soundcloud_track_id -%}
+  {%- capture sc %}{% render 'mix-meta', article: article, field: 'soundcloud' %}{% endcapture -%}
   <main class="story story--mix" id="main" data-story="mix" data-story-no="{{ no }}" data-story-src="{{ src }}" data-section-id="{{ section.id }}">
     <a class="story__back" href="{{ blog.url }}">← {{ s.back_mixes }}</a>
     <article class="story__hero">

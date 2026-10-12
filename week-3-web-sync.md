@@ -76,7 +76,8 @@ Alex will keep a private preview link so Mason’s team does not have to live in
 - `theme/` is a complete OS 2.0 theme generated from the prototype: same markup, CSS and JS; Liquid feeds live collections, cart, customer, blogs and pages into the prototype scripts via `window.AugustBootstrap`. `shopify theme check` passes (2 non-blocking warnings).
 - Editor surface for the content/sales team: every copy/image area is a section setting or block — header mega panels + mobile promos, home hero / shelves / brand cards / AUX card, PLP + search filters, PDP tabs + Ask AI + labels, bag copy, blog + article copy, August Inn page, footer, tab bar, 404, password, plus theme settings for Catalog handles, Colors, Typography, Announcement, Pickup store and the 10% Offer popup. Guide: `theme/README.md`.
 - Zip is built by `npm run theme:zip` → `dist/august-2.0-theme.zip` with `layout/theme.liquid` at the zip root (the Oct 9 failure was a macOS folder-zip).
-- [ ] Upload `dist/august-2.0-theme.zip` as **August 2.0** (unpublished), run the one-time setup in `theme/README.md` (Catalog handles, `page.august-inn` template, pickup store, footer menu, `august.*` metafields), then paste the private preview link here:
+- Live content pre-loaded from the 9 Oct theme export: homepage brand imagery (Stüssy, Saucony, Kardo, ASICS, Sorel × Needles), New Arrivals / Nike / AIAIAI shelves, Mixtapes + newsletter copy, product Contact/Shipping/Returns tabs, Inn page (copy, photos, Airbnb/VRBO), favicon, socials, free-shipping announcement, `CLUB10` popup. Blog handles match the store (`august-aux`, `events`, `august-inn`), so the theme fills itself on upload.
+- [ ] Upload `dist/august-2.0-theme.zip` as **August 2.0** (unpublished), then paste the private preview link here:
   - Preview link: _(add after upload)_
 - [ ] Wed Oct 14 (NYC): walk Mason's team through Customize on the draft theme; collect schema gaps for the Oct 16–23 staff week.
 

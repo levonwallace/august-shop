@@ -15,9 +15,42 @@
       <a href="{{ link.url }}">{{ link.title }}</a>
     {%- else -%}
       <a href="{{ routes.all_products_collection_url }}">Shop</a>
-      {%- if pages[settings.inn_page].url != blank -%}<a href="{{ pages[settings.inn_page].url }}">August Inn</a>{%- endif -%}
+      {%- assign inn_url = pages[settings.inn_page].url | default: blogs[settings.inn_blog].url -%}
+      {%- if inn_url != blank -%}<a href="{{ inn_url }}">August Inn</a>{%- endif -%}
     {%- endfor -%}
   </nav>
+  {%- if section.settings.show_social -%}
+    {%- liquid
+      assign socials = ''
+      if settings.social_instagram != blank
+        assign socials = socials | append: 'Instagram|' | append: settings.social_instagram | append: ','
+      endif
+      if settings.social_soundcloud != blank
+        assign socials = socials | append: 'SoundCloud|' | append: settings.social_soundcloud | append: ','
+      endif
+      if settings.social_spotify != blank
+        assign socials = socials | append: 'Spotify|' | append: settings.social_spotify | append: ','
+      endif
+      if settings.social_facebook != blank
+        assign socials = socials | append: 'Facebook|' | append: settings.social_facebook | append: ','
+      endif
+      if settings.social_twitter != blank
+        assign socials = socials | append: 'X|' | append: settings.social_twitter | append: ','
+      endif
+      if settings.social_vimeo != blank
+        assign socials = socials | append: 'Vimeo|' | append: settings.social_vimeo | append: ','
+      endif
+      assign social_list = socials | split: ','
+    -%}
+    {%- if social_list.size > 0 -%}
+      <nav class="footer-links footer-links--social" aria-label="Social">
+        {%- for item in social_list -%}
+          {%- assign pair = item | split: '|' -%}
+          {%- if pair.size == 2 -%}<a href="{{ pair.last }}" target="_blank" rel="noopener">{{ pair.first }}</a>{%- endif -%}
+        {%- endfor -%}
+      </nav>
+    {%- endif -%}
+  {%- endif -%}
 </footer>
 
 {% schema %}
@@ -38,7 +71,8 @@
       "label": "Footer menu",
       "default": "footer",
       "info": "Keep Shop, then Help, Shipping & returns, August Inn, Visit."
-    }
+    },
+    { "type": "checkbox", "id": "show_social", "label": "Show social links", "default": true, "info": "Links come from Theme settings → Social." }
   ]
 }
 {% endschema %}

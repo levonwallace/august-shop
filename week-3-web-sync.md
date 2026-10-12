@@ -11,9 +11,12 @@ Start Shopify theme development. Live store stays untouched. Staff will preview 
 | When | What |
 | --- | --- |
 | Now | Design pass + start draft theme setup |
-| Fri Oct 9 | Next working session |
+| ~~Fri Oct 9~~ | Working session (done — live theme exported, transfer brief written) |
+| **Wed Oct 14** | Next meeting — in person, Scissor Studio HQ, 373 Broadway STE 522, New York, NY 10013 |
 | Oct 16–23 | Staff play in draft editor (Alex in Miami) |
 | After that | Bug / schema week if needed |
+
+> Scheduling drifted after Oct 2 — we are in week 6 but on track. The Nov 9 date in the Gemini notes was a transcription error for Oct 9.
 
 - **Live shop:** undisturbed. New work lives in a draft theme.
 - **Internal name:** August 2.0
@@ -57,14 +60,23 @@ Alex will keep a private preview link so Mason’s team does not have to live in
 - [x] Mega menu scale + account onboarding
 - [x] Routed homepage (feed vs everything)
 - [x] Prototype Tinder-style swipe on product cards to train Your feed (right = similar, left = less)
-- [ ] Everything feed = live Shopify availability (waiting on draft theme)
+- [ ] Everything feed = live Shopify availability (waiting on draft theme upload)
 - [x] Events + mix pages
 - [x] Search typeahead: category / brand jumps above SKU hits (ASICS, jeans)
 - [x] Collapse Explore + 10% popup + newsletter (`august_offer_dismissed`)
 - [x] Polish Inn + bag
 - [x] Ambient background: pushed nostalgic corner-to-corner roam (still paper-clear; can kill later)
 - [x] Draft-theme plan written in `shopify-draft.md` — do not publish over live
-- [ ] Alex updates the production document and the demo once more, then move notes onto the draft theme
+- [x] Alex updates the production document and the demo once more, then move notes onto the draft theme
+
+## Status — Oct 12
+
+- Final demo pass shipped: grey-frosted "dock" glass on the mobile header + tab bar, constant 6px corner across the desktop zoom (`--ui-zoom`).
+- Live theme (Pipeline 7.0.2) exported Oct 9. Strategy is now **fork the live export, overlay August 2.0** — see `august-2.0-liquid-transfer.md` (the package). The 36-file `theme/` scaffold is a skeleton only, not a store.
+- First upload attempt failed (`missing template "layout/theme.liquid"`): the zip was a macOS folder-zip with a wrapper directory. Rebuilt clean at `~/Downloads/august-2.0-draft.zip` — theme folders at root, `__MACOSX`/`.DS_Store` stripped, and four custom sections (`section-one` … `section-four`) had trailing-comma schema JSON fixed so the editor won't choke. All 79 section schemas + templates validate.
+- Editor surface for the content/sales team: 43 addable sections with presets, all schemas valid. `section-four` keeps its stored Inn imagery untouched.
+- [ ] Upload `august-2.0-draft.zip` as **August 2.0 draft** (do not publish), then paste the private preview link here:
+  - Preview link: _(add after upload)_
 
 ---
 

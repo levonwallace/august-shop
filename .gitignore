@@ -8,3 +8,6 @@ theme/assets/*.svg
 theme/assets/*.jpg
 theme/assets/*.png
 theme/assets/*.woff2
+
+# Built theme zips
+dist/

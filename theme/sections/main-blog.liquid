@@ -1,13 +1,86 @@
-<main class="story" id="main">
-  <h1>{{ blog.title }}</h1>
-  {% for article in blog.articles %}
-    <a href="{{ article.url }}">{{ article.title }}</a>
-  {% endfor %}
-</main>
+{% comment %}
+  Prototype: aux.html (mix archive) + events.html (events archive).
+  Which layout renders depends on whether this blog is the Events blog
+  (Theme settings → Catalog).
+{% endcomment %}
+{%- liquid
+  assign s = section.settings
+  assign is_events = false
+  if blog.handle == settings.events_blog
+    assign is_events = true
+  endif
+  assign kicker = s.kicker
+  assign lead = s.lead
+  if is_events
+    if kicker == blank
+      assign kicker = s.events_kicker
+    endif
+    if lead == blank
+      assign lead = s.events_lead
+    endif
+  else
+    if kicker == blank
+      assign kicker = s.aux_kicker
+    endif
+    if lead == blank
+      assign lead = s.aux_lead
+    endif
+  endif
+-%}
+{%- paginate blog.articles by s.per_page -%}
+  {%- if is_events -%}
+    <main class="story story--index story--events" id="main" data-story="events-index" data-section-id="{{ section.id }}">
+      <header class="story__mast">
+        <p class="story__kicker">{{ kicker }}</p>
+        <h1 class="story__title">{{ s.title | default: blog.title }}</h1>
+        {%- if lead != blank -%}<p class="story__lead">{{ lead }}</p>{%- endif -%}
+      </header>
+      <div class="story__list story__list--archive" data-story-index>
+        {%- for article in blog.articles -%}
+          {%- if forloop.first and paginate.current_page == 1 -%}
+            {%- render 'event-card', article: article, variant: 'feature' -%}
+          {%- else -%}
+            {%- render 'event-card', article: article -%}
+          {%- endif -%}
+        {%- endfor -%}
+      </div>
+      {%- if paginate.pages > 1 -%}<nav class="story__pagination" aria-label="Pagination">{{ paginate | default_pagination }}</nav>{%- endif -%}
+    </main>
+  {%- else -%}
+    <main class="story story--index story--aux" id="main" data-story="aux-index" data-section-id="{{ section.id }}">
+      <header class="story__mast">
+        <p class="story__kicker">{{ kicker }}</p>
+        <h1 class="story__title">{{ s.title | default: blog.title }}</h1>
+        {%- if lead != blank -%}<p class="story__lead">{{ lead }}</p>{%- endif -%}
+      </header>
+      <div class="story__grid story__grid--archive" data-story-index>
+        {%- for article in blog.articles -%}
+          {%- assign fallback_no = blog.articles_count | minus: paginate.current_offset | minus: forloop.index0 -%}
+          {%- render 'mix-tile', article: article, fallback_no: fallback_no -%}
+        {%- endfor -%}
+      </div>
+      {%- if paginate.pages > 1 -%}<nav class="story__pagination" aria-label="Pagination">{{ paginate | default_pagination }}</nav>{%- endif -%}
+    </main>
+  {%- endif -%}
+{%- endpaginate -%}
 
 {% schema %}
 {
-  "name": "Blog",
-  "settings": []
+  "name": "Blog archive",
+  "tag": "div",
+  "class": "shopify-section-story",
+  "settings": [
+    { "type": "paragraph", "content": "Renders the mix grid for the AUX blog and the events list for the Events blog (set both in Theme settings → Catalog)." },
+    { "type": "text", "id": "title", "label": "Title override", "info": "Defaults to the blog title." },
+    { "type": "text", "id": "kicker", "label": "Kicker override" },
+    { "type": "text", "id": "lead", "label": "Lead override" },
+    { "type": "range", "id": "per_page", "label": "Posts per page", "min": 12, "max": 50, "step": 1, "default": 36 },
+    { "type": "header", "content": "AUX defaults" },
+    { "type": "text", "id": "aux_kicker", "label": "Kicker", "default": "August AUX" },
+    { "type": "text", "id": "aux_lead", "label": "Lead", "default": "Staff and guest sessions from 414 State Street. Play from the archive." },
+    { "type": "header", "content": "Events defaults" },
+    { "type": "text", "id": "events_kicker", "label": "Kicker", "default": "414 State St · The Side Door" },
+    { "type": "text", "id": "events_lead", "label": "Lead", "default": "Live sets, art installs, nights at the shop. Madison." }
+  ]
 }
 {% endschema %}

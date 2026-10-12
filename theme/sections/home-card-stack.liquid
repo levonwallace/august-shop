@@ -1,0 +1,420 @@
+{% comment %}
+  Prototype: index.html .card-stack — the swipeable home.
+  Blocks are the cards. Order of cards is fixed by kind (hero → brand banners
+  → AUX); staff reorder brand banners by dragging the blocks.
+
+    hero   (1)  lockup words, hero grid collection, statement copy
+    shelf  (4)  a titled product row inside the hero card
+    brand  (6)  one full-bleed brand card
+    aux    (1)  the AUX radio card — mixes, events, newsletter
+
+  cardstack.js, swipe.js, radiocard.js and profile.js bind to the same
+  class names and data hooks as the prototype.
+{% endcomment %}
+{%- liquid
+  assign hero_block = section.blocks | where: 'type', 'hero' | first
+  assign shelf_blocks = section.blocks | where: 'type', 'shelf'
+  assign brand_blocks = section.blocks | where: 'type', 'brand'
+  assign aux_block = section.blocks | where: 'type', 'aux' | first
+
+  assign everything = collections[settings.everything_collection]
+  if everything.handle == blank
+    assign everything = collections.all
+  endif
+  assign hero_collection = collections[hero_block.settings.collection]
+  if hero_collection.handle == blank
+    assign hero_collection = everything
+  endif
+  assign hero_count = hero_block.settings.count | default: 11
+  assign announce_href = settings.announce_link | default: routes.all_products_collection_url
+
+  assign aux_blog = blogs[settings.aux_blog]
+  assign events_blog = blogs[settings.events_blog]
+  assign card_index = 0
+-%}
+
+{%- comment %} Client catalog = the Everything collection (feed, swipe, mega menu) {% endcomment -%}
+{%- paginate everything.products by 250 -%}
+  {% render 'catalog-json', products: everything.products, limit: 250 %}
+{%- endpaginate -%}
+
+<div class="card-stack" id="main" data-card-stack data-section-id="{{ section.id }}">
+
+  {%- if hero_block -%}
+  <div class="card-stack__card" data-card="{{ card_index }}" {{ hero_block.shopify_attributes }}>
+    <main class="home-hero" data-card-scroll>
+      <div class="home-layout">
+        <div class="home-copy">
+          {%- if hero_block.settings.show_announce and settings.announce_enable and settings.announce_text != blank -%}
+            <a class="announce-chip announce-chip--hero" href="{{ announce_href }}"><span class="dot" aria-hidden="true"></span>{{ settings.announce_text }}</a>
+          {%- endif -%}
+          <h1 class="home-lockup">
+            {%- for i in (1..4) -%}
+              {%- assign word_key = 'word_' | append: i -%}
+              {%- assign ink_key = 'ink_' | append: i -%}
+              {%- assign word = hero_block.settings[word_key] -%}
+              {%- if word != blank -%}
+                <span class="home-lockup__word {{ hero_block.settings[ink_key] }}">{{ word }}</span>
+              {%- endif -%}
+            {%- endfor -%}
+          </h1>
+        </div>
+        <h2 class="home-grid__title" data-title-everything="{{ hero_block.settings.grid_title | escape }}">{{ hero_block.settings.grid_title }}</h2>
+        <div class="home-grid__tag">{{ hero_block.settings.grid_tag }}</div>
+        <div class="home-grid">
+          {%- for product in hero_collection.products limit: hero_count -%}
+            {%- liquid
+              case forloop.index0
+                when 0
+                  assign tile_class = 'home-tile--hero'
+                  assign tile_sizes = '(min-width: 901px) 62vw, 75vw'
+                when 1
+                  assign tile_class = ''
+                  assign tile_sizes = '(min-width: 901px) 24vw, 70vw'
+                when 2 or 3
+                  assign tile_class = 'home-tile--tall'
+                  assign tile_sizes = '(min-width: 901px) 24vw, 70vw'
+                when 4 or 5 or 6
+                  assign tile_class = 'home-tile--extra'
+                  assign tile_sizes = '(min-width: 901px) 24vw, 70vw'
+                else
+                  assign tile_class = 'home-tile--desktop'
+                  assign tile_sizes = '(min-width: 901px) 24vw, 70vw'
+              endcase
+            -%}
+            <a class="home-tile {{ tile_class }}" href="{{ product.url }}" data-swipe-card data-product-id="{{ product.id }}">
+              {%- if product.featured_image -%}
+                <img
+                  src="{{ product.featured_image | image_url: width: 900 }}"
+                  srcset="{{ product.featured_image | image_url: width: 400 }} 400w, {{ product.featured_image | image_url: width: 600 }} 600w, {{ product.featured_image | image_url: width: 900 }} 900w, {{ product.featured_image | image_url: width: 1400 }} 1400w"
+                  sizes="{{ tile_sizes }}"
+                  alt="{{ product.title | escape }}"
+                  width="{{ product.featured_image.width }}"
+                  height="{{ product.featured_image.height }}"
+                  {% unless forloop.first %}loading="lazy"{% endunless %}
+                >
+              {%- endif -%}
+            </a>
+          {%- endfor -%}
+        </div>
+      </div>
+
+      <section class="home-statement" aria-label="About {{ shop.name | escape }}">
+        {%- if hero_block.settings.statement != blank -%}
+          <p class="home-statement__text">{{ hero_block.settings.statement }}</p>
+        {%- endif -%}
+
+        {%- for block in shelf_blocks -%}
+          {%- assign shelf_collection = collections[block.settings.collection] -%}
+          {%- if shelf_collection.handle == blank -%}{%- assign shelf_collection = everything -%}{%- endif -%}
+          <h2 class="home-statement__title" {{ block.shopify_attributes }}>{{ block.settings.title | default: shelf_collection.title }}</h2>
+          <div class="home-statement__grid" data-shelf-curated>
+            {%- for product in shelf_collection.products limit: block.settings.count -%}
+              {%- if forloop.index > block.settings.mobile_count -%}
+                {%- render 'product-card', product: product, class: 'product-card--desktop' -%}
+              {%- else -%}
+                {%- render 'product-card', product: product -%}
+              {%- endif -%}
+            {%- endfor -%}
+          </div>
+        {%- endfor -%}
+
+        {%- if hero_block.settings.scroll_note != blank -%}
+          <div class="home-scroll-note" aria-hidden="true">
+            <span class="home-scroll-note__label">{{ hero_block.settings.scroll_note }}{% if brand_blocks.first %} {{ brand_blocks.first.settings.title | downcase }}{% endif %}</span>
+            <svg class="home-scroll-note__arrow" viewBox="0 0 12 12" fill="none"><path d="M2 4.5l4 4 4-4" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </div>
+        {%- endif -%}
+      </section>
+    </main>
+  </div>
+  {%- assign card_index = card_index | plus: 1 -%}
+  {%- endif -%}
+
+  {%- for block in brand_blocks -%}
+    {%- liquid
+      assign brand_collection = block.settings.collection
+      assign brand_href = block.settings.link
+      if brand_href == blank and brand_collection.url != blank
+        assign brand_href = brand_collection.url
+      endif
+      if brand_href == blank
+        assign vendor_q = block.settings.title | url_encode
+        assign brand_href = routes.collections_url | append: '/vendors?q=' | append: vendor_q
+      endif
+      assign desktop_img = block.settings.image
+      if desktop_img == blank
+        assign desktop_img = brand_collection.featured_image
+      endif
+      assign mobile_img = block.settings.image_mobile
+    -%}
+    <div class="card-stack__card card-stack__card--brand" data-card="{{ card_index }}" {{ block.shopify_attributes }}>
+      <a class="brand-banner brand-banner--full" href="{{ brand_href }}">
+        {%- if desktop_img -%}
+          <picture>
+            {%- if mobile_img -%}
+              <source media="(max-width: 900px)" srcset="{{ mobile_img | image_url: width: 1080 }}" width="{{ mobile_img.width }}" height="{{ mobile_img.height }}">
+            {%- endif -%}
+            <img class="brand-banner__media" src="{{ desktop_img | image_url: width: 1600 }}" srcset="{{ desktop_img | image_url: width: 1000 }} 1000w, {{ desktop_img | image_url: width: 1600 }} 1600w, {{ desktop_img | image_url: width: 2400 }} 2400w" sizes="100vw" alt="" width="{{ desktop_img.width }}" height="{{ desktop_img.height }}" loading="lazy">
+          </picture>
+        {%- endif -%}
+        <span class="brand-banner__overlay" aria-hidden="true"></span>
+        <span class="brand-banner__content">
+          <span class="brand-banner__title">{{ block.settings.title | default: brand_collection.title }}</span>
+          <span class="brand-banner__cta">{{ block.settings.cta }}</span>
+        </span>
+      </a>
+    </div>
+    {%- assign card_index = card_index | plus: 1 -%}
+  {%- endfor -%}
+
+  {%- if aux_block -%}
+  <div class="card-stack__card card-stack__card--radio" data-card="{{ card_index }}" {{ aux_block.shopify_attributes }}>
+    <div class="radio-card" data-card-scroll>
+      <div class="radio-card__inner">
+
+        <section class="radio-hero">
+          <div class="radio-hero__header">
+            <span class="radio-hero__badge"><span class="radio-hero__live-dot"></span>{{ aux_block.settings.badge }}</span>
+            {%- if aux_block.settings.tagline != blank -%}
+              <p class="radio-hero__tagline">{{ aux_block.settings.tagline }}</p>
+            {%- endif -%}
+            {%- if aux_block.settings.submit_text != blank -%}
+              <p class="radio-hero__submit">{{ aux_block.settings.submit_text }} <a href="mailto:{{ aux_block.settings.submit_email | default: shop.email }}">{{ aux_block.settings.submit_email | default: shop.email }}</a></p>
+            {%- endif -%}
+          </div>
+
+          {%- comment %} 3×3 mix grid + pagination — radiocard.js re-renders from AugustBootstrap.mixes {% endcomment -%}
+          <div class="aux-grid" data-aux-grid>
+            {%- for article in aux_blog.articles limit: 9 -%}
+              <a class="radio-cover aux-tile" href="{{ article.url }}" aria-label="{{ article.title | escape }}">
+                <div class="aux-tile__art">{% if article.image %}<img src="{{ article.image | image_url: width: 600 }}" alt="" loading="lazy" width="600" height="600">{% endif %}</div>
+                <span class="aux-tile__no">{{ article.tags.first }}</span>
+                <span class="aux-tile__title">{{ article.title }}</span>
+              </a>
+            {%- endfor -%}
+          </div>
+          <nav class="aux-pages-wrap" aria-label="Archive pages">
+            <div class="aux-pages" data-aux-pages></div>
+            {%- if aux_blog.url != blank -%}
+              <a class="aux-archive__all" href="{{ aux_blog.url }}">{{ aux_block.settings.archive_label }}</a>
+            {%- endif -%}
+          </nav>
+
+          <div class="radio-hero__now-playing" data-radio-bar>
+            <div class="radio-wave" aria-hidden="true">
+              {%- for i in (1..30) -%}<span></span>{%- endfor -%}
+            </div>
+            <div class="radio-hero__track-info">
+              <a class="radio-hero__track-title" data-radio-title href="{{ aux_blog.articles.first.url | default: aux_blog.url }}">{{ aux_block.settings.badge }}</a>
+              <span class="radio-hero__track-sub" data-radio-sub>{{ aux_blog.articles.first.title }}</span>
+            </div>
+            <button class="radio-hero__play" type="button" aria-label="Play" data-radio-play>
+              <svg class="radio-hero__play-icon" viewBox="0 0 48 48" fill="none"><circle cx="24" cy="24" r="23" stroke="currentColor" stroke-width="1.5"/><path d="M19 15.5L33 24L19 32.5V15.5Z" fill="currentColor"/></svg>
+              <svg class="radio-hero__pause-icon" viewBox="0 0 48 48" fill="none" hidden><circle cx="24" cy="24" r="23" stroke="currentColor" stroke-width="1.5"/><rect x="17" y="15" width="4.5" height="18" rx="1.2" fill="currentColor"/><rect x="26.5" y="15" width="4.5" height="18" rx="1.2" fill="currentColor"/></svg>
+            </button>
+            <button class="radio-hero__expand" type="button" aria-label="Expand player" aria-expanded="false" data-radio-expand>
+              <svg viewBox="0 0 12 12" fill="none" aria-hidden="true"><path d="M2 4.5l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </button>
+            <div class="radio-hero__extra">
+              <div class="radio-hero__extra-inner">
+                <div class="radio-seek" data-radio-seek role="slider" aria-label="Seek" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" tabindex="0">
+                  <div class="radio-seek__track"><div class="radio-seek__fill" data-radio-seek-fill></div></div>
+                </div>
+                <div class="radio-hero__extra-row">
+                  <span class="radio-hero__time" data-radio-time>0:00 / 0:00</span>
+                  <div class="radio-hero__transport">
+                    <button class="radio-hero__skip-btn" type="button" aria-label="Previous mix" data-radio-prev>
+                      <svg viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M10.5 3.5L5.5 8l5 4.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                    </button>
+                    <button class="radio-hero__skip-btn" type="button" aria-label="Next mix" data-radio-next>
+                      <svg viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M5.5 3.5L10.5 8l-5 4.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {%- if aux_block.settings.show_events -%}
+        <hr class="radio-card__divider">
+        <section class="aux-events">
+          <div class="aux-events__head">
+            <h2 class="radio-newsletter__heading">{{ aux_block.settings.events_heading }}</h2>
+            {%- if events_blog.url != blank -%}
+              <a class="aux-archive__all" href="{{ events_blog.url }}">{{ aux_block.settings.events_all_label }}</a>
+            {%- endif -%}
+          </div>
+          <ul class="aux-events__list" data-aux-events>
+            {%- for article in events_blog.articles limit: 9 -%}
+              <li>
+                <a class="aux-event" href="{{ article.url }}">
+                  <div class="aux-event__meta">
+                    <span class="aux-event__series">{{ article.metafields.august.series | default: article.tags.first }}</span>
+                    <span class="aux-event__date">{{ article.metafields.august.event_date | default: article.published_at | date: '%b %-d, %Y' }}</span>
+                  </div>
+                  <h3 class="aux-event__title">{{ article.title }}</h3>
+                  <p class="aux-event__excerpt">{{ article.excerpt_or_content | strip_html | truncate: 160 }}</p>
+                </a>
+              </li>
+            {%- endfor -%}
+          </ul>
+        </section>
+        {%- endif -%}
+
+        {%- if aux_block.settings.show_newsletter -%}
+        <hr class="radio-card__divider">
+        <section class="aux-newsletter">
+          <h2 class="radio-newsletter__heading">{{ aux_block.settings.newsletter_heading }}</h2>
+          {%- if aux_block.settings.newsletter_sub != blank -%}
+            <p class="aux-newsletter__sub">{{ aux_block.settings.newsletter_sub }}</p>
+          {%- endif -%}
+          {%- form 'customer', id: 'aux-newsletter', class: 'aux-newsletter__form' -%}
+            {%- if form.posted_successfully? -%}
+              <p class="aux-newsletter__done" role="status">{{ aux_block.settings.newsletter_success }}</p>
+            {%- else -%}
+              <input type="hidden" name="contact[tags]" value="newsletter">
+              <input type="email" name="contact[email]" placeholder="{{ aux_block.settings.newsletter_placeholder }}" aria-label="Email" autocomplete="email" required>
+              <button type="submit">{{ aux_block.settings.newsletter_button }}</button>
+              {%- if form.errors -%}
+                <p class="aux-newsletter__error" role="alert">{{ form.errors | default_errors }}</p>
+              {%- endif -%}
+            {%- endif -%}
+          {%- endform -%}
+        </section>
+        {%- endif -%}
+
+      </div>
+    </div>
+  </div>
+  {%- assign card_index = card_index | plus: 1 -%}
+  {%- endif -%}
+
+</div>
+
+{%- comment %} Pagination dots live outside .card-stack (overflow:hidden) {% endcomment -%}
+<div class="card-stack__dots" data-card-dots>
+  {%- assign dot = 0 -%}
+  {%- if hero_block -%}
+    <button class="card-stack__dot is-active" data-dot="{{ dot }}" aria-label="Home"></button>
+    {%- assign dot = dot | plus: 1 -%}
+  {%- endif -%}
+  {%- for block in brand_blocks -%}
+    <button class="card-stack__dot" data-dot="{{ dot }}" aria-label="{{ block.settings.title | escape }}"></button>
+    {%- assign dot = dot | plus: 1 -%}
+  {%- endfor -%}
+  {%- if aux_block -%}
+    <button class="card-stack__dot" data-dot="{{ dot }}" aria-label="{{ aux_block.settings.badge | escape }}"></button>
+  {%- endif -%}
+</div>
+
+{% schema %}
+{
+  "name": "Home card stack",
+  "tag": "section",
+  "class": "shopify-section-home",
+  "limit": 1,
+  "settings": [
+    {
+      "type": "paragraph",
+      "content": "The swipeable home. Add a Hero, up to four Shelves (rows inside the hero), brand cards, and the AUX card. Cards always run hero → brands → AUX."
+    }
+  ],
+  "blocks": [
+    {
+      "type": "hero",
+      "name": "Hero card",
+      "limit": 1,
+      "settings": [
+        { "type": "checkbox", "id": "show_announce", "label": "Show announcement chip", "default": true },
+        { "type": "header", "content": "Lockup" },
+        { "type": "text", "id": "word_1", "label": "Word 1", "default": "Streetwear," },
+        { "type": "select", "id": "ink_1", "label": "Word 1 color", "default": "ink-leather", "options": [
+          { "value": "", "label": "Ink" }, { "value": "ink-leather", "label": "Leather" }, { "value": "ink-slate", "label": "Slate" }, { "value": "ink-madder", "label": "Madder" }, { "value": "ink-cobalt", "label": "Cobalt" } ] },
+        { "type": "text", "id": "word_2", "label": "Word 2", "default": "sneakers," },
+        { "type": "select", "id": "ink_2", "label": "Word 2 color", "default": "ink-slate", "options": [
+          { "value": "", "label": "Ink" }, { "value": "ink-leather", "label": "Leather" }, { "value": "ink-slate", "label": "Slate" }, { "value": "ink-madder", "label": "Madder" }, { "value": "ink-cobalt", "label": "Cobalt" } ] },
+        { "type": "text", "id": "word_3", "label": "Word 3", "default": "art," },
+        { "type": "select", "id": "ink_3", "label": "Word 3 color", "default": "ink-madder", "options": [
+          { "value": "", "label": "Ink" }, { "value": "ink-leather", "label": "Leather" }, { "value": "ink-slate", "label": "Slate" }, { "value": "ink-madder", "label": "Madder" }, { "value": "ink-cobalt", "label": "Cobalt" } ] },
+        { "type": "text", "id": "word_4", "label": "Word 4", "default": "music." },
+        { "type": "select", "id": "ink_4", "label": "Word 4 color", "default": "ink-cobalt", "options": [
+          { "value": "", "label": "Ink" }, { "value": "ink-leather", "label": "Leather" }, { "value": "ink-slate", "label": "Slate" }, { "value": "ink-madder", "label": "Madder" }, { "value": "ink-cobalt", "label": "Cobalt" } ] },
+        { "type": "header", "content": "Hero grid" },
+        { "type": "text", "id": "grid_title", "label": "Title", "default": "In stock now" },
+        { "type": "text", "id": "grid_tag", "label": "Tag", "default": "New arrivals" },
+        { "type": "collection", "id": "collection", "label": "Collection", "info": "Defaults to the Everything collection (Theme settings → Catalog)." },
+        { "type": "range", "id": "count", "label": "Tiles", "min": 4, "max": 12, "step": 1, "default": 11 },
+        { "type": "header", "content": "Statement" },
+        { "type": "textarea", "id": "statement", "label": "Statement", "default": "An amalgamation of streetwear, sneakers, art, and music — new arrivals dropping weekly." },
+        { "type": "text", "id": "scroll_note", "label": "Scroll hint", "default": "keep scrolling — up next:", "info": "The next card's name is appended automatically." }
+      ]
+    },
+    {
+      "type": "shelf",
+      "name": "Shelf (product row)",
+      "limit": 4,
+      "settings": [
+        { "type": "text", "id": "title", "label": "Title", "default": "Best sellers" },
+        { "type": "collection", "id": "collection", "label": "Collection" },
+        { "type": "range", "id": "count", "label": "Products", "min": 4, "max": 12, "step": 1, "default": 8 },
+        { "type": "range", "id": "mobile_count", "label": "Products on mobile", "min": 4, "max": 12, "step": 1, "default": 6, "info": "Extra cards only render on desktop." }
+      ]
+    },
+    {
+      "type": "brand",
+      "name": "Brand card",
+      "limit": 6,
+      "settings": [
+        { "type": "text", "id": "title", "label": "Brand", "default": "Vans" },
+        { "type": "collection", "id": "collection", "label": "Collection", "info": "Used for the link and as the image fallback." },
+        { "type": "url", "id": "link", "label": "Link override" },
+        { "type": "image_picker", "id": "image", "label": "Image (landscape, 1312×738)" },
+        { "type": "image_picker", "id": "image_mobile", "label": "Mobile image (portrait, 720×1280)" },
+        { "type": "text", "id": "cta", "label": "Button", "default": "Shop now" }
+      ]
+    },
+    {
+      "type": "aux",
+      "name": "AUX card (mixes, events, newsletter)",
+      "limit": 1,
+      "settings": [
+        { "type": "paragraph", "content": "Mixes and events come from the blogs chosen in Theme settings → Catalog." },
+        { "type": "text", "id": "badge", "label": "Badge", "default": "August AUX" },
+        { "type": "textarea", "id": "tagline", "label": "Tagline", "default": "SoundCloud mixes and Spotify playlists curated by our staff and DJs from Madison and around the world." },
+        { "type": "text", "id": "submit_text", "label": "Submission line", "default": "Want to be featured?" },
+        { "type": "text", "id": "submit_email", "label": "Submission email", "info": "Defaults to the store email." },
+        { "type": "text", "id": "archive_label", "label": "Archive link label", "default": "Full archive" },
+        { "type": "header", "content": "Events" },
+        { "type": "checkbox", "id": "show_events", "label": "Show events", "default": true },
+        { "type": "text", "id": "events_heading", "label": "Heading", "default": "Events" },
+        { "type": "text", "id": "events_all_label", "label": "All events label", "default": "All events" },
+        { "type": "header", "content": "Newsletter" },
+        { "type": "checkbox", "id": "show_newsletter", "label": "Show newsletter", "default": true },
+        { "type": "text", "id": "newsletter_heading", "label": "Heading", "default": "Newsletter" },
+        { "type": "text", "id": "newsletter_sub", "label": "Subheading", "default": "Drops, events, and the occasional offer." },
+        { "type": "text", "id": "newsletter_placeholder", "label": "Placeholder", "default": "Email" },
+        { "type": "text", "id": "newsletter_button", "label": "Button", "default": "Join" },
+        { "type": "text", "id": "newsletter_success", "label": "Success message", "default": "Joined ✓ — see you in the inbox." }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Home card stack",
+      "blocks": [
+        { "type": "hero" },
+        { "type": "shelf", "settings": { "title": "Apparel & accessories" } },
+        { "type": "shelf", "settings": { "title": "Best sellers" } },
+        { "type": "shelf", "settings": { "title": "Back in stock" } },
+        { "type": "brand", "settings": { "title": "Vans" } },
+        { "type": "brand", "settings": { "title": "Square Trade Goods" } },
+        { "type": "brand", "settings": { "title": "Dr. Martens" } },
+        { "type": "aux" }
+      ]
+    }
+  ],
+  "enabled_on": { "templates": ["index"] }
+}
+{% endschema %}

@@ -1,11 +1,157 @@
-<main class="story" id="main">
-  <h1>{{ article.title }}</h1>
-  <div class="story__body">{{ article.content }}</div>
-</main>
+{% comment %}
+  Prototype: mix.html (AUX mix) + event.html (event). The Events blog gets
+  the event layout; every other blog gets the mix layout. story.js only
+  binds the audio player on the live theme — everything else is Liquid.
+{% endcomment %}
+{%- liquid
+  assign s = section.settings
+  assign is_events = false
+  if blog.handle == settings.events_blog
+    assign is_events = true
+  endif
+  assign street = settings.store_address | split: ',' | first
+-%}
+
+{%- if is_events -%}
+  {%- liquid
+    assign series = article.metafields.august.series | default: article.tags.first | default: 'Event'
+    assign when = article.metafields.august.event_date | default: article.published_at
+    assign venue = article.metafields.august.venue
+    if venue == blank
+      assign venue = shop.name | append: ', ' | append: settings.store_address
+    endif
+    assign today = 'now' | date: '%s' | plus: 0
+    assign event_ts = when | date: '%s' | plus: 86399
+    assign upcoming = false
+    if event_ts >= today
+      assign upcoming = true
+    endif
+    assign ticket = article.metafields.august.ticket_url
+    assign rsvp_subject = 'RSVP — ' | append: article.title | url_encode
+    assign rsvp_to = s.rsvp_email | default: shop.email
+    assign rsvp = 'mailto:' | append: rsvp_to | append: '?subject=' | append: rsvp_subject
+    assign maps_q = venue | url_encode
+    assign maps = settings.store_map_url
+    if article.metafields.august.venue != blank or maps == blank
+      assign maps = 'https://maps.google.com/?q=' | append: maps_q
+    endif
+  -%}
+  <main class="story story--event" id="main" data-story="event" data-story-id="{{ article.handle }}" data-section-id="{{ section.id }}">
+    <a class="story__back" href="{{ blog.url }}">← {{ s.back_events }}</a>
+    <article class="story__hero story__hero--event">
+      <div class="story__cover story__cover--event" data-story-cover{% unless article.image %} hidden{% endunless %}>
+        {%- if article.image -%}<img data-story-art src="{{ article.image | image_url: width: 1200 }}" alt="{{ article.title | escape }}" width="1200" height="1200">{%- endif -%}
+      </div>
+      <div class="story__head">
+        <p class="story__kicker" data-story-kicker>{{ series }}</p>
+        <h1 class="story__title" data-story-title>{{ article.title }}</h1>
+        <p class="story__meta" data-story-meta>{{ when | date: '%A, %B %-d, %Y' }} · {{ venue | split: ',' | first }}</p>
+        <dl class="story__facts" data-story-facts>
+          <div class="story__fact"><dt>When</dt><dd>{{ when | date: '%A, %B %-d, %Y' }}</dd></div>
+          <div class="story__fact"><dt>Where</dt><dd>{{ venue }}</dd></div>
+          <div class="story__fact"><dt>Series</dt><dd>{{ series }}</dd></div>
+        </dl>
+        <div class="story__actions" data-story-actions>
+          {%- if upcoming -%}
+            <a class="btn btn--primary" href="{{ ticket | default: rsvp }}"{% if ticket != blank %} target="_blank" rel="noopener noreferrer"{% endif %}>{{ s.rsvp_label }}</a>
+            <a class="btn btn--ghost" href="{{ maps }}" target="_blank" rel="noopener noreferrer">{{ s.directions_label }}</a>
+          {%- else -%}
+            <a class="btn btn--primary" href="{{ maps }}" target="_blank" rel="noopener noreferrer">{{ s.visit_label }}</a>
+            <a class="btn btn--ghost" href="{{ rsvp }}">{{ s.list_label }}</a>
+          {%- endif -%}
+        </div>
+      </div>
+    </article>
+    <div class="story__body" data-story-body>{{ article.content }}</div>
+    {%- if s.show_more -%}
+      <section class="story__more" aria-label="{{ s.more_events | escape }}">
+        <h2>{{ s.more_events }}</h2>
+        <div class="story__list" data-story-more>
+          {%- assign shown = 0 -%}
+          {%- for other in blog.articles -%}
+            {%- if other.id != article.id and shown < 4 -%}
+              {%- render 'event-card', article: other, variant: 'compact' -%}
+              {%- assign shown = shown | plus: 1 -%}
+            {%- endif -%}
+          {%- endfor -%}
+        </div>
+      </section>
+    {%- endif -%}
+  </main>
+
+{%- else -%}
+  {%- capture no %}{% render 'mix-meta', article: article, field: 'no' %}{% endcapture -%}
+  {%- capture name %}{% render 'mix-meta', article: article, field: 'name' %}{% endcapture -%}
+  {%- capture genre %}{% render 'mix-meta', article: article, field: 'genre' %}{% endcapture -%}
+  {%- assign src = article.metafields.august.audio_url -%}
+  {%- assign sc = article.metafields.august.soundcloud_track_id -%}
+  <main class="story story--mix" id="main" data-story="mix" data-story-no="{{ no }}" data-story-src="{{ src }}" data-section-id="{{ section.id }}">
+    <a class="story__back" href="{{ blog.url }}">← {{ s.back_mixes }}</a>
+    <article class="story__hero">
+      <div class="story__cover">{% if article.image %}<img data-story-art src="{{ article.image | image_url: width: 900 }}" alt="{{ name | escape }}" width="900" height="900">{% endif %}</div>
+      <div class="story__head">
+        <p class="story__kicker" data-story-kicker>{{ s.mix_kicker }}</p>
+        <h1 class="story__title" data-story-title>{{ name }}</h1>
+        <p class="story__meta" data-story-meta>{{ no }}{% if genre != blank %} · {{ genre }}{% endif %} · {{ article.published_at | date: '%b %-d, %Y' }}</p>
+        {%- if s.mix_context != blank -%}<p class="story__context" data-story-context>{{ s.mix_context | replace: '[address]', street }}</p>{%- endif -%}
+        {%- if src != blank -%}
+          <div class="story-player" data-story-player>
+            <button class="story-player__play" type="button" aria-label="Play" data-story-play>
+              <svg class="story-player__play-icon" viewBox="0 0 48 48" fill="none"><circle cx="24" cy="24" r="23" stroke="currentColor" stroke-width="1.5"/><path d="M19 15.5L33 24L19 32.5V15.5Z" fill="currentColor"/></svg>
+              <svg class="story-player__pause-icon" viewBox="0 0 48 48" fill="none" hidden><circle cx="24" cy="24" r="23" stroke="currentColor" stroke-width="1.5"/><rect x="17" y="15" width="4.5" height="18" rx="1.2" fill="currentColor"/><rect x="26.5" y="15" width="4.5" height="18" rx="1.2" fill="currentColor"/></svg>
+            </button>
+            <div class="story-player__seek" data-story-seek role="slider" aria-label="Seek" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" tabindex="0">
+              <div class="story-player__track"><div class="story-player__fill" data-story-fill></div></div>
+            </div>
+            <span class="story-player__time" data-story-time>0:00 / 0:00</span>
+          </div>
+        {%- elsif sc != blank -%}
+          <div class="story-embed">
+            <iframe title="{{ name | escape }}" width="100%" height="166" scrolling="no" frameborder="no" allow="autoplay" loading="lazy" src="https://w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/tracks/{{ sc }}&color=%230f0f0f&auto_play=false&hide_related=true&show_comments=false&show_user=true&show_reposts=false&show_teaser=false"></iframe>
+          </div>
+        {%- endif -%}
+      </div>
+    </article>
+    <div class="story__body" data-story-body>{{ article.content }}</div>
+    {%- if s.show_more -%}
+      <section class="story__more" aria-label="{{ s.more_mixes | escape }}">
+        <h2>{{ s.more_mixes }}</h2>
+        <div class="story__grid" data-story-more>
+          {%- assign shown = 0 -%}
+          {%- for other in blog.articles -%}
+            {%- if other.id != article.id and shown < 6 -%}
+              {%- assign fallback_no = blog.articles_count | minus: forloop.index0 -%}
+              {%- render 'mix-tile', article: other, fallback_no: fallback_no -%}
+              {%- assign shown = shown | plus: 1 -%}
+            {%- endif -%}
+          {%- endfor -%}
+        </div>
+      </section>
+    {%- endif -%}
+  </main>
+{%- endif -%}
 
 {% schema %}
 {
-  "name": "Article",
-  "settings": []
+  "name": "Article (mix / event)",
+  "tag": "div",
+  "class": "shopify-section-story",
+  "settings": [
+    { "type": "paragraph", "content": "Mix pages read article metafields august.mix_number, august.mix_title, august.genre, august.audio_url, august.soundcloud_track_id. Event pages read august.series, august.event_date, august.venue, august.ticket_url." },
+    { "type": "checkbox", "id": "show_more", "label": "Show more posts", "default": true },
+    { "type": "header", "content": "Mixes" },
+    { "type": "text", "id": "back_mixes", "label": "Back link", "default": "All mixes" },
+    { "type": "text", "id": "mix_kicker", "label": "Kicker", "default": "August AUX" },
+    { "type": "text", "id": "mix_context", "label": "Context line", "default": "Play from the archive — recorded for the shop floor at [address]." },
+    { "type": "text", "id": "more_mixes", "label": "More heading", "default": "More from August AUX" },
+    { "type": "header", "content": "Events" },
+    { "type": "text", "id": "back_events", "label": "Back link", "default": "All events" },
+    { "type": "text", "id": "rsvp_email", "label": "RSVP email", "info": "Defaults to the store email." },
+    { "type": "text", "id": "rsvp_label", "label": "RSVP button", "default": "RSVP" },
+    { "type": "text", "id": "directions_label", "label": "Directions button", "default": "Get directions" },
+    { "type": "text", "id": "visit_label", "label": "Past event button", "default": "Visit" },
+    { "type": "text", "id": "list_label", "label": "Past event secondary", "default": "Get on the list" },
+    { "type": "text", "id": "more_events", "label": "More heading", "default": "More events" }
+  ]
 }
 {% endschema %}

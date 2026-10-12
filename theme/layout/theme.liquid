@@ -1,8 +1,56 @@
 {% comment %}
-  Prototype: index.html <head> + shared chrome.
-  Push unpublished only. See shopify-draft.md.
+  August 2.0 — layout. Mirrors the <head> + shared chrome of the static
+  prototype (index.html). Push unpublished only — see shopify-draft.md.
 {% endcomment %}
-<!DOCTYPE html>
+{%- liquid
+  case request.page_type
+    when 'index'
+      assign page_class = 'home'
+    when 'collection' or 'search' or 'list-collections'
+      assign page_class = 'plp'
+    when 'product'
+      assign page_class = 'pdp'
+    when 'cart'
+      assign page_class = 'cart'
+    when 'customers/order'
+      assign page_class = 'cart page--account page--order'
+    when 'customers/account' or 'customers/login' or 'customers/register' or 'customers/addresses' or 'customers/reset_password' or 'customers/activate_account'
+      assign page_class = 'account'
+    when 'blog'
+      if blog.handle == settings.aux_blog
+        assign page_class = 'story page--aux'
+      elsif blog.handle == settings.events_blog
+        assign page_class = 'story page--events'
+      else
+        assign page_class = 'story'
+      endif
+    when 'article'
+      if blog.handle == settings.aux_blog
+        assign page_class = 'story page--mix'
+      elsif blog.handle == settings.events_blog
+        assign page_class = 'story page--event'
+      else
+        assign page_class = 'story'
+      endif
+    when 'page'
+      if page.handle == settings.inn_page
+        assign page_class = 'story page--inn'
+      else
+        assign page_class = 'story'
+      endif
+    else
+      assign page_class = 'story'
+  endcase
+
+  assign og_image = page_image | default: settings.og_image
+  assign sale_collection = collections[settings.sale_collection]
+  assign new_collection = collections[settings.new_collection]
+  assign everything = collections[settings.everything_collection]
+  if everything == blank or everything.handle == blank
+    assign everything = collections.all
+  endif
+-%}
+<!doctype html>
 <html lang="{{ request.locale.iso_code }}">
   <head>
     <meta charset="utf-8">
@@ -11,61 +59,192 @@
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="default">
-    <meta name="apple-mobile-web-app-title" content="{{ shop.name }}">
+    <meta name="apple-mobile-web-app-title" content="{{ shop.name | escape }}">
     <meta name="format-detection" content="telephone=no">
-    <title>{{ page_title }}{% unless page_title contains shop.name %} — {{ shop.name }}{% endunless %}</title>
-    {% if page_description %}
+
+    <title>
+      {{- page_title -}}
+      {%- if current_tags %} &ndash; tagged "{{ current_tags | join: ', ' }}"{% endif -%}
+      {%- if current_page != 1 %} &ndash; Page {{ current_page }}{% endif -%}
+      {%- unless page_title contains shop.name %} &ndash; {{ shop.name }}{% endunless -%}
+    </title>
+    {%- if page_description %}
       <meta name="description" content="{{ page_description | escape }}">
-    {% endif %}
+    {%- endif %}
     <link rel="canonical" href="{{ canonical_url }}">
+
+    {%- if settings.favicon %}
+      <link rel="icon" type="image/png" href="{{ settings.favicon | image_url: width: 64, height: 64 }}">
+      <link rel="apple-touch-icon" href="{{ settings.favicon | image_url: width: 180, height: 180 }}">
+    {%- else %}
+      <link rel="icon" type="image/svg+xml" href="{{ 'favicon.svg' | asset_url }}">
+      <link rel="apple-touch-icon" href="{{ 'favicon.svg' | asset_url }}">
+    {%- endif %}
+
+    {%- comment %} Open Graph / social — mirrors the prototype's head {% endcomment -%}
+    <meta property="og:site_name" content="{{ shop.name | escape }}">
+    <meta property="og:url" content="{{ canonical_url }}">
+    <meta property="og:title" content="{{ page_title | default: shop.name | escape }}">
+    <meta property="og:type" content="{% if request.page_type == 'product' %}product{% elsif request.page_type == 'article' %}article{% else %}website{% endif %}">
+    <meta property="og:description" content="{{ page_description | default: shop.description | default: shop.name | escape }}">
+    {%- if og_image %}
+      <meta property="og:image" content="http:{{ og_image | image_url: width: 1200 }}">
+      <meta property="og:image:secure_url" content="https:{{ og_image | image_url: width: 1200 }}">
+      <meta property="og:image:width" content="1200">
+      <meta property="og:image:alt" content="{{ og_image.alt | default: shop.name | escape }}">
+      <meta name="twitter:card" content="summary_large_image">
+      <meta name="twitter:image" content="https:{{ og_image | image_url: width: 1200 }}">
+    {%- else %}
+      <meta name="twitter:card" content="summary">
+    {%- endif %}
+    <meta name="twitter:title" content="{{ page_title | default: shop.name | escape }}">
+    <meta name="twitter:description" content="{{ page_description | default: shop.description | default: shop.name | escape }}">
+
     {% render 'css-variables' %}
     {{ 'tokens.css' | asset_url | stylesheet_tag }}
     {{ 'base.css' | asset_url | stylesheet_tag }}
     {{ 'components.css' | asset_url | stylesheet_tag }}
     {{ 'pages.css' | asset_url | stylesheet_tag }}
     {{ 'profile.css' | asset_url | stylesheet_tag }}
+    {{ 'cardstack.css' | asset_url | stylesheet_tag }}
     {{ 'sheet.css' | asset_url | stylesheet_tag }}
     {{ 'tabbar.css' | asset_url | stylesheet_tag }}
     {{ 'segmented.css' | asset_url | stylesheet_tag }}
+    {{ 'feed.css' | asset_url | stylesheet_tag }}
     {{ 'search.css' | asset_url | stylesheet_tag }}
     {{ 'offer.css' | asset_url | stylesheet_tag }}
-    {{ 'feed.css' | asset_url | stylesheet_tag }}
     {{ 'account.css' | asset_url | stylesheet_tag }}
-    {{ 'cardstack.css' | asset_url | stylesheet_tag }}
+    {{ 'theme-live.css' | asset_url | stylesheet_tag }}
+
     {{ content_for_header }}
   </head>
-  <body>
+
+  <body class="template-{{ request.page_type | handle }}{% if customer %} is-customer{% endif %}">
     <a class="skip-link" href="#main">Skip to content</a>
+    <div class="mega-backdrop" data-mega-backdrop hidden></div>
+
+    {%- comment %}
+      Bootstrap for the prototype JS. Sections append `products`, `mixes`
+      and `events` via the catalog-json / aux-json snippets below this tag.
+    {% endcomment -%}
     <script>
       window.AugustBootstrap = {
         live: true,
+        template: {{ request.page_type | json }},
+        shop: {
+          name: {{ shop.name | json }},
+          email: {{ shop.email | json }},
+          moneyFormat: {{ shop.money_format | json }},
+          currency: {{ cart.currency.iso_code | json }}
+        },
+        routes: {
+          root: {{ routes.root_url | json }},
+          cart: {{ routes.cart_url | json }},
+          search: {{ routes.search_url | json }},
+          predictive: {{ routes.predictive_search_url | json }},
+          account: {{ routes.account_url | json }},
+          login: {{ routes.account_login_url | json }},
+          register: {{ routes.account_register_url | json }},
+          logout: {{ routes.account_logout_url | json }},
+          all: {{ everything.url | default: routes.all_products_collection_url | json }},
+          vendors: {{ routes.collections_url | append: '/vendors' | json }},
+          sale: {{ sale_collection.url | default: routes.all_products_collection_url | json }},
+          new: {{ new_collection.url | default: everything.url | default: routes.all_products_collection_url | json }},
+          cats: {
+            shoes: {{ collections[settings.footwear_collection].url | default: '' | json }},
+            apparel: {{ collections[settings.apparel_collection].url | default: '' | json }},
+            accessories: {{ collections[settings.accessories_collection].url | default: '' | json }},
+            objects: {{ collections[settings.objects_collection].url | default: '' | json }}
+          },
+          aux: {{ blogs[settings.aux_blog].url | default: '' | json }},
+          events: {{ blogs[settings.events_blog].url | default: '' | json }},
+          inn: {{ pages[settings.inn_page].url | default: '' | json }}
+        },
         customer: {% if customer %}{
           id: {{ customer.id | json }},
           name: {{ customer.name | json }},
           email: {{ customer.email | json }},
+          createdAt: {% if customer.metafields.august.member_since != blank %}{{ customer.metafields.august.member_since | date: '%s' | times: 1000 }}{% elsif customer.orders_count > 0 %}{{ customer.orders.last.created_at | date: '%s' | times: 1000 }}{% else %}null{% endif %},
           homepage: {{ customer.metafields.august.homepage.value | json }},
           preferredBrands: {{ customer.metafields.august.preferred_brands.value | json }},
           swipes: {{ customer.metafields.august.swipes.value | json }}
         }{% else %}null{% endif %},
         cart: {{ cart | json }},
-        moneyFormat: {{ shop.money_format | json }}
+        collection: {% if collection %}{ title: {{ collection.title | json }}, handle: {{ collection.handle | json }}, url: {{ collection.url | json }}, count: {{ collection.products_count | json }}, description: {{ collection.description | strip_html | truncate: 140 | json }} }{% else %}null{% endif %},
+        searchTerms: {{ search.terms | default: '' | json }},
+        brands: {{ shop.vendors | json }},
+        products: [],
+        mixes: [],
+        events: [],
+        store: {
+          name: {{ settings.store_name | json }},
+          address: {{ settings.store_address | json }},
+          hours: {{ settings.store_hours | json }},
+          lat: {{ settings.store_lat | json }},
+          lng: {{ settings.store_lng | json }},
+          mapUrl: {{ settings.store_map_url | json }}
+        },
+        offer: {
+          enabled: {{ settings.offer_enable | json }},
+          eyebrow: {{ settings.offer_eyebrow | json }},
+          heading: {{ settings.offer_heading | json }},
+          lede: {{ settings.offer_lede | json }},
+          code: {{ settings.offer_code | json }},
+          success: {{ settings.offer_success | json }},
+          fine: {{ settings.offer_fine | json }},
+          delay: {{ settings.offer_delay | default: 1800 | json }}
+        }
       };
     </script>
-    {% section 'header' %}
-    <div class="page page--{{ request.page_type | handle }}">
+
+    {%- comment %}
+      Site-wide catalog floor: the Everything collection (first 50) so the
+      mega menu, search recents, related products and swipe lookups always
+      have real products. Home / PLP / search / PDP sections append more.
+    {% endcomment -%}
+    {%- unless request.page_type == 'index' or request.page_type == 'collection' or request.page_type == 'search' -%}
+      {% render 'catalog-json', products: everything.products, limit: 50 %}
+    {%- endunless -%}
+    {%- if settings.aux_blog != blank and blogs[settings.aux_blog].handle != blank -%}
+      {% render 'aux-json', kind: 'mixes', blog: blogs[settings.aux_blog], articles: blogs[settings.aux_blog].articles %}
+    {%- endif -%}
+    {%- if settings.events_blog != blank and blogs[settings.events_blog].handle != blank -%}
+      {% render 'aux-json', kind: 'events', blog: blogs[settings.events_blog], articles: blogs[settings.events_blog].articles %}
+    {%- endif -%}
+
+    <div class="page page--{{ page_class }}">
+      {% sections 'header-group' %}
+
       {{ content_for_layout }}
-      {% section 'footer' %}
-      {% section 'tabbar' %}
+
+      {% sections 'footer-group' %}
     </div>
-    {{ 'catalog.js' | asset_url | script_tag }}
-    {{ 'profile.js' | asset_url | script_tag }}
-    {{ 'shopify-bridge.js' | asset_url | script_tag }}
-    {{ 'shopify.js' | asset_url | script_tag }}
-    {{ 'main.js' | asset_url | script_tag }}
-    {{ 'sheet.js' | asset_url | script_tag }}
-    {{ 'segmented.js' | asset_url | script_tag }}
-    {{ 'cart.js' | asset_url | script_tag }}
-    {{ 'swipe.js' | asset_url | script_tag }}
-    {{ 'offer.js' | asset_url | script_tag }}
+
+    {%- comment %}
+      Same order as the prototype HTML. `defer` keeps that order and still
+      runs everything before DOMContentLoaded, which every file waits on.
+    {% endcomment -%}
+    <script src="{{ 'catalog.js' | asset_url }}" defer></script>
+    <script src="{{ 'auxdata.js' | asset_url }}" defer></script>
+    <script src="{{ 'shopify-bridge.js' | asset_url }}" defer></script>
+    <script src="{{ 'shopify.js' | asset_url }}" defer></script>
+    <script src="{{ 'august-live.js' | asset_url }}" defer></script>
+    <script src="{{ 'main.js' | asset_url }}" defer></script>
+    <script src="{{ 'sheet.js' | asset_url }}" defer></script>
+    <script src="{{ 'segmented.js' | asset_url }}" defer></script>
+    <script src="{{ 'profile.js' | asset_url }}" defer></script>
+    {%- case request.page_type %}
+      {%- when 'index' %}
+        <script src="{{ 'cardstack.js' | asset_url }}" defer></script>
+        <script src="{{ 'radiocard.js' | asset_url }}" defer></script>
+      {%- when 'cart' %}
+        <script src="{{ 'cart.js' | asset_url }}" defer></script>
+      {%- when 'blog' or 'article' %}
+        <script src="{{ 'story.js' | asset_url }}" defer></script>
+      {%- when 'customers/account' %}
+        <script src="{{ 'account.js' | asset_url }}" defer></script>
+    {%- endcase %}
+    <script src="{{ 'swipe.js' | asset_url }}" defer></script>
+    <script src="{{ 'offer.js' | asset_url }}" defer></script>
   </body>
 </html>

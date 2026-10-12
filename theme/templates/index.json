@@ -1,9 +1,33 @@
 {
   "sections": {
-    "hero": {
-      "type": "home-hero",
+    "home": {
+      "type": "home-card-stack",
+      "blocks": {
+        "hero": {
+          "type": "hero",
+          "settings": {
+            "word_1": "Streetwear,", "ink_1": "ink-leather",
+            "word_2": "sneakers,", "ink_2": "ink-slate",
+            "word_3": "art,", "ink_3": "ink-madder",
+            "word_4": "music.", "ink_4": "ink-cobalt",
+            "grid_title": "In stock now",
+            "grid_tag": "New arrivals",
+            "count": 11,
+            "statement": "An amalgamation of streetwear, sneakers, art, and music — new arrivals dropping weekly.",
+            "scroll_note": "keep scrolling — up next:"
+          }
+        },
+        "shelf_apparel": { "type": "shelf", "settings": { "title": "Apparel & accessories", "collection": "apparel", "count": 8, "mobile_count": 6 } },
+        "shelf_best": { "type": "shelf", "settings": { "title": "Best sellers", "count": 8, "mobile_count": 6 } },
+        "shelf_restock": { "type": "shelf", "settings": { "title": "Back in stock", "count": 8, "mobile_count": 6 } },
+        "brand_vans": { "type": "brand", "settings": { "title": "Vans", "collection": "vans", "cta": "Shop now" } },
+        "brand_stg": { "type": "brand", "settings": { "title": "Square Trade Goods", "collection": "square-trade-goods", "cta": "Shop now" } },
+        "brand_docs": { "type": "brand", "settings": { "title": "Dr. Martens", "collection": "dr-martens", "cta": "Shop now" } },
+        "aux": { "type": "aux", "settings": { "badge": "August AUX" } }
+      },
+      "block_order": ["hero", "shelf_apparel", "shelf_best", "shelf_restock", "brand_vans", "brand_stg", "brand_docs", "aux"],
       "settings": {}
     }
   },
-  "order": ["hero"]
+  "order": ["home"]
 }

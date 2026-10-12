@@ -1,21 +1,81 @@
-{% comment %} Prototype: collection.html PLP grid {% endcomment %}
-<main class="plp" id="main">
-  <header class="plp-intro">
-    <h1>{{ collection.title }}</h1>
-    <p>{{ collection.products_count }} products</p>
-  </header>
-  <div class="product-grid">
-    {% for product in collection.products %}
-      {% render 'product-card', product: product %}
-    {% else %}
-      <p>Nothing in this collection yet.</p>
-    {% endfor %}
-  </div>
-</main>
+{% comment %}
+  Prototype: collection.html / sale.html (.plp-main). Liquid renders the
+  collection; main.js keeps the client-side filter sheet working over the
+  bootstrapped catalog (this collection's products).
+{% endcomment %}
+{%- liquid
+  assign s = section.settings
+  assign is_sale = false
+  if collection.handle == settings.sale_collection
+    assign is_sale = true
+  endif
+  assign count = collection.products_count
+  assign count_label = count | append: ' product'
+  if count != 1
+    assign count_label = count_label | append: 's'
+  endif
+  if s.show_description and collection.description != blank
+    assign island = collection.description | strip_html | truncate: 110 | append: ' · ' | append: count_label
+  elsif collection.handle == 'all' or collection.handle == settings.everything_collection
+    assign island = s.everything_text | default: collection.title | append: ' · ' | append: count_label
+  else
+    assign island = collection.title | append: ' · ' | append: count_label
+  endif
+-%}
+{%- paginate collection.products by s.per_page -%}
+  {%- render 'catalog-json', products: collection.products, limit: s.per_page -%}
+
+  <main class="plp-main" id="main" data-plp{% if is_sale %} data-plp-sale{% endif %} data-section-id="{{ section.id }}">
+    <h1 class="sr-only">{{ collection.title }}</h1>
+    <section class="plp-intro" aria-labelledby="plp-intro-heading">
+      <h2 id="plp-intro-heading" class="sr-only">Collection intro</h2>
+      <div class="plp-intro__island">
+        <p data-island-default="{{ island | escape }}">{{ island }}</p>
+      </div>
+      <button class="plp-filter-btn" type="button" data-sheet-open="filter-sheet" aria-label="Filter and sort">
+        <svg viewBox="0 0 14 14" fill="none" aria-hidden="true"><path d="M2 4h10M4 7h6M6 10h2" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>
+        <span>{{ s.filter_label }}</span>
+        <span class="plp-filter-btn__count" data-filter-count hidden>0</span>
+      </button>
+    </section>
+
+    <section class="plp-grid-wrap" aria-label="Products">
+      <div class="product-grid">
+        {%- for product in collection.products -%}
+          {%- render 'product-card', product: product -%}
+        {%- else -%}
+          <p class="plp-empty">{{ s.empty_text }}</p>
+        {%- endfor -%}
+      </div>
+      {%- if paginate.pages > 1 -%}
+        <nav class="plp-pagination" aria-label="Pagination">{{ paginate | default_pagination: next: 'Next →', previous: '← Previous' }}</nav>
+      {%- endif -%}
+    </section>
+  </main>
+
+  {%- render 'filter-sheet', vendors: collection.all_vendors, eyebrow: count_label, section: section -%}
+{%- endpaginate -%}
 
 {% schema %}
 {
-  "name": "Collection",
-  "settings": []
+  "name": "Collection grid",
+  "tag": "div",
+  "class": "shopify-section-plp",
+  "settings": [
+    { "type": "range", "id": "per_page", "label": "Products per page", "min": 24, "max": 248, "step": 4, "default": 96, "info": "The filter sheet filters what's on the page, so larger is better for small collections." },
+    { "type": "checkbox", "id": "show_description", "label": "Use collection description as the intro", "default": true },
+    { "type": "text", "id": "everything_text", "label": "Intro for the Everything collection", "default": "New arrivals from Nike, Adidas, Carhartt WIP, and more" },
+    { "type": "text", "id": "filter_label", "label": "Filter button", "default": "Filter & sort" },
+    { "type": "text", "id": "empty_text", "label": "Empty message", "default": "Nothing here yet — check back soon." },
+    { "type": "header", "content": "Filter sheet" },
+    { "type": "checkbox", "id": "show_brands", "label": "Brand chips", "default": true },
+    { "type": "checkbox", "id": "show_dept", "label": "Department (Men / Women)", "default": true, "info": "Products need dept:men / dept:women tags." },
+    { "type": "checkbox", "id": "show_cats", "label": "Category chips", "default": true, "info": "Uses cat:shoes / cat:apparel / cat:accessories / cat:objects tags, else product type." },
+    { "type": "checkbox", "id": "show_price", "label": "Price bands", "default": true },
+    { "type": "number", "id": "price_band_1", "label": "Price band 1 ($)", "default": 50 },
+    { "type": "number", "id": "price_band_2", "label": "Price band 2 ($)", "default": 100 },
+    { "type": "number", "id": "price_band_3", "label": "Price band 3 ($)", "default": 150 },
+    { "type": "checkbox", "id": "show_sale", "label": "Sale toggle", "default": true }
+  ]
 }
 {% endschema %}

@@ -1,0 +1,34 @@
+{% comment %} /collections — brand + category directory in the story layout {% endcomment %}
+<main class="story story--index" id="main" data-section-id="{{ section.id }}">
+  <header class="story__mast">
+    <p class="story__kicker">{{ section.settings.kicker }}</p>
+    <h1 class="story__title">{{ section.settings.title }}</h1>
+  </header>
+  <div class="story__grid story__grid--archive">
+    {%- paginate collections by 48 -%}
+      {%- for c in collections -%}
+        {%- if c.products_count > 0 or section.settings.show_empty -%}
+          <a class="story-tile" href="{{ c.url }}">
+            <div class="story-tile__art">{% if c.featured_image %}<img src="{{ c.featured_image | image_url: width: 600 }}" alt="" loading="lazy" width="600" height="600">{% endif %}</div>
+            <span class="story-tile__no">{{ c.products_count }} product{% if c.products_count != 1 %}s{% endif %}</span>
+            <span class="story-tile__title">{{ c.title }}</span>
+          </a>
+        {%- endif -%}
+      {%- endfor -%}
+      {%- if paginate.pages > 1 -%}<nav class="story__pagination">{{ paginate | default_pagination }}</nav>{%- endif -%}
+    {%- endpaginate -%}
+  </div>
+</main>
+
+{% schema %}
+{
+  "name": "Collections list",
+  "tag": "div",
+  "class": "shopify-section-story",
+  "settings": [
+    { "type": "text", "id": "kicker", "label": "Kicker", "default": "August" },
+    { "type": "text", "id": "title", "label": "Title", "default": "Collections" },
+    { "type": "checkbox", "id": "show_empty", "label": "Show empty collections", "default": false }
+  ]
+}
+{% endschema %}

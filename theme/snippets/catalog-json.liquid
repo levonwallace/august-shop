@@ -1,0 +1,17 @@
+{% comment %}
+  Append a product list to window.AugustBootstrap.products.
+  Sections call this so the client catalog (js/catalog.js) is scoped to
+  what the page is about: the Everything collection on home, the current
+  collection on a PLP, search hits on /search, product + related on a PDP.
+
+  Usage: {% render 'catalog-json', products: collection.products, limit: 250 %}
+{% endcomment %}
+{%- assign cap = limit | default: 250 -%}
+<script>
+  window.AugustBootstrap = window.AugustBootstrap || { products: [] };
+  window.AugustBootstrap.products = (window.AugustBootstrap.products || []).concat([
+    {%- for product in products limit: cap -%}
+      {%- render 'product-json', product: product -%}{%- unless forloop.last -%},{%- endunless -%}
+    {%- endfor -%}
+  ]);
+</script>

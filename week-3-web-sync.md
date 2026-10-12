@@ -60,7 +60,7 @@ Alex will keep a private preview link so Mason’s team does not have to live in
 - [x] Mega menu scale + account onboarding
 - [x] Routed homepage (feed vs everything)
 - [x] Prototype Tinder-style swipe on product cards to train Your feed (right = similar, left = less)
-- [ ] Everything feed = live Shopify availability (waiting on draft theme upload)
+- [x] Everything feed = live Shopify availability (Liquid collections → `AugustBootstrap.products`; verify on the draft theme after upload)
 - [x] Events + mix pages
 - [x] Search typeahead: category / brand jumps above SKU hits (ASICS, jeans)
 - [x] Collapse Explore + 10% popup + newsletter (`august_offer_dismissed`)
@@ -72,11 +72,13 @@ Alex will keep a private preview link so Mason’s team does not have to live in
 ## Status — Oct 12
 
 - Final demo pass shipped: grey-frosted "dock" glass on the mobile header + tab bar, constant 6px corner across the desktop zoom (`--ui-zoom`).
-- Live theme (Pipeline 7.0.2) exported Oct 9. Strategy is now **fork the live export, overlay August 2.0** — see `august-2.0-liquid-transfer.md` (the package). The 36-file `theme/` scaffold is a skeleton only, not a store.
-- First upload attempt failed (`missing template "layout/theme.liquid"`): the zip was a macOS folder-zip with a wrapper directory. Rebuilt clean at `~/Downloads/august-2.0-draft.zip` — theme folders at root, `__MACOSX`/`.DS_Store` stripped, and four custom sections (`section-one` … `section-four`) had trailing-comma schema JSON fixed so the editor won't choke. All 79 section schemas + templates validate.
-- Editor surface for the content/sales team: 43 addable sections with presets, all schemas valid. `section-four` keeps its stored Inn imagery untouched.
-- [ ] Upload `august-2.0-draft.zip` as **August 2.0 draft** (do not publish), then paste the private preview link here:
+- Direction change: the Pipeline 7.0.2 export (Oct 9) turned out to be a clone of the current site, not a base for August 2.0. **The theme is now built from this repo.** `august-2.0-liquid-transfer.md` is kept for reference only.
+- `theme/` is a complete OS 2.0 theme generated from the prototype: same markup, CSS and JS; Liquid feeds live collections, cart, customer, blogs and pages into the prototype scripts via `window.AugustBootstrap`. `shopify theme check` passes (2 non-blocking warnings).
+- Editor surface for the content/sales team: every copy/image area is a section setting or block — header mega panels + mobile promos, home hero / shelves / brand cards / AUX card, PLP + search filters, PDP tabs + Ask AI + labels, bag copy, blog + article copy, August Inn page, footer, tab bar, 404, password, plus theme settings for Catalog handles, Colors, Typography, Announcement, Pickup store and the 10% Offer popup. Guide: `theme/README.md`.
+- Zip is built by `npm run theme:zip` → `dist/august-2.0-theme.zip` with `layout/theme.liquid` at the zip root (the Oct 9 failure was a macOS folder-zip).
+- [ ] Upload `dist/august-2.0-theme.zip` as **August 2.0** (unpublished), run the one-time setup in `theme/README.md` (Catalog handles, `page.august-inn` template, pickup store, footer menu, `august.*` metafields), then paste the private preview link here:
   - Preview link: _(add after upload)_
+- [ ] Wed Oct 14 (NYC): walk Mason's team through Customize on the draft theme; collect schema gaps for the Oct 16–23 staff week.
 
 ---
 

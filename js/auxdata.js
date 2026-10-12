@@ -309,6 +309,22 @@
     },
   ];
 
+  /* Theme: the AUX + Events blogs arrive as window.AugustBootstrap.mixes /
+     .events (snippets/aux-json.liquid). Replace the sample data in place so
+     every consumer (radiocard.js, story.js, swipe toasts) sees the real
+     posts without changing their references. */
+  const BOOT = window.AugustBootstrap;
+  if (BOOT && BOOT.live) {
+    if (Array.isArray(BOOT.mixes) && BOOT.mixes.length) {
+      MIXES.splice(0, MIXES.length, ...BOOT.mixes.map((m) => ({ ...m, art: m.art || ART_POOL[0] })));
+    } else if (Array.isArray(BOOT.mixes)) {
+      MIXES.splice(0, MIXES.length);
+    }
+    if (Array.isArray(BOOT.events)) {
+      EVENTS.splice(0, EVENTS.length, ...BOOT.events);
+    }
+  }
+
   const mixByNo = (no) => MIXES.find((m) => m.no === String(no).padStart(3, "0"));
   const eventById = (id) => EVENTS.find((e) => e.id === id);
 

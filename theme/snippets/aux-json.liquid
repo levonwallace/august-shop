@@ -1,0 +1,89 @@
+{% comment %}
+  AUX mixes + Events → window.AugustBootstrap.mixes / .events
+  Replaces js/auxdata.js fake data on the live theme.
+
+  Usage:
+    {% render 'aux-json', kind: 'mixes',  blog: blogs[settings.aux_blog],    articles: blog.articles %}
+    {% render 'aux-json', kind: 'events', blog: blogs[settings.events_blog], articles: blog.articles %}
+
+  Article metafields (namespace `august`, all optional):
+    mix_number         "078"            — else parsed from "AUGUST AUX :: 078 …"
+    mix_title          display name     — else the words after the number
+    genre              "House"          — else first tag
+    audio_url          hosted mp3/wav   — plays in the AUX card + mix page
+    soundcloud_track_id                 — embedded on the mix page
+    series             "AUX" / "Art Collective" — events, else first tag
+    event_date         date             — else published_at
+    venue              "The Side Door, Madison"
+    ticket_url         link for the event CTA
+{% endcomment %}
+{%- assign list = articles | default: blog.articles -%}
+<script>
+  window.AugustBootstrap = window.AugustBootstrap || {};
+  {%- if kind == 'mixes' %}
+  window.AugustBootstrap.mixes = (window.AugustBootstrap.mixes || []).concat([
+    {%- for article in list -%}
+      {%- liquid
+        assign parts = article.title | split: '::'
+        assign tail = article.title
+        if parts.size > 1
+          assign tail = parts | last | strip
+        endif
+        assign first_word = tail | split: ' ' | first | strip
+        assign numeric = first_word | plus: 0
+        assign no = article.metafields.august.mix_number | strip
+        assign derived_name = tail
+        if no == blank
+          if numeric > 0 or first_word == '0' or first_word == '00' or first_word == '000'
+            assign no = first_word
+            assign derived_name = tail | remove_first: first_word | strip
+          else
+            assign no = list.size | minus: forloop.index0 | append: ''
+          endif
+        endif
+        assign no = no | prepend: '00' | slice: -3, 3
+        assign name = article.metafields.august.mix_title | default: derived_name | default: article.title
+        if name == blank
+          assign name = article.title
+        endif
+        assign genre = article.metafields.august.genre | default: article.tags.first | default: ''
+      -%}
+      {
+        "no": {{ no | json }},
+        "name": {{ name | json }},
+        "genre": {{ genre | json }},
+        "art": {% if article.image %}{{ article.image | image_url: width: 600 | json }}{% else %}""{% endif %},
+        "src": {{ article.metafields.august.audio_url | default: '' | json }},
+        "soundcloud": {{ article.metafields.august.soundcloud_track_id | default: '' | json }},
+        "body": {{ article.excerpt_or_content | strip_html | truncate: 600 | json }},
+        "date": {{ article.published_at | date: '%b %-d, %Y' | json }},
+        "handle": {{ article.handle | json }},
+        "url": {{ article.url | json }}
+      }{%- unless forloop.last -%},{%- endunless -%}
+    {%- endfor -%}
+  ]);
+  {%- else %}
+  window.AugustBootstrap.events = (window.AugustBootstrap.events || []).concat([
+    {%- for article in list -%}
+      {%- liquid
+        assign series = article.metafields.august.series | default: article.tags.first | default: 'Event'
+        assign when = article.metafields.august.event_date | default: article.published_at
+        assign paragraphs = article.content | replace: '</p>', '|||' | strip_html | split: '|||'
+      -%}
+      {
+        "id": {{ article.handle | json }},
+        "series": {{ series | json }},
+        "date": {{ when | date: '%b %-d, %Y' | json }},
+        "iso": {{ when | date: '%Y-%m-%d' | json }},
+        "title": {{ article.title | json }},
+        "excerpt": {{ article.excerpt_or_content | strip_html | truncate: 160 | json }},
+        "venue": {{ article.metafields.august.venue | default: '' | json }},
+        "link": {{ article.metafields.august.ticket_url | default: '' | json }},
+        "image": {% if article.image %}{{ article.image | image_url: width: 1200 | json }}{% else %}""{% endif %},
+        "body": [{% for para in paragraphs %}{% assign clean = para | strip %}{% if clean != blank %}{{ clean | json }},{% endif %}{% endfor %}""].filter(Boolean),
+        "url": {{ article.url | json }}
+      }{%- unless forloop.last -%},{%- endunless -%}
+    {%- endfor -%}
+  ]);
+  {%- endif %}
+</script>

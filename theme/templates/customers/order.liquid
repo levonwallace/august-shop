@@ -1,6 +1,133 @@
-<main class="account-page" id="main">
-  <h1>Order {{ order.name }}</h1>
-  <p>{{ order.created_at | date: '%b %d, %Y' }} · {{ order.financial_status_label }}</p>
-  <p>{{ order.total_price | money }}</p>
-  <a href="{{ routes.account_url }}">Back to account</a>
+{% comment %}
+  Prototype: order.html — tracking page. Live data: steps come from the
+  order's financial / fulfillment status, tracking links from fulfillments.
+  (The prototype's animated Leaflet route was demo-only and is not shipped.)
+{% endcomment %}
+{%- liquid
+  assign street = settings.store_address | split: ',' | first
+  assign fulfilled = false
+  if order.fulfillment_status == 'fulfilled'
+    assign fulfilled = true
+  endif
+  assign status_label = order.fulfillment_status_label
+  assign status_class = 'order-status--process'
+  if fulfilled
+    assign status_label = 'Shipped'
+    assign status_class = 'order-status--done'
+  elsif order.fulfillment_status == 'partial'
+    assign status_label = 'Partially shipped'
+    assign status_class = 'order-status--transit'
+  endif
+  if order.cancelled
+    assign status_label = 'Cancelled'
+  endif
+  assign fulfillment = order.line_items | map: 'fulfillment' | compact | first
+  assign is_pickup = false
+  if order.attributes.fulfillment == 'pickup' or order.shipping_address == blank
+    assign is_pickup = true
+  endif
+-%}
+<main class="story story--order" id="main">
+  <a class="story__back" href="{{ routes.account_url }}#orders">← Orders</a>
+  <p class="story__kicker" data-order-kicker>{{ order.name }}</p>
+  <div class="track-head">
+    <h1 class="story__title">{{ status_label }}</h1>
+    <span class="order-status {{ status_class }}">{{ order.financial_status_label }}</span>
+  </div>
+  <p class="story__lead">
+    {%- if order.cancelled -%}
+      Cancelled {{ order.cancelled_at | date: '%b %-d' }}{% if order.cancel_reason_label != blank %} · {{ order.cancel_reason_label }}{% endif %}
+    {%- elsif fulfilled and fulfillment.tracking_url -%}
+      On its way via {{ fulfillment.tracking_company }} — <a href="{{ fulfillment.tracking_url }}" target="_blank" rel="noopener noreferrer">track package</a>
+    {%- elsif fulfilled -%}
+      {% if is_pickup %}Ready for pickup at {{ street }}.{% else %}Shipped from {{ street }}.{% endif %}
+    {%- else -%}
+      {% if is_pickup %}Being pulled for pickup at {{ street }}.{% else %}Being packed at {{ street }}.{% endif %}
+    {%- endif -%}
+  </p>
+
+  <ol class="track-steps">
+    <li class="track-step is-done{% unless fulfilled or order.fulfillment_status == 'partial' %} is-current{% endunless %}">
+      <span class="track-step__dot" aria-hidden="true"></span>
+      <span class="track-step__label">Ordered</span>
+      <span class="track-step__detail">{{ order.created_at | date: '%b %-d' }}</span>
+    </li>
+    <li class="track-step{% if fulfilled or order.fulfillment_status == 'partial' %} is-done{% endif %}{% if order.fulfillment_status == 'partial' %} is-current{% endif %}">
+      <span class="track-step__dot" aria-hidden="true"></span>
+      <span class="track-step__label">Packed</span>
+      <span class="track-step__detail">{% if fulfilled or order.fulfillment_status == 'partial' %}{{ fulfillment.created_at | date: '%b %-d' }}{% else %}Next up{% endif %}</span>
+    </li>
+    <li class="track-step{% if fulfilled %} is-done is-current{% endif %}">
+      <span class="track-step__dot" aria-hidden="true"></span>
+      <span class="track-step__label">{% if is_pickup %}Ready for pickup{% else %}In transit{% endif %}</span>
+      <span class="track-step__detail">{% if fulfilled %}{% if fulfillment.tracking_number %}{{ fulfillment.tracking_company }} {{ fulfillment.tracking_number }}{% else %}On the way{% endif %}{% else %}—{% endif %}</span>
+    </li>
+  </ol>
+
+  <section class="track-panel" aria-labelledby="track-items-title">
+    <h2 id="track-items-title">Items</h2>
+    <div>
+      {%- for item in order.line_items -%}
+        <a class="track-item" href="{{ item.url | default: routes.all_products_collection_url }}">
+          <div class="track-item__thumb">{% if item.image %}<img src="{{ item.image | image_url: width: 160 }}" alt="" width="160" height="160">{% endif %}</div>
+          <div class="track-item__info">
+            <span class="track-item__brand">{{ item.vendor }}</span>
+            <span class="track-item__title">{{ item.title }}</span>
+            <span class="track-item__meta">{% unless item.variant.title == 'Default Title' or item.variant.title == blank %}{{ item.variant.title }} · {% endunless %}Qty {{ item.quantity }}</span>
+          </div>
+          <span class="track-item__price">{{ item.final_line_price | money }}</span>
+        </a>
+      {%- endfor -%}
+    </div>
+  </section>
+
+  <section class="track-panel" aria-labelledby="track-ship-title">
+    <h2 id="track-ship-title">{% if is_pickup %}Pickup{% else %}Shipping{% endif %}</h2>
+    <div class="track-meta">
+      <div>
+        <span class="track-meta__label">{% if is_pickup %}Pick up at{% else %}Ships from{% endif %}</span>
+        <p>{{ settings.store_name }} · {{ street }}</p>
+      </div>
+      {%- unless is_pickup -%}
+        <div>
+          <span class="track-meta__label">Delivering to</span>
+          <p>{{ order.shipping_address | format_address }}</p>
+        </div>
+      {%- endunless -%}
+      {%- if fulfillment.tracking_number -%}
+        <div>
+          <span class="track-meta__label">Carrier</span>
+          <p>{{ fulfillment.tracking_company }} · {% if fulfillment.tracking_url %}<a href="{{ fulfillment.tracking_url }}" target="_blank" rel="noopener noreferrer">{{ fulfillment.tracking_number }}</a>{% else %}{{ fulfillment.tracking_number }}{% endif %}</p>
+        </div>
+      {%- endif -%}
+      <div>
+        <span class="track-meta__label">Placed</span>
+        <p>{{ order.created_at | date: '%a, %b %-d, %Y' }}</p>
+      </div>
+      <div>
+        <span class="track-meta__label">Subtotal</span>
+        <p>{{ order.line_items_subtotal_price | money }}</p>
+      </div>
+      {%- for discount in order.discount_applications -%}
+        <div>
+          <span class="track-meta__label">Discount{% if discount.title != blank %} · {{ discount.title }}{% endif %}</span>
+          <p>−{{ discount.total_allocated_amount | money }}</p>
+        </div>
+      {%- endfor -%}
+      {%- for line in order.shipping_methods -%}
+        <div>
+          <span class="track-meta__label">{{ line.title }}</span>
+          <p>{{ line.price | money }}</p>
+        </div>
+      {%- endfor -%}
+      <div>
+        <span class="track-meta__label">Tax</span>
+        <p>{{ order.tax_price | money }}</p>
+      </div>
+      <div>
+        <span class="track-meta__label">Total</span>
+        <p>{{ order.total_price | money }}</p>
+      </div>
+    </div>
+  </section>
 </main>

@@ -1,0 +1,45 @@
+{% layout none %}
+<!doctype html>
+<html lang="{{ request.locale.iso_code }}">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>{{ shop.name }} — Gift card</title>
+    {% render 'css-variables' %}
+    {{ 'tokens.css' | asset_url | stylesheet_tag }}
+    {{ 'base.css' | asset_url | stylesheet_tag }}
+    {{ 'components.css' | asset_url | stylesheet_tag }}
+    {{ 'pages.css' | asset_url | stylesheet_tag }}
+    {{ 'profile.css' | asset_url | stylesheet_tag }}
+    {{ 'theme-live.css' | asset_url | stylesheet_tag }}
+    {{ content_for_header }}
+  </head>
+  <body class="template-gift-card">
+    <div class="page page--account">
+      <main class="account-page" id="main">
+        <div class="account-gate">
+          <div class="glass-panel account-gate__card">
+            <p class="story__kicker">{{ shop.name }}</p>
+            <h1>{{ gift_card.initial_value | money }} gift card</h1>
+            {%- if gift_card.enabled == false or gift_card.expired -%}
+              <p class="account-gate__why">This gift card is no longer valid.</p>
+            {%- else -%}
+              <p class="account-gate__why">Balance: {{ gift_card.balance | money }}{% if gift_card.expires_on %} · Expires {{ gift_card.expires_on | date: '%b %-d, %Y' }}{% endif %}</p>
+            {%- endif -%}
+            <p class="story__title" style="letter-spacing:.08em">{{ gift_card.code | format_code }}</p>
+            <div class="gift-card__qr" data-gift-card-qr data-identifier="{{ gift_card.qr_identifier }}" style="display:flex;justify-content:center;margin:16px 0"></div>
+            <script src="{{ 'vendor/qrcode.js' | shopify_asset_url }}" defer></script>
+            <script>
+              document.addEventListener("DOMContentLoaded", () => {
+                const el = document.querySelector("[data-gift-card-qr]");
+                if (el && window.QRCode) new QRCode(el, { text: el.dataset.identifier, width: 160, height: 160 });
+              });
+            </script>
+            <a class="btn btn--primary btn--block" href="{{ shop.url }}">Shop {{ shop.name }}</a>
+            <button class="btn btn--ghost btn--block" type="button" onclick="window.print()">Print</button>
+          </div>
+        </div>
+      </main>
+    </div>
+  </body>
+</html>

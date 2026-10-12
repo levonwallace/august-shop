@@ -1,48 +1,246 @@
-{% comment %} Prototype: product.html + js/pdp.js — Ajax add via AugustCart / shopify-bridge {% endcomment %}
-<main class="pdp" id="main" data-product-handle="{{ product.handle }}">
-  <div class="pdp-media">
-    {% for image in product.images %}
-      <img
-        src="{{ image | image_url: width: 1400 }}"
-        alt="{{ image.alt | default: product.title | escape }}"
-        {% if forloop.first %}{% else %}loading="lazy"{% endif %}
-      >
-    {% endfor %}
-  </div>
-  <div class="pdp-info">
-    <p class="pdp-brand">{{ product.vendor }}</p>
-    <h1>{{ product.title }}</h1>
-    <p class="pdp-price">
-      {% if product.compare_at_price > product.price %}
-        <span class="price-was">{{ product.compare_at_price | money }}</span>
-      {% endif %}
-      {{ product.price | money }}
-    </p>
-    {% form 'product', product %}
-      {% unless product.has_only_default_variant %}
-        {% for option in product.options_with_values %}
-          <fieldset class="segmented" data-segmented>
-            <legend>{{ option.name }}</legend>
-            {% for value in option.values %}
-              <button type="button" class="segmented__opt{% if option.selected_value == value %} is-active{% endif %}" data-value="{{ value | escape }}">{{ value }}</button>
-            {% endfor %}
-          </fieldset>
-        {% endfor %}
-      {% endunless %}
-      <input type="hidden" name="id" value="{{ product.selected_or_first_available_variant.id }}">
-      <button class="btn btn--primary btn--block" type="submit" name="add"{% unless product.selected_or_first_available_variant.available %} disabled{% endunless %}>
-        Add to bag
-      </button>
-    {% endform %}
-    <div class="pdp-body">{{ product.description }}</div>
-  </div>
+{% comment %}
+  Prototype: product.html — gallery, glass buy box, description card,
+  tabs card. Liquid renders the product; august-live.js handles variant
+  selection (segmented), Ajax add-to-bag and the confirmation sheet.
+{% endcomment %}
+{%- liquid
+  assign s = section.settings
+  assign variant = product.selected_or_first_available_variant
+  assign has_options = true
+  if product.has_only_default_variant
+    assign has_options = false
+  endif
+  assign short = product.metafields.august.short_description
+  if short == blank
+    assign short = product.description | strip_html | truncate: 180
+  endif
+  assign related = blank
+  if s.related_collection != blank
+    assign related = collections[s.related_collection].products
+  elsif product.collections.size > 0
+    assign related = product.collections.last.products
+  endif
+-%}
+
+<script>
+  window.AugustBootstrap.product = {
+    id: {{ product.id }},
+    handle: {{ product.handle | json }},
+    title: {{ product.title | json }},
+    brand: {{ product.vendor | json }},
+    img: {{ product.featured_image | image_url: width: 600 | json }},
+    options: {{ product.options | json }},
+    variants: [
+      {%- for v in product.variants -%}
+        { id: {{ v.id }}, title: {{ v.title | json }}, available: {{ v.available }}, price: {{ v.price | divided_by: 100.0 }}, compare: {{ v.compare_at_price | default: 0 | divided_by: 100.0 }}, options: {{ v.options | json }}, img: {{ v.featured_image | image_url: width: 600 | json }} }{% unless forloop.last %},{% endunless %}
+      {%- endfor -%}
+    ]
+  };
+</script>
+
+<main id="main" data-section-id="{{ section.id }}">
+  <section class="pdp-main" data-pdp>
+    <div class="pdp-gallery">
+      {%- assign hero_image = variant.featured_image | default: product.featured_image -%}
+      {%- if hero_image -%}
+        <img class="pdp-gallery__image" src="{{ hero_image | image_url: width: 1200 }}" srcset="{{ hero_image | image_url: width: 700 }} 700w, {{ hero_image | image_url: width: 1200 }} 1200w, {{ hero_image | image_url: width: 1800 }} 1800w" sizes="(min-width: 901px) 56vw, 100vw" alt="{{ hero_image.alt | default: product.title | escape }}" width="{{ hero_image.width }}" height="{{ hero_image.height }}" data-pdp-image>
+      {%- else -%}
+        {{ 'product-1' | placeholder_svg_tag: 'pdp-gallery__image' }}
+      {%- endif -%}
+      <div class="pdp-thumbs" aria-label="Product views"{% if product.media.size < 2 %} hidden{% endif %} data-pdp-thumbs>
+        {%- for media in product.media limit: s.thumb_count -%}
+          {%- if media.media_type == 'image' -%}
+            <button type="button" class="pdp-thumbs__btn{% if forloop.first %} is-active{% endif %}" data-thumb="{{ media | image_url: width: 1200 }}" aria-label="View {{ forloop.index }}">
+              <img src="{{ media | image_url: width: 160 }}" alt="" loading="lazy" width="160" height="160">
+            </button>
+          {%- endif -%}
+        {%- endfor -%}
+      </div>
+    </div>
+
+    <div class="glass-panel buy-box">
+      <div class="buy-box__brand">{{ product.vendor }}</div>
+      <h1 class="buy-box__title">{{ product.title }}</h1>
+      <div class="buy-box__price" data-pdp-price>
+        {%- if variant.compare_at_price > variant.price -%}<span class="price-was">{{ variant.compare_at_price | money }}</span> {% endif -%}
+        {{- variant.price | money -}}
+      </div>
+      {%- if short != blank -%}<p class="buy-box__desc">{{ short }}</p>{%- endif -%}
+
+      {%- form 'product', product, class: 'buy-box__form', data-pdp-form: '' -%}
+        {%- if has_options -%}
+          {%- for option in product.options_with_values -%}
+            <div class="buy-box__label">{{ option.name }}</div>
+            <div class="segmented segmented--block" data-segmented data-option-index="{{ forloop.index0 }}" role="radiogroup" aria-label="{{ option.name | escape }}">
+              {%- for value in option.values -%}
+                {%- assign selected = false -%}
+                {%- if option.selected_value == value -%}{%- assign selected = true -%}{%- endif -%}
+                <button type="button" class="segmented__segment{% if selected %} is-active{% endif %}" role="radio" aria-checked="{{ selected }}" data-value="{{ value | escape }}">{{ value }}</button>
+              {%- endfor -%}
+            </div>
+          {%- endfor -%}
+        {%- endif -%}
+        <input type="hidden" name="id" value="{{ variant.id }}" data-pdp-variant>
+        <input type="hidden" name="quantity" value="1">
+        <button type="submit" class="btn btn--primary btn--block" data-sheet-open="atb-sheet" data-pdp-atb data-label="{{ s.atb_label | escape }}" data-soldout="{{ s.soldout_label | escape }}"{% unless variant.available %} disabled{% endunless %}>
+          {%- if variant.available -%}{{ s.atb_label }} — {{ variant.price | money }}{%- else -%}{{ s.soldout_label }}{%- endif -%}
+        </button>
+      {%- endform -%}
+
+      {%- if s.note != blank -%}<p class="buy-box__note">{{ s.note }}</p>{%- endif -%}
+
+      {%- for block in section.blocks -%}
+        {%- if block.type == 'ask_ai' -%}
+          <div class="ask-ai" {{ block.shopify_attributes }}>
+            <input class="ask-ai__input" type="text" value="{{ block.settings.placeholder | escape }}" readonly />
+            <div class="ask-ai__chips">
+              {%- if block.settings.chip_1 != blank -%}<button type="button"><span class="spark">✦</span> {{ block.settings.chip_1 }}</button>{%- endif -%}
+              {%- if block.settings.chip_2 != blank -%}<button type="button"><span class="spark">✦</span> {{ block.settings.chip_2 }}</button>{%- endif -%}
+              {%- if block.settings.chip_3 != blank -%}<button type="button"><span class="spark">✦</span> {{ block.settings.chip_3 }}</button>{%- endif -%}
+            </div>
+            {%- if block.settings.legal != blank -%}<p class="ask-ai__legal">{{ block.settings.legal }}</p>{%- endif -%}
+          </div>
+        {%- endif -%}
+      {%- endfor -%}
+    </div>
+  </section>
+
+  {%- if related != blank and s.show_related -%}
+    {%- assign shown = 0 -%}
+    {%- capture related_cards -%}
+      {%- for p in related -%}
+        {%- if p.id != product.id and shown < 4 -%}
+          {%- render 'product-card', product: p -%}
+          {%- assign shown = shown | plus: 1 -%}
+        {%- endif -%}
+      {%- endfor -%}
+    {%- endcapture -%}
+    {%- if shown > 0 -%}
+      <section class="pdp-related" aria-label="{{ s.related_title | escape }}">
+        <h2>{{ s.related_title }}</h2>
+        <div class="product-grid">{{ related_cards }}</div>
+      </section>
+    {%- endif -%}
+  {%- endif -%}
+
+  <section class="pdp-extended">
+    {%- if product.description != blank -%}
+      <div class="white-panel desc-card">
+        <div class="desc-card__body">{{ product.description }}</div>
+      </div>
+    {%- endif -%}
+
+    {%- assign tabs = section.blocks | where: 'type', 'tab' -%}
+    {%- if tabs.size > 0 -%}
+      <div class="white-panel tabs-card" data-tabs>
+        <div class="tabs-card__seg">
+          <div class="segmented segmented--block" data-segmented role="radiogroup" aria-label="Info">
+            {%- for block in tabs -%}
+              <button type="button" class="segmented__segment{% if forloop.first %} is-active{% endif %}" role="radio" aria-checked="{% if forloop.first %}true{% else %}false{% endif %}" data-tab="{{ block.id }}" data-value="{{ block.id }}" {{ block.shopify_attributes }}>{{ block.settings.title }}</button>
+            {%- endfor -%}
+          </div>
+        </div>
+        {%- for block in tabs -%}
+          <div class="tab-panel{% if forloop.first %} is-active{% endif %}" data-panel="{{ block.id }}">
+            {%- if block.settings.heading != blank -%}<h3>{{ block.settings.heading }}</h3>{%- endif -%}
+            {{ block.settings.body }}
+          </div>
+        {%- endfor -%}
+      </div>
+    {%- endif -%}
+  </section>
 </main>
-<script type="application/json" data-product>{{ product | json }}</script>
-<script src="{{ 'pdp.js' | asset_url }}" defer></script>
+
+{%- comment %} Add-to-bag confirmation — august-live.js fills it after /cart/add.js {% endcomment -%}
+<div class="sheet" id="atb-sheet" data-sheet aria-labelledby="atb-sheet-title">
+  <div class="sheet__backdrop" data-sheet-close></div>
+  <div class="sheet__panel" data-sheet-panel>
+    <div class="sheet__grabber" aria-hidden="true"></div>
+    <header class="sheet__header">
+      <div>
+        <span class="sheet-confirm__badge">
+          <span class="sheet-confirm__badge-dot" aria-hidden="true"></span>
+          <span data-atb-badge>{{ s.atb_badge }}</span>
+        </span>
+        <h2 class="sheet__title" id="atb-sheet-title" data-atb-heading>{{ s.atb_heading }}</h2>
+      </div>
+      <button class="sheet__close" type="button" aria-label="Close" data-sheet-close>
+        <svg viewBox="0 0 12 12" fill="none" aria-hidden="true"><path d="M1 1l10 10M11 1L1 11" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>
+      </button>
+    </header>
+    <div class="sheet__body">
+      <div class="sheet-confirm">
+        <div class="sheet-confirm__thumb"><img src="{{ product.featured_image | image_url: width: 240 }}" alt="" width="240" height="240"></div>
+        <div class="sheet-confirm__meta">
+          <p class="sheet-confirm__title">{{ product.title }}</p>
+          <p class="sheet-confirm__sub">{{ product.vendor }} &middot; {{ variant.title }} &middot; {{ variant.price | money }}</p>
+        </div>
+      </div>
+      <p class="sheet-confirm__error" data-atb-error hidden role="alert"></p>
+    </div>
+    <footer class="sheet__footer">
+      <div class="btn-row">
+        <button type="button" class="btn btn--ghost" data-sheet-close>{{ s.atb_continue }}</button>
+        <a class="btn btn--primary" href="{{ routes.cart_url }}">{{ s.atb_view_bag }}</a>
+      </div>
+    </footer>
+  </div>
+</div>
 
 {% schema %}
 {
-  "name": "Product",
-  "settings": []
+  "name": "Product page",
+  "tag": "div",
+  "class": "shopify-section-pdp",
+  "settings": [
+    { "type": "range", "id": "thumb_count", "label": "Thumbnails", "min": 2, "max": 8, "step": 1, "default": 5 },
+    { "type": "text", "id": "atb_label", "label": "Add to bag label", "default": "Add to bag" },
+    { "type": "text", "id": "soldout_label", "label": "Sold out label", "default": "Sold out" },
+    { "type": "text", "id": "note", "label": "Note under button", "default": "Free local pickup in Madison  ·  Ships nationwide" },
+    { "type": "header", "content": "More from August" },
+    { "type": "checkbox", "id": "show_related", "label": "Show related products", "default": true },
+    { "type": "text", "id": "related_title", "label": "Title", "default": "More from August" },
+    { "type": "collection", "id": "related_collection", "label": "Pull from collection", "info": "Leave empty to use the product's own collection." },
+    { "type": "header", "content": "Added-to-bag sheet" },
+    { "type": "text", "id": "atb_badge", "label": "Badge", "default": "Added to bag" },
+    { "type": "text", "id": "atb_heading", "label": "Heading", "default": "Nice pick" },
+    { "type": "text", "id": "atb_continue", "label": "Continue button", "default": "Continue shopping" },
+    { "type": "text", "id": "atb_view_bag", "label": "View bag button", "default": "View bag" }
+  ],
+  "blocks": [
+    {
+      "type": "ask_ai",
+      "name": "Ask anything",
+      "limit": 1,
+      "settings": [
+        { "type": "text", "id": "placeholder", "label": "Prompt", "default": "Ask anything about this product" },
+        { "type": "text", "id": "chip_1", "label": "Chip 1", "default": "When will my order ship?" },
+        { "type": "text", "id": "chip_2", "label": "Chip 2", "default": "Will these fit comfortably?" },
+        { "type": "text", "id": "chip_3", "label": "Chip 3", "default": "Are they good for daily wear?" },
+        { "type": "textarea", "id": "legal", "label": "Legal line", "default": "Chats are recorded and processed by us and our service providers. By continuing, you consent to this recording." }
+      ]
+    },
+    {
+      "type": "tab",
+      "name": "Info tab",
+      "limit": 5,
+      "settings": [
+        { "type": "text", "id": "title", "label": "Tab", "default": "Shipping" },
+        { "type": "text", "id": "heading", "label": "Heading", "default": "Shipping" },
+        { "type": "richtext", "id": "body", "label": "Body", "default": "<p>Orders ship within 1–2 business days. Free local pickup available in Madison, WI.</p>" }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Product page",
+      "blocks": [
+        { "type": "ask_ai" },
+        { "type": "tab", "settings": { "title": "Contact us", "heading": "Customer service / order inquiries", "body": "<p>Please contact us via email: <a href=\"mailto:info@august-shop.com\">info@august-shop.com</a></p><p>CS Hours: 11 AM – 7 PM Central Time</p>" } },
+        { "type": "tab", "settings": { "title": "Shipping", "heading": "Shipping", "body": "<p>Orders ship within 1–2 business days. Free local pickup available in Madison, WI.</p>" } },
+        { "type": "tab", "settings": { "title": "Returns", "heading": "Returns", "body": "<p>Unworn items can be returned within 14 days. See our full returns policy for details.</p>" } }
+      ]
+    }
+  ]
 }
 {% endschema %}

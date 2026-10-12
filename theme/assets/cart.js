@@ -249,7 +249,12 @@
 
     const rows = items
       .map((item, i) => {
-        const product = window.AugustCatalog.byId(item.id);
+        // Theme: Ajax cart lines carry their own title/brand/img/price
+        // (shopify-bridge.js) — fall back to them when the catalog
+        // floor doesn't include the product.
+        const product =
+          window.AugustCatalog.byId(item.id) ||
+          (item.title ? { title: item.title, brand: item.brand || "", img: item.img || "", price: item.price || 0 } : null);
         return product ? lineHtml(item, product, i) : "";
       })
       .filter(Boolean);
@@ -273,14 +278,16 @@
     const note = document.querySelector("[data-cart-fulfill-note]");
     const shipLabel = document.querySelector("[data-cart-ship-label]");
     const shipValue = document.querySelector("[data-cart-ship-value]");
+    // Theme: copy comes from data-* attributes set by sections/main-cart.liquid
+    const txt = (el, key, fallback) => el?.dataset?.[key] || fallback;
     if (fulfill === "ship") {
-      if (note) note.textContent = "1–2 business days from 414 State St.";
-      if (shipLabel) shipLabel.textContent = "Shipping";
-      if (shipValue) shipValue.textContent = "At checkout";
+      if (note) note.textContent = txt(note, "noteShip", "1–2 business days from 414 State St.");
+      if (shipLabel) shipLabel.textContent = txt(shipLabel, "labelShip", "Shipping");
+      if (shipValue) shipValue.textContent = txt(shipValue, "valueShip", "At checkout");
     } else {
-      if (note) note.textContent = "Ready at 414 State St. Usually same day.";
-      if (shipLabel) shipLabel.textContent = "Pickup";
-      if (shipValue) shipValue.textContent = "Free";
+      if (note) note.textContent = txt(note, "notePickup", "Ready at 414 State St. Usually same day.");
+      if (shipLabel) shipLabel.textContent = txt(shipLabel, "labelPickup", "Pickup");
+      if (shipValue) shipValue.textContent = txt(shipValue, "valuePickup", "Free");
     }
 
     const checkout = document.querySelector("[data-cart-checkout]");
@@ -292,6 +299,8 @@
   const wireCheckout = () => {
     const checkout = document.querySelector("[data-cart-checkout]");
     if (!checkout) return;
+    // Theme: the button is a real link to Shopify checkout.
+    if (window.AugustBootstrap?.live) return;
     checkout.addEventListener("click", (e) => {
       e.preventDefault();
       if (!window.AugustCart || !window.AugustCart.items().length) return;
@@ -322,6 +331,7 @@
   document.addEventListener("DOMContentLoaded", () => {
     const fulfillRoot = document.querySelector("[data-cart-fulfill]");
     if (fulfillRoot) {
+      fulfill = fulfillRoot.querySelector(".is-active")?.getAttribute("data-value") === "ship" ? "ship" : "pickup";
       fulfillRoot.addEventListener("segmented:change", (e) => {
         fulfill = e.detail?.value === "ship" ? "ship" : "pickup";
         paintSummary();

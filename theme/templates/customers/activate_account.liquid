@@ -1,8 +1,23 @@
-<main class="account-gate" id="main">
-  <h1>Activate account</h1>
-  {% form 'activate_customer_password' %}
-    <input type="password" name="customer[password]" autocomplete="new-password">
-    <input type="password" name="customer[password_confirmation]" autocomplete="new-password">
-    <button class="btn btn--primary" type="submit">Activate</button>
-  {% endform %}
+<main class="account-page" id="main">
+  <div class="account-gate">
+    <div class="glass-panel account-gate__card">
+      <h1>Activate account</h1>
+      <p class="account-gate__why">Set a password to finish setting up your account.</p>
+      {%- form 'activate_customer_password', class: 'profile-form' -%}
+        {%- if form.errors -%}
+          <p class="profile-form__error" role="alert">{{ form.errors | default_errors }}</p>
+        {%- endif -%}
+        <label class="profile-field">
+          <span>Password</span>
+          <input type="password" name="customer[password]" required minlength="8" autocomplete="new-password">
+        </label>
+        <label class="profile-field">
+          <span>Confirm password</span>
+          <input type="password" name="customer[password_confirmation]" required minlength="8" autocomplete="new-password">
+        </label>
+        <button class="btn btn--primary btn--block profile-form__submit" type="submit">Activate</button>
+        <button class="btn btn--ghost btn--block" type="submit" name="decline">Decline invitation</button>
+      {%- endform -%}
+    </div>
+  </div>
 </main>

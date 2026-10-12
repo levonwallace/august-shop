@@ -1,12 +1,28 @@
-{% comment %} Prototype: css/tokens.css :root — theme settings override at runtime. {% endcomment %}
+{% comment %}
+  Theme settings → CSS custom properties. Overrides css/tokens.css :root
+  at runtime so the editor's Colors / Chrome groups actually restyle the shop.
+  Only tokens with a setting are emitted; everything else keeps the prototype value.
+{% endcomment %}
 {% style %}
   :root {
     --color-ink: {{ settings.color_ink }};
     --color-page: {{ settings.color_page }};
+    --color-surface: {{ settings.color_page }};
     --color-muted: {{ settings.color_muted }};
     --color-link: {{ settings.color_link }};
+    --color-cobalt: {{ settings.color_link }};
     --color-ink-verdigris: {{ settings.color_verdigris }};
-    --ui-scale: {{ settings.ui_scale }};
+    --color-ink-verdigris-hover: {{ settings.color_verdigris | color_lighten: 6 }};
+    --color-madder: {{ settings.color_madder }};
+    --color-verdigris: {{ settings.color_verdigris_soft }};
+    --color-cognac: {{ settings.color_cognac }};
+    --color-ochre: {{ settings.color_ochre }};
+    --color-dot: {{ settings.color_dot }};
+    --ui-scale: {{ settings.ui_scale | default: 75 | divided_by: 100.0 }};
     --radius-card: {{ settings.radius_card }}px;
+    --radius-chrome: {{ settings.radius_chrome }}px;
+    {%- if settings.font_stack != blank %}
+    --font: {{ settings.font_stack }};
+    {%- endif %}
   }
 {% endstyle %}

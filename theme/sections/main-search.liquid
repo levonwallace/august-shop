@@ -1,22 +1,83 @@
-<main class="plp" id="main">
-  <h1>Search</h1>
-  <form action="{{ routes.search_url }}" method="get">
-    <input type="search" name="q" value="{{ search.terms | escape }}" placeholder="Search">
-  </form>
-  <div class="product-grid">
-    {% for item in search.results %}
-      {% if item.object_type == 'product' %}
-        {% render 'product-card', product: item %}
-      {% endif %}
-    {% else %}
-      <p>No results.</p>
-    {% endfor %}
-  </div>
-</main>
+{% comment %}
+  Prototype: collection.html?q=… — Liquid renders real search results, the
+  filter sheet still works client-side over them.
+{% endcomment %}
+{%- liquid
+  assign s = section.settings
+  assign hits = search.results | where: 'object_type', 'product'
+  assign count = search.results_count
+  assign count_label = count | append: ' product'
+  if count != 1
+    assign count_label = count_label | append: 's'
+  endif
+  if search.performed
+    assign island = 'Results for “' | append: search.terms | append: '” · ' | append: count_label
+  else
+    assign island = s.idle_text
+  endif
+-%}
+{%- paginate search.results by s.per_page -%}
+  {%- render 'catalog-json', products: hits, limit: s.per_page -%}
+
+  <main class="plp-main plp-main--search" id="main" data-plp data-plp-search data-section-id="{{ section.id }}">
+    <h1 class="sr-only">{{ s.heading }}</h1>
+    <section class="plp-intro" aria-labelledby="plp-intro-heading">
+      <h2 id="plp-intro-heading" class="sr-only">Search</h2>
+      <div class="plp-intro__island">
+        <p data-island-default="{{ island | escape }}">{{ island }}</p>
+      </div>
+      <button class="plp-filter-btn" type="button" data-sheet-open="filter-sheet" aria-label="Filter and sort">
+        <svg viewBox="0 0 14 14" fill="none" aria-hidden="true"><path d="M2 4h10M4 7h6M6 10h2" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>
+        <span>{{ s.filter_label }}</span>
+        <span class="plp-filter-btn__count" data-filter-count hidden>0</span>
+      </button>
+    </section>
+
+    <section class="plp-grid-wrap" aria-label="Results">
+      <div class="product-grid">
+        {%- for product in hits -%}
+          {%- render 'product-card', product: product -%}
+        {%- else -%}
+          {%- if search.performed -%}
+            <p class="plp-empty">{{ s.empty_text }}</p>
+          {%- else -%}
+            <form class="plp-search-form" action="{{ routes.search_url }}" method="get" role="search">
+              <input type="hidden" name="type" value="product">
+              <input class="plp-search-form__input" type="search" name="q" placeholder="{{ s.placeholder }}" aria-label="Search" autofocus>
+            </form>
+          {%- endif -%}
+        {%- endfor -%}
+      </div>
+      {%- if paginate.pages > 1 -%}
+        <nav class="plp-pagination" aria-label="Pagination">{{ paginate | default_pagination: next: 'Next →', previous: '← Previous' }}</nav>
+      {%- endif -%}
+    </section>
+  </main>
+
+  {%- render 'filter-sheet', vendors: shop.vendors, eyebrow: count_label, section: section -%}
+{%- endpaginate -%}
 
 {% schema %}
 {
-  "name": "Search",
-  "settings": []
+  "name": "Search results",
+  "tag": "div",
+  "class": "shopify-section-plp",
+  "settings": [
+    { "type": "text", "id": "heading", "label": "Heading (screen readers)", "default": "Search" },
+    { "type": "text", "id": "idle_text", "label": "Intro before searching", "default": "Search the shop — brands, products, mixes" },
+    { "type": "text", "id": "placeholder", "label": "Placeholder", "default": "Search" },
+    { "type": "text", "id": "empty_text", "label": "No results", "default": "Nothing matches — try another search or clear a filter." },
+    { "type": "range", "id": "per_page", "label": "Results per page", "min": 24, "max": 248, "step": 4, "default": 96 },
+    { "type": "text", "id": "filter_label", "label": "Filter button", "default": "Filter & sort" },
+    { "type": "header", "content": "Filter sheet" },
+    { "type": "checkbox", "id": "show_brands", "label": "Brand chips", "default": true },
+    { "type": "checkbox", "id": "show_dept", "label": "Department", "default": true },
+    { "type": "checkbox", "id": "show_cats", "label": "Category chips", "default": true },
+    { "type": "checkbox", "id": "show_price", "label": "Price bands", "default": true },
+    { "type": "number", "id": "price_band_1", "label": "Price band 1 ($)", "default": 50 },
+    { "type": "number", "id": "price_band_2", "label": "Price band 2 ($)", "default": 100 },
+    { "type": "number", "id": "price_band_3", "label": "Price band 3 ($)", "default": 150 },
+    { "type": "checkbox", "id": "show_sale", "label": "Sale toggle", "default": true }
+  ]
 }
 {% endschema %}

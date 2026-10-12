@@ -1,0 +1,18 @@
+{
+  "type": "footer",
+  "name": "Footer",
+  "sections": {
+    "footer": {
+      "type": "footer",
+      "settings": {
+        "tagline": "Streetwear, sneakers, art & music — Madison, WI.",
+        "menu": "footer"
+      }
+    },
+    "tabbar": {
+      "type": "tabbar",
+      "settings": {}
+    }
+  },
+  "order": ["footer", "tabbar"]
+}

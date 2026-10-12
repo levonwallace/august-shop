@@ -1,9 +1,41 @@
-<main class="account-gate" id="main">
-  <h1>Create account</h1>
-  {% form 'create_customer' %}
-    <label>Name <input type="text" name="customer[first_name]" autocomplete="name"></label>
-    <label>Email <input type="email" name="customer[email]" autocomplete="email"></label>
-    <label>Password <input type="password" name="customer[password]" autocomplete="new-password"></label>
-    <button class="btn btn--primary" type="submit">Create account</button>
-  {% endform %}
+{% comment %} Prototype: profile.js auth modal (create account tab) as a page {% endcomment %}
+<main class="account-page" id="main">
+  <div class="account-gate">
+    <div class="glass-panel account-gate__card">
+      <div class="auth-tabs" role="tablist" aria-label="Sign in or create account">
+        <a class="auth-tab" role="tab" aria-selected="false" href="{{ routes.account_login_url }}">Sign in</a>
+        <a class="auth-tab is-active" role="tab" aria-selected="true" href="{{ routes.account_register_url }}">Create account</a>
+      </div>
+      <h1>Create account</h1>
+      <p class="account-gate__why">Save a feed, track orders.</p>
+      {%- form 'create_customer', class: 'profile-form' -%}
+        {%- if form.errors -%}
+          <p class="profile-form__error" role="alert">{{ form.errors | default_errors }}</p>
+        {%- endif -%}
+        <label class="profile-field profile-field--name">
+          <span>First name</span>
+          <input type="text" name="customer[first_name]" autocomplete="given-name">
+        </label>
+        <label class="profile-field profile-field--name">
+          <span>Last name</span>
+          <input type="text" name="customer[last_name]" autocomplete="family-name">
+        </label>
+        <label class="profile-field">
+          <span>Email</span>
+          <input type="email" name="customer[email]" required autocomplete="email" autocapitalize="off">
+        </label>
+        <label class="profile-field">
+          <span>Password</span>
+          <input type="password" name="customer[password]" required minlength="8" autocomplete="new-password">
+        </label>
+        <label class="pref-toggle">
+          <input type="checkbox" name="customer[accepts_marketing]" value="true">
+          <span class="pref-toggle__track"><span class="pref-toggle__thumb"></span></span>
+          Drops, events, and the occasional offer by email
+        </label>
+        <button class="btn btn--primary btn--block profile-form__submit" type="submit">Create account</button>
+      {%- endform -%}
+      <p class="auth-footnote">By continuing, you agree to {{ shop.name }}'s <a href="{{ shop.terms_of_service.url | default: '/policies/terms-of-service' }}">Terms</a> and <a href="{{ shop.privacy_policy.url | default: '/policies/privacy-policy' }}">Privacy Policy</a>.</p>
+    </div>
+  </div>
 </main>

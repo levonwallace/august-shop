@@ -1,58 +1,275 @@
-{% comment %} Prototype: index.html header.site-header + morph-menu {% endcomment %}
-<header class="site-header">
+{% comment %}
+  Prototype: header.site-header + morph-menu (mega) + mobile-nav in every page.
+  Blocks:
+    mega_panel — one top-level nav item. Opens the morph menu with its links,
+                 four product tiles from a collection, and an editorial card.
+                 Directory mode swaps the links for the brand / category grid.
+    promo      — a tile in the mobile menu's "Featured" strip.
+  main.js reads window.AugustMegaPanels (emitted below) instead of its
+  hard-coded panels when it exists.
+{% endcomment %}
+{%- liquid
+  assign avatar_src = 'avatar-demo.jpg' | asset_url
+  if settings.avatar_default != blank
+    assign avatar_src = settings.avatar_default | image_url: width: 66
+  endif
+  assign announce_href = settings.announce_link | default: routes.all_products_collection_url
+  assign panel_blocks = section.blocks | where: 'type', 'mega_panel'
+  assign promo_blocks = section.blocks | where: 'type', 'promo'
+  assign first_panel = panel_blocks | first
+-%}
+
+<header class="site-header" data-section-id="{{ section.id }}">
   <div class="header-mobile">
-    <button class="nav-toggle" type="button" aria-label="Open menu" aria-expanded="false" aria-controls="mobile-nav" data-nav-toggle>Menu</button>
-    <a class="wordmark" href="{{ routes.root_url }}">{{ shop.name }}</a>
+    <button class="nav-toggle" type="button" aria-label="Open menu" aria-expanded="false" aria-controls="mobile-nav" data-nav-toggle>{{ section.settings.menu_label }}</button>
+    <a class="wordmark" href="{{ routes.root_url }}">{{ section.settings.wordmark | default: shop.name }}</a>
     <div class="header-mobile__actions">
-      <a href="{{ routes.cart_url }}" aria-label="Bag">
-        <img class="icon-bag" src="{{ 'icon-bag.svg' | asset_url }}" alt="">
-      </a>
+      <img class="avatar" src="{{ avatar_src }}" width="33" height="33" alt="">
+      <a href="{{ routes.cart_url }}" aria-label="Bag"><img class="icon-bag" src="{{ 'icon-bag.svg' | asset_url }}" alt="" width="600" height="600"></a>
     </div>
   </div>
 
   <div class="header-desktop">
     <div class="header-island header-nav" data-header-nav>
-      <a class="wordmark" href="{{ routes.root_url }}">{{ shop.name }}</a>
+      <a class="wordmark" href="{{ routes.root_url }}">{{ section.settings.wordmark | default: shop.name }}</a>
       <nav class="nav-links" aria-label="Primary">
-        {% for link in section.settings.menu.links %}
-          <a href="{{ link.url }}">{{ link.title }}</a>
-        {% else %}
-          <a href="{{ routes.all_products_collection_url }}">New arrivals</a>
-        {% endfor %}
+        {%- for block in panel_blocks -%}
+          <button type="button" aria-expanded="false" data-mega-trigger="{{ block.id }}" {{ block.shopify_attributes }}>{{ block.settings.title }}</button>
+        {%- endfor -%}
       </nav>
     </div>
-    {% if settings.announce_enable and settings.announce_text != blank %}
+
+    {%- if settings.announce_enable and settings.announce_text != blank %}
       <div class="announce-wrap">
-        <a class="announce-chip" href="{{ settings.announce_link | default: routes.all_products_collection_url }}">
-          <span class="dot" aria-hidden="true"></span>{{ settings.announce_text }}
-        </a>
+        <a class="announce-chip" href="{{ announce_href }}"><span class="dot" aria-hidden="true"></span>{{ settings.announce_text }}</a>
       </div>
-    {% endif %}
+    {%- endif %}
+
     <div class="header-island header-utilities">
       <form class="search-field" action="{{ routes.search_url }}" method="get" role="search">
         <svg viewBox="0 0 14 14" fill="none" aria-hidden="true"><circle cx="6" cy="6" r="4.25" stroke="currentColor" stroke-width="1.4"/><path d="M9.2 9.2L12 12" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>
-        <input type="search" name="q" placeholder="Search" aria-label="Search" value="{{ search.terms | escape }}">
+        <input type="search" name="q" placeholder="{{ section.settings.search_placeholder }}" aria-label="Search" value="{{ search.terms | escape }}" autocomplete="off">
+        <input type="hidden" name="type" value="product">
       </form>
       <div class="util-actions">
-        <a href="{{ routes.cart_url }}" aria-label="Bag">
-          <img class="icon-bag" src="{{ 'icon-bag.svg' | asset_url }}" alt="">
-        </a>
-        <a href="{{ routes.account_url }}" aria-label="Account">Account</a>
+        <a href="{{ routes.cart_url }}" aria-label="Bag"><img class="icon-bag" src="{{ 'icon-bag.svg' | asset_url }}" alt="" width="600" height="600"></a>
+        <img class="avatar" src="{{ avatar_src }}" width="33" height="33" alt="">
       </div>
     </div>
   </div>
+
+  {%- comment %} Expanding mega menu — morph card {% endcomment -%}
+  <div class="morph-menu" id="morph-menu" data-morph-menu aria-hidden="true">
+    <div class="morph-menu__bar">
+      <div class="morph-menu__cluster">
+        <a class="wordmark" href="{{ routes.root_url }}">{{ section.settings.wordmark | default: shop.name }}</a>
+        <nav class="morph-menu__nav" aria-label="Mega menu sections">
+          {%- for block in panel_blocks -%}
+            <button type="button" aria-expanded="false" data-mega-trigger="{{ block.id }}">{{ block.settings.title }}</button>
+          {%- endfor -%}
+        </nav>
+      </div>
+      <button class="morph-menu__close" type="button" aria-label="Close menu" data-mega-close>
+        <svg viewBox="0 0 12 12" fill="none" aria-hidden="true"><path d="M1 1l10 10M11 1L1 11" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>
+      </button>
+    </div>
+    <div class="morph-menu__divider" aria-hidden="true"></div>
+    <div class="morph-menu__body">
+      <div class="morph-links" data-mega-panel>
+        <p class="morph-links__label" data-mega-label>{{ first_panel.settings.title }}</p>
+        <div class="morph-links__list" data-mega-links>
+          {%- for link in first_panel.settings.menu.links -%}
+            <a href="{{ link.url }}">{{ link.title }}</a>
+          {%- endfor -%}
+        </div>
+        <a class="morph-links__all" href="{{ first_panel.settings.all_link | default: routes.all_products_collection_url }}" data-mega-all>{{ first_panel.settings.all_label | default: 'View all →' }}</a>
+      </div>
+      <div class="morph-products">
+        {%- liquid
+          assign mega_source = first_panel.settings.products_collection
+          if mega_source == blank or mega_source.products_count == 0
+            assign mega_source = collections[settings.new_collection]
+          endif
+          if mega_source == blank or mega_source.products_count == 0
+            assign mega_source = collections[settings.everything_collection]
+          endif
+          if mega_source == blank or mega_source.products_count == 0
+            assign mega_source = collections.all
+          endif
+        -%}
+        {%- for product in mega_source.products limit: 4 -%}
+          <a class="mega-product" href="{{ product.url }}">
+            <div class="mega-product__media">
+              {%- if product.featured_image -%}
+                <img src="{{ product.featured_image | image_url: width: 360 }}" alt="{{ product.title | escape }}" width="178" height="118" loading="lazy">
+              {%- endif -%}
+            </div>
+            <span class="mega-product__price">{{ product.price | money }}</span>
+            <span class="mega-product__title">{{ product.title }}</span>
+          </a>
+        {%- endfor -%}
+      </div>
+      <a class="morph-editorial" href="{{ first_panel.settings.editorial_link | default: routes.all_products_collection_url }}" data-mega-editorial>
+        <span class="morph-editorial__label" data-mega-editorial-label>{{ first_panel.settings.editorial_label | default: 'Editorial' }}</span>
+        <span class="morph-editorial__title" data-mega-editorial-title>{{ first_panel.settings.editorial_title | default: first_panel.settings.title }}</span>
+        <span class="morph-editorial__cta" data-mega-editorial-cta>{{ first_panel.settings.editorial_cta | default: 'Explore →' }}</span>
+      </a>
+    </div>
+  </div>
+
+  {%- comment %} Mobile menu {% endcomment -%}
+  <div class="mobile-nav" id="mobile-nav" data-mobile-nav hidden>
+    {%- if settings.announce_enable and settings.announce_text != blank %}
+      <a class="announce-chip announce-chip--mobile" href="{{ announce_href }}"><span class="dot" aria-hidden="true"></span>{{ settings.announce_text }}</a>
+    {%- endif %}
+    <form class="search-field search-field--mobile" action="{{ routes.search_url }}" method="get" role="search">
+      <svg viewBox="0 0 14 14" fill="none" aria-hidden="true"><circle cx="6" cy="6" r="4.25" stroke="currentColor" stroke-width="1.4"/><path d="M9.2 9.2L12 12" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>
+      <input type="search" name="q" placeholder="{{ section.settings.search_placeholder }}" aria-label="Search" autocomplete="off">
+      <input type="hidden" name="type" value="product">
+    </form>
+    <nav class="mobile-nav__links" aria-label="Mobile primary">
+      {%- for block in panel_blocks -%}
+        <a href="{{ block.settings.all_link | default: routes.all_products_collection_url }}"{% if block.settings.directory != 'none' %} data-mobile-dir="{{ block.settings.directory }}"{% endif %}>{{ block.settings.title }}</a>
+      {%- endfor -%}
+      {%- for link in section.settings.mobile_extra_menu.links -%}
+        <a href="{{ link.url }}">{{ link.title }}</a>
+      {%- endfor -%}
+      <a href="{{ routes.cart_url }}">Bag</a>
+    </nav>
+    {%- if promo_blocks.size > 0 %}
+      <div class="mobile-nav__promos" aria-label="Featured">
+        {%- for block in promo_blocks -%}
+          <a class="mobile-nav__promo" href="{{ block.settings.link | default: routes.all_products_collection_url }}" {{ block.shopify_attributes }}>
+            {%- if block.settings.image -%}
+              <img src="{{ block.settings.image | image_url: width: 480 }}" alt="" loading="lazy" width="480" height="480">
+            {%- elsif block.settings.collection.featured_image -%}
+              <img src="{{ block.settings.collection.featured_image | image_url: width: 480 }}" alt="" loading="lazy" width="480" height="480">
+            {%- endif -%}
+            <span>{{ block.settings.label | default: block.settings.collection.title }}</span>
+          </a>
+        {%- endfor -%}
+      </div>
+    {%- endif %}
+  </div>
 </header>
+
+{%- comment %} Mega menu data for main.js {% endcomment -%}
+<script>
+  window.AugustMegaPanels = {
+    {%- for block in panel_blocks -%}
+      {{ block.id | json }}: {
+        label: {{ block.settings.title | json }},
+        all: {{ block.settings.all_label | default: 'View all →' | json }},
+        href: {{ block.settings.all_link | default: routes.all_products_collection_url | json }},
+        directory: {{ block.settings.directory | json }},
+        links: [
+          {%- for link in block.settings.menu.links -%}
+            { label: {{ link.title | json }}, href: {{ link.url | json }} }{% unless forloop.last %},{% endunless %}
+          {%- endfor -%}
+        ],
+        editorial: {
+          label: {{ block.settings.editorial_label | json }},
+          title: {{ block.settings.editorial_title | default: block.settings.title | json }},
+          cta: {{ block.settings.editorial_cta | json }},
+          href: {{ block.settings.editorial_link | default: block.settings.all_link | default: routes.all_products_collection_url | json }}
+        },
+        products: [
+          {%- for product in block.settings.products_collection.products limit: 4 -%}
+            {%- render 'product-json', product: product -%}{% unless forloop.last %},{% endunless %}
+          {%- endfor -%}
+        ]
+      }{% unless forloop.last %},{% endunless %}
+    {%- endfor -%}
+  };
+</script>
 
 {% schema %}
 {
   "name": "Header",
+  "class": "shopify-section-header",
   "settings": [
     {
+      "type": "text",
+      "id": "wordmark",
+      "label": "Wordmark",
+      "info": "Leave blank to use the store name.",
+      "default": "August"
+    },
+    {
+      "type": "text",
+      "id": "menu_label",
+      "label": "Mobile menu button",
+      "default": "Menu"
+    },
+    {
+      "type": "text",
+      "id": "search_placeholder",
+      "label": "Search placeholder",
+      "default": "Search"
+    },
+    {
       "type": "link_list",
-      "id": "menu",
-      "label": "Menu",
-      "default": "main-menu"
+      "id": "mobile_extra_menu",
+      "label": "Extra mobile links",
+      "info": "Shown under the main items in the mobile menu (e.g. August Inn, Events)."
+    },
+    {
+      "type": "paragraph",
+      "content": "The announcement chip is a theme setting: Theme settings → Announcement."
     }
-  ]
+  ],
+  "blocks": [
+    {
+      "type": "mega_panel",
+      "name": "Menu item",
+      "limit": 6,
+      "settings": [
+        { "type": "text", "id": "title", "label": "Label", "default": "New arrivals" },
+        {
+          "type": "select",
+          "id": "directory",
+          "label": "Panel content",
+          "default": "none",
+          "options": [
+            { "value": "none", "label": "Links from a menu" },
+            { "value": "brands", "label": "Brand directory (all vendors, A–Z)" },
+            { "value": "categories", "label": "Category directory" }
+          ]
+        },
+        { "type": "link_list", "id": "menu", "label": "Links", "info": "Used when Panel content is “Links from a menu”." },
+        { "type": "text", "id": "all_label", "label": "“View all” label", "default": "Shop all →" },
+        { "type": "url", "id": "all_link", "label": "“View all” link" },
+        { "type": "header", "content": "Product tiles" },
+        { "type": "collection", "id": "products_collection", "label": "Collection for the four tiles" },
+        { "type": "header", "content": "Editorial card" },
+        { "type": "text", "id": "editorial_label", "label": "Eyebrow", "default": "Editorial" },
+        { "type": "textarea", "id": "editorial_title", "label": "Title" },
+        { "type": "text", "id": "editorial_cta", "label": "Call to action", "default": "Explore →" },
+        { "type": "url", "id": "editorial_link", "label": "Link" }
+      ]
+    },
+    {
+      "type": "promo",
+      "name": "Mobile featured tile",
+      "limit": 6,
+      "settings": [
+        { "type": "text", "id": "label", "label": "Label" },
+        { "type": "image_picker", "id": "image", "label": "Image" },
+        { "type": "collection", "id": "collection", "label": "Collection", "info": "Fallback image + label when the fields above are empty." },
+        { "type": "url", "id": "link", "label": "Link" }
+      ]
+    }
+  ],
+  "default": {
+    "blocks": [
+      { "type": "mega_panel", "settings": { "title": "New arrivals", "directory": "none", "all_label": "Shop all new arrivals →", "editorial_title": "New\narrivals" } },
+      { "type": "mega_panel", "settings": { "title": "Brands", "directory": "brands", "all_label": "View all brands →" } },
+      { "type": "mega_panel", "settings": { "title": "Categories", "directory": "categories", "all_label": "Shop all categories →" } },
+      { "type": "mega_panel", "settings": { "title": "Shop by color", "directory": "none", "all_label": "Browse all colors →" } },
+      { "type": "mega_panel", "settings": { "title": "Sale", "directory": "none", "all_label": "Shop all sale →", "editorial_title": "Sale" } },
+      { "type": "promo", "settings": { "label": "New arrivals" } },
+      { "type": "promo", "settings": { "label": "Sale" } }
+    ]
+  }
 }
 {% endschema %}

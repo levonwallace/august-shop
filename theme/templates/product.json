@@ -2,6 +2,34 @@
   "sections": {
     "main": {
       "type": "main-product",
+      "blocks": {
+        "ask": { "type": "ask_ai", "settings": {} },
+        "contact": {
+          "type": "tab",
+          "settings": {
+            "title": "Contact us",
+            "heading": "Customer service / order inquiries",
+            "body": "<p>Please contact us via email: <a href=\"mailto:info@august-shop.com\">info@august-shop.com</a></p><p>CS Hours: 11 AM – 7 PM Central Time</p>"
+          }
+        },
+        "shipping": {
+          "type": "tab",
+          "settings": {
+            "title": "Shipping",
+            "heading": "Shipping",
+            "body": "<p>Orders ship within 1–2 business days. Free local pickup available in Madison, WI.</p>"
+          }
+        },
+        "returns": {
+          "type": "tab",
+          "settings": {
+            "title": "Returns",
+            "heading": "Returns",
+            "body": "<p>Unworn items can be returned within 14 days. See our full returns policy for details.</p>"
+          }
+        }
+      },
+      "block_order": ["ask", "contact", "shipping", "returns"],
       "settings": {}
     }
   },

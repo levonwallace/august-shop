@@ -1,65 +1,125 @@
-# August 2.0 draft theme
+# August 2.0 — Shopify theme
 
-Online Store 2.0 scaffold. **Never publish this over the live shop.**
-Push unpublished and share a preview link. See `/shopify-draft.md`.
+Online Store 2.0 theme generated from the prototype in the repo root. The
+prototype HTML/CSS/JS is the UX source of truth; this folder is the Liquid
+destination. **Never publish this over the live shop** — upload it as a
+draft and share the preview link.
 
-The static HTML prototype in the repo root is still the UX source of truth.
-This folder is the Liquid destination.
+## How it is built
 
-## First push
+- `layout/theme.liquid` renders the same markup and class names as the
+  prototype, then emits live data into `window.AugustBootstrap`
+  (`live: true`, routes, customer, cart, products, mixes, events, store,
+  offer). The prototype JS reads that instead of its sample data.
+- `css/` and `js/` in the repo root are copied flat into `assets/` by
+  `npm run theme:sync` (`assets/` is git-ignored — always regenerate).
+- `js/august-live.js` (theme only) rewrites prototype hrefs to Shopify
+  routes, wires predictive search, the PDP Ajax add-to-bag, and cart
+  attributes. `js/shopify-bridge.js` maps the Ajax Cart API onto the
+  prototype's `AugustCart`.
+
+## Build + upload
 
 ```bash
-npm run theme:sync
-shopify theme push --unpublished --path theme
+npm run theme:check   # shopify theme check --path theme
+npm run theme:zip     # sync assets, check, write dist/august-2.0-theme.zip
 ```
 
-CLI config lives at `/shopify.theme.toml`. `theme:sync` copies `css/`, `js/`, and chrome icons into `theme/assets/` (Shopify assets are a flat folder).
+Shopify admin → Online Store → Themes → **Add theme → Upload zip file** →
+pick `dist/august-2.0-theme.zip`. It lands as an unpublished theme. Use
+**Customize** to edit, **Preview** for the share link.
+
+The zip is built from the *contents* of this folder so `layout/theme.liquid`
+sits at the zip root. Zipping the folder in Finder adds a wrapper directory
+and Shopify rejects it (`missing template 'layout/theme.liquid'`).
+
+## First-time store setup (one time, in the editor)
+
+1. **Theme settings → Catalog**: point the handles at real collections and
+   blogs. Defaults: `everything`, `new-arrivals`, `sale`, `footwear`,
+   `apparel`, `accessories`, `objects`; blogs `august-aux`, `events`;
+   page `august-inn`. The mega menu, tab bar, home hero and PLP filters all
+   read from these.
+2. **Pages → August Inn** → set the template to `page.august-inn`.
+3. **Theme settings → Pickup store** (address, hours, map link, lat/lng)
+   and **Offer popup** (10% code, copy, delay).
+4. Add the `footer` navigation menu (Shop · Help · August Inn).
+
+## What the content / sales team can edit
+
+Everything with copy or imagery is a section setting or a block. Sections
+are per template; theme settings are global.
+
+| Where | Section | Editable |
+| --- | --- | --- |
+| Header (all pages) | **Header** | wordmark, menu label, search placeholder; `Mega panel` blocks (title, directory type, menu, "all" label/link, products collection, editorial label/title/CTA/link); `Promo` blocks (label, image, collection/link) for the mobile menu |
+| Home | **Home card stack** | `Hero` (announcement, 4 lockup words + ink colors, grid title/tag, collection, count, statement); `Shelf` ×4 (title, collection, count, mobile count); `Brand` ×6 (title, collection, link, desktop/mobile image, CTA); `AUX` card (radio tagline, archive label, events heading, newsletter copy) |
+| Collection / Sale | **Collection grid** | per page, intro text, filter sheet toggles (brands, dept, categories, price bands, sale) |
+| Search | **Search results** | heading, idle copy, placeholder, empty text, same filter toggles |
+| Product | **Product page** | thumb count, add-to-bag / sold-out labels, note, related shelf + collection, confirm sheet copy; `Ask AI` block; up to 5 `Tab` blocks (title + rich text) |
+| Bag | **Bag** | heading, swipe hint, checkout label, pickup / ship labels + notes, empty state |
+| AUX / Events blog | **Blog archive** | kicker, lead, per page, AUX/events defaults |
+| Mix / Event article | **Article (mix / event)** | back labels, kicker, RSVP email + labels, "more" headings |
+| August Inn | **August Inn page** | kicker, title, lead, hero, body; `Fact`, `Book link`, `Amenity`, `Photo` blocks |
+| Footer | **Footer**, **Mobile tab bar** | logo, tagline, menu; tab labels, show radio |
+| 404 / Password / Collections list | own sections | all copy |
+| Theme settings | — | Brand (favicon, OG image, avatar), Catalog handles, Colors, Typography & chrome (`ui_scale` %, radii), Announcement bar, Pickup store, Offer popup |
+
+Hero grid tiles, shelves, mega-menu products and the PLP all come straight
+from collections — merchandise in Shopify, not in the theme.
+
+## Product tags (optional)
+
+Department, category and type are inferred from the product title/type.
+Override with tags when the guess is wrong:
+
+- `dept:men` · `dept:women` · `dept:unisex`
+- `cat:shoes` · `cat:apparel` · `cat:accessories` · `cat:objects`
+- `type:sneakers` (free text, used for sub-filters)
+
+## Metafields (namespace `august`)
+
+Create these in Settings → Custom data. Enable storefront access.
+
+| Owner | Key | Type | Used for |
+| --- | --- | --- | --- |
+| Product | `short_description` | multi-line text | buy-box blurb (falls back to truncated description) |
+| Article (AUX blog) | `mix_number`, `mix_title`, `genre` | text | tile + player labels |
+| Article (AUX blog) | `audio_url` | URL | native player source |
+| Article (AUX blog) | `soundcloud_track_id` | text | SoundCloud embed when no `audio_url` |
+| Article (events blog) | `event_date` | date | card date / upcoming logic |
+| Article (events blog) | `venue`, `series`, `ticket_url` | text / URL | facts + RSVP |
+| Customer | `member_since` | date | "Member since" on account |
+| Customer | `homepage`, `preferred_brands`, `swipes` | json | Your feed (see below) |
+
+Customer JSON shapes:
+
+```json
+{ "enabled": true, "department": "men", "category": "shoes", "saleOnly": true }
+["Vans", "Hoka"]
+{ "likes": [], "skips": [], "items": [] }
+```
+
+Writes still need an app proxy; until then the feed persists in
+`localStorage` per device.
 
 ## Page map
 
 | Prototype | Theme |
 | --- | --- |
-| `index.html` | `templates/index.json` + `sections/home-hero.liquid` |
-| `collection.html` / `sale.html` | `templates/collection.json` |
-| `product.html` | `templates/product.json` |
-| `cart.html` | `templates/cart.json` |
-| `account.html` | `templates/customers/account.liquid` |
-| `inn.html` | `templates/page.json` (page handle `august-inn`) |
-| `aux.html` / `events.html` | `templates/blog.json` + `article.json` |
-| Header / footer / tab bar | `sections/header.liquid`, `footer.liquid`, `tabbar.liquid` |
-| Product card | `snippets/product-card.liquid` ← `js/catalog.js` `cardHtml()` |
-| Tokens | `snippets/css-variables.liquid` + `config/settings_schema.json` |
-
-## What stays JS
-
-Keep these assets; they have no Shopify dependency besides class names:
-
-- `sheet.js`, `segmented.js`, `cardstack.js`, `swipe.js`, `cart.js` (gestures)
-- `main.js` (mega / mobile nav)
-- `shopify-bridge.js` (Ajax Cart + customer metafields → existing APIs)
-
-## What Liquid replaces
-
-| Prototype | Live |
-| --- | --- |
-| `js/catalog.js` product list | Collection / product JSON |
-| `AugustCart` localStorage | `/cart/add.js`, `/cart.js` via the bridge |
-| `AugustProfile` localStorage | Customer metafields `august.*` |
-| `js/orders.js` samples | `customer.orders` |
-| Search proxy `scripts/dev-server.py` | Predictive search / `routes.search_url` |
-
-## Customer metafields
-
-Namespace `august`. Enable storefront access.
-
-| Key | Type | Shape |
-| --- | --- | --- |
-| `homepage` | json | `{ "enabled": true, "department": "men", "category": "shoes", "saleOnly": true }` |
-| `preferred_brands` | json | `["Vans", "Hoka"]` |
-| `swipes` | json | `{ "likes": [], "skips": [], "items": [] }` |
-
-`layout/theme.liquid` injects them as `window.AugustBootstrap`. Writes still need an app proxy — not in this pass.
+| `index.html` | `templates/index.json` → `sections/home-card-stack.liquid` |
+| `collection.html` / `sale.html` | `templates/collection.json` → `main-collection.liquid` |
+| search | `templates/search.json` → `main-search.liquid` |
+| `product.html` | `templates/product.json` → `main-product.liquid` |
+| `cart.html` | `templates/cart.json` → `main-cart.liquid` |
+| `aux.html` / `events.html` | `templates/blog.json` → `main-blog.liquid` |
+| `mix.html` / `event.html` | `templates/article.json` → `main-article.liquid` |
+| `inn.html` | `templates/page.august-inn.json` → `page-inn.liquid` |
+| `account.html`, `login.html`, `order.html` | `templates/customers/*.liquid` |
+| header / footer / tab bar | `sections/header-group.json`, `footer-group.json` |
 
 ## Class names
 
-Do not rename `.product-card`, `.site-header`, `.tabbar`, `.sheet`, `.home-lockup`, `.swipe-more`. CSS and JS bind to these. Liquid snippets already use the prototype classes.
+Do not rename `.product-card`, `.site-header`, `.tabbar`, `.sheet`,
+`.home-lockup`, `.card-stack`, `.swipe-more`, `.plp-main`, `.buy-box`.
+CSS and JS bind to these; the Liquid uses the prototype classes verbatim.

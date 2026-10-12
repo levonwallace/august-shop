@@ -1,23 +1,54 @@
-{% comment %} Prototype: nav.tabbar in index.html {% endcomment %}
-<nav class="tabbar" aria-label="Primary" data-tabbar>
-  <a class="tabbar__item{% if request.page_type == 'index' %} is-active{% endif %}" href="{{ routes.root_url }}">
-    <span>Shop</span>
+{% comment %}
+  Prototype: nav.tabbar (≤900px). Search + Profile open sheets that main.js /
+  profile.js inject; Radio jumps to the AUX card on home, or deep-links /#radio.
+{% endcomment %}
+{%- liquid
+  assign on_home = false
+  if request.page_type == 'index'
+    assign on_home = true
+  endif
+  assign radio_href = routes.root_url | append: '#radio'
+  if on_home
+    assign radio_href = '#radio'
+  endif
+-%}
+<nav class="tabbar" aria-label="Primary" data-tabbar data-section-id="{{ section.id }}">
+  <a class="tabbar__item{% if on_home %} is-active{% endif %}" href="{{ routes.root_url }}"{% if on_home %} aria-current="page" data-card-jump="0"{% endif %}>
+    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 10l9-7 9 7v11a1 1 0 01-1 1h-5v-7h-6v7H4a1 1 0 01-1-1V10z"/></svg>
+    <span>{{ section.settings.label_shop }}</span>
   </a>
-  <a class="tabbar__item" href="{{ routes.search_url }}">
-    <span>Search</span>
-  </a>
-  <a class="tabbar__item" href="{{ routes.cart_url }}">
+  <button type="button" class="tabbar__item" data-sheet-open="search-sheet">
+    <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="10.5" cy="10.5" r="6.5"/><path d="M15 15l5 5"/></svg>
+    <span>{{ section.settings.label_search }}</span>
+  </button>
+  {%- if section.settings.show_radio %}
+    <a class="tabbar__item" href="{{ radio_href }}"{% if on_home %} data-card-jump="last"{% endif %}>
+      <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="9" width="18" height="11" rx="2"/><path d="M7.5 9L17 4.5"/><circle cx="8.5" cy="14.5" r="2.6"/><path d="M14.5 12.5h3.5M14.5 16.5h3.5"/></svg>
+      <span>{{ section.settings.label_radio }}</span>
+    </a>
+  {%- endif %}
+  <a class="tabbar__item{% if request.page_type == 'cart' %} is-active{% endif %}" href="{{ routes.cart_url }}"{% if request.page_type == 'cart' %} aria-current="page"{% endif %}>
+    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 8h14l-1 12a2 2 0 01-2 2H8a2 2 0 01-2-2L5 8z"/><path d="M9 8V6a3 3 0 016 0v2"/></svg>
     <span class="tabbar__badge"{% if cart.item_count == 0 %} hidden{% endif %}>{{ cart.item_count }}</span>
-    <span>Bag</span>
+    <span>{{ section.settings.label_bag }}</span>
   </a>
-  <a class="tabbar__item{% if request.page_type contains 'customers' %} is-active{% endif %}" href="{{ routes.account_url }}">
-    <span>Profile</span>
-  </a>
+  <button type="button" class="tabbar__item{% if request.page_type contains 'customers' %} is-active{% endif %}" data-sheet-open="profile-sheet">
+    <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 4-7 8-7s8 3 8 7"/></svg>
+    <span>{{ section.settings.label_profile }}</span>
+  </button>
 </nav>
 
 {% schema %}
 {
-  "name": "Tab bar",
-  "settings": []
+  "name": "Mobile tab bar",
+  "class": "shopify-section-tabbar",
+  "settings": [
+    { "type": "text", "id": "label_shop", "label": "Shop label", "default": "Shop" },
+    { "type": "text", "id": "label_search", "label": "Search label", "default": "Search" },
+    { "type": "checkbox", "id": "show_radio", "label": "Show Radio tab", "default": true },
+    { "type": "text", "id": "label_radio", "label": "Radio label", "default": "Radio" },
+    { "type": "text", "id": "label_bag", "label": "Bag label", "default": "Bag" },
+    { "type": "text", "id": "label_profile", "label": "Profile label", "default": "Profile" }
+  ]
 }
 {% endschema %}

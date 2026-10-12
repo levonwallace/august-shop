@@ -1,21 +1,189 @@
-{% comment %} Prototype: account.html — customer metafields under namespace august {% endcomment %}
+{% comment %}
+  Prototype: account.html — Instagram-style profile. Liked / Less / brand
+  follows / homepage mode live in localStorage (profile.js), seeded from
+  customer metafields (namespace august) by shopify-bridge.js. Orders are
+  real. Name/email edits go through Shopify's account pages, so the inline
+  edit form from the prototype is intentionally absent here.
+{% endcomment %}
+{%- liquid
+  assign avatar = settings.avatar_default
+  assign map_q = settings.store_name | append: ' ' | append: settings.store_address | url_encode
+  assign map_href = settings.store_map_url
+  if map_href == blank
+    assign map_href = 'https://maps.google.com/?q=' | append: map_q
+  endif
+-%}
 <main class="account-page" id="main">
-  {% if customer %}
+  <div class="account-gate" data-account-signed-out hidden>
+    <div class="glass-panel account-gate__card">
+      <h1>Your {{ shop.name }} account</h1>
+      <p class="account-gate__why">Save a feed, track orders.</p>
+      <a class="btn btn--primary btn--block" href="{{ routes.account_register_url }}">Create account</a>
+      <a class="btn btn--ghost btn--block" href="{{ routes.account_login_url }}">Sign in</a>
+    </div>
+  </div>
+
+  <div data-account-signed-in>
     <header class="account-head">
+      <div class="account-head__pic">
+        {%- if avatar -%}
+          <img class="account-head__avatar" src="{{ avatar | image_url: width: 320, height: 320, crop: 'center' }}" alt="" width="160" height="160">
+        {%- else -%}
+          <img class="account-head__avatar" src="{{ 'avatar-demo.jpg' | asset_url }}" alt="" width="600" height="600">
+        {%- endif -%}
+      </div>
       <div class="account-head__meta">
-        <h1>{{ customer.name }}</h1>
-        <p class="account-sub">{{ customer.email }}</p>
+        <div class="account-head__title">
+          <h1 data-account-name-display>{{ customer.name | default: customer.email }}</h1>
+          <a class="account-head__settings" href="{{ routes.account_addresses_url }}" aria-label="Addresses">
+            <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+              <circle cx="12" cy="12" r="3" stroke="currentColor" stroke-width="1.5"/>
+              <path d="M12 3.6 13.1 6a6.8 6.8 0 0 1 1.5.6l2.4-1.1 1.5 1.5-1.1 2.4c.3.5.5 1 .6 1.5L20.4 12 18 13.1c-.1.5-.3 1-.6 1.5l1.1 2.4-1.5 1.5-2.4-1.1a6.8 6.8 0 0 1-1.5.6L12 20.4 10.9 18a6.8 6.8 0 0 1-1.5-.6l-2.4 1.1-1.5-1.5 1.1-2.4a6.8 6.8 0 0 1-.6-1.5L3.6 12 6 10.9c.1-.5.3-1 .6-1.5L5.5 7l1.5-1.5 2.4 1.1c.5-.3 1-.5 1.5-.6L12 3.6Z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/>
+            </svg>
+          </a>
+        </div>
+        <p class="account-sub" data-account-email>{{ customer.email }}</p>
+        <p class="account-sub account-sub--since">
+          {%- if customer.metafields.august.member_since != blank -%}
+            Member since <span data-account-since>{{ customer.metafields.august.member_since | date: '%B %Y' }}</span>
+          {%- elsif customer.orders_count > 0 -%}
+            Member since <span data-account-since>{{ customer.orders.last.created_at | date: '%B %Y' }}</span>
+          {%- else -%}
+            <span data-account-since>{{ customer.orders_count }} orders</span>
+          {%- endif -%}
+        </p>
+        <div class="account-stats">
+          <button type="button" class="account-stat" data-account-tab="liked">
+            <strong data-stat-likes>0</strong>
+            <span>Likes</span>
+          </button>
+          <button type="button" class="account-stat" data-account-scroll="brands">
+            <strong data-stat-following>0</strong>
+            <span>Following</span>
+          </button>
+          <button type="button" class="account-stat" data-account-tab="less">
+            <strong data-stat-less>0</strong>
+            <span>Less</span>
+          </button>
+        </div>
       </div>
     </header>
-    <p>Liked, Less, and homepage prefs hydrate from customer metafields via shopify-bridge.js.</p>
-    <a href="{{ routes.account_logout_url }}">Sign out</a>
-  {% else %}
-    <div class="account-gate">
-      <h1>Your August account</h1>
-      <p>Save a feed, track orders.</p>
-      <a class="btn btn--primary" href="{{ routes.account_register_url }}">Create account</a>
-      <a class="btn btn--ghost" href="{{ routes.account_login_url }}">Sign in</a>
+
+    <section class="account-prefs" aria-label="Feed and alerts">
+      <div class="account-prefs__block">
+        <p class="account-prefs__label">Homepage</p>
+        <p class="account-prefs__hint">One choice. Everything is the full shop. My feed is only what you pick next.</p>
+        <div class="feed-toggle account-prefs__mode" data-home-mode role="group" aria-label="Homepage">
+          <button type="button" class="feed-toggle__opt" data-home-mode-opt="off">Everything</button>
+          <button type="button" class="feed-toggle__opt" data-home-mode-opt="on">My feed</button>
+        </div>
+        <div class="account-prefs__filters" data-home-filters hidden>
+          <p class="account-prefs__sub">Who it’s for</p>
+          <div class="pref-options" data-home-dept>
+            <button type="button" class="pref-chip" data-value="all">Everyone</button>
+            <button type="button" class="pref-chip" data-value="men">Men</button>
+            <button type="button" class="pref-chip" data-value="women">Women</button>
+          </div>
+          <p class="account-prefs__sub">What to show</p>
+          <div class="pref-options" data-home-cat>
+            <button type="button" class="pref-chip" data-value="all">All</button>
+            <button type="button" class="pref-chip" data-value="shoes">Shoes</button>
+            <button type="button" class="pref-chip" data-value="apparel">Apparel</button>
+            <button type="button" class="pref-chip" data-value="accessories">Accessories</button>
+          </div>
+          <div class="pref-options" data-home-sale>
+            <button type="button" class="pref-chip" data-value="all">Full price and sale</button>
+            <button type="button" class="pref-chip" data-value="sale">On sale only</button>
+          </div>
+        </div>
+        <p class="account-prefs__preview" data-home-preview></p>
+      </div>
+
+      <div class="account-prefs__block" id="account-brands">
+        <p class="account-prefs__label">Brands I follow</p>
+        <p class="account-prefs__hint">We’ll notify you every time they upload a product.</p>
+        <div class="brand-field" data-brand-field>
+          <div class="brand-field__picked" data-brand-picked></div>
+          <input class="brand-field__input" type="search" placeholder="Add a brand" data-brand-query autocomplete="off" spellcheck="false" aria-label="Add a brand" aria-controls="account-brand-list" aria-expanded="false" aria-autocomplete="list" />
+        </div>
+        <div class="brand-field__list" id="account-brand-list" data-account-brands hidden></div>
+      </div>
+    </section>
+
+    <div class="account-tabs" data-account-tabs role="tablist" aria-label="Account">
+      <button type="button" class="account-tabs__btn is-active" role="tab" id="account-tab-liked" data-account-tab="liked" aria-controls="account-panel-liked" aria-selected="true">Liked</button>
+      <button type="button" class="account-tabs__btn" role="tab" id="account-tab-less" data-account-tab="less" aria-controls="account-panel-less" aria-selected="false">Less</button>
+      <button type="button" class="account-tabs__btn" role="tab" id="account-tab-orders" data-account-tab="orders" aria-controls="account-panel-orders" aria-selected="false">Orders</button>
     </div>
-  {% endif %}
+
+    <div class="account-panel" data-account-panel="liked" id="account-panel-liked" role="tabpanel" aria-labelledby="account-tab-liked">
+      <p class="account-swipe-hint">Swipe right to like, left to show less — it trains Your feed. Change it here anytime.</p>
+      <div class="account-mosaic" data-liked-grid></div>
+    </div>
+
+    <div class="account-panel" data-account-panel="less" id="account-panel-less" role="tabpanel" aria-labelledby="account-tab-less" hidden>
+      <p class="account-swipe-hint">Swipe right to like, left to show less — it trains Your feed. Change it here anytime.</p>
+      <div class="account-mosaic" data-less-grid></div>
+    </div>
+
+    <div class="account-panel" data-account-panel="orders" id="account-panel-orders" role="tabpanel" aria-labelledby="account-tab-orders" hidden>
+      <section class="glass-panel account-orders" aria-labelledby="orders-heading">
+        <h2 id="orders-heading">Orders</h2>
+        {%- paginate customer.orders by 20 -%}
+          {%- for order in customer.orders -%}
+            {%- liquid
+              assign first = order.line_items.first
+              assign status_class = 'order-status--process'
+              assign status_label = order.fulfillment_status_label
+              if order.fulfillment_status == 'fulfilled'
+                assign status_class = 'order-status--done'
+                assign status_label = 'Shipped'
+              elsif order.fulfillment_status == 'partial'
+                assign status_class = 'order-status--transit'
+              endif
+              if order.cancelled
+                assign status_label = 'Cancelled'
+              endif
+            -%}
+            <a class="order-row" href="{{ order.customer_url }}">
+              <div class="order-row__thumb">{% if first.image %}<img src="{{ first.image | image_url: width: 160 }}" alt="" width="160" height="160">{% endif %}</div>
+              <div class="order-row__info">
+                <span class="order-row__title">{{ first.title }}{% if order.line_items.size > 1 %} +{{ order.line_items.size | minus: 1 }} more{% endif %}</span>
+                <span class="order-row__meta">{{ order.name }} · {{ order.created_at | date: '%b %-d, %Y' }}</span>
+              </div>
+              <span class="order-status {{ status_class }}">{{ status_label }}</span>
+              <span class="order-row__price">{{ order.total_price | money }}</span>
+            </a>
+            {%- unless forloop.last -%}<div class="cart-divider"></div>{%- endunless -%}
+          {%- else -%}
+            <p class="account-card__text account-card__text--muted">No orders yet. <a href="{{ routes.all_products_collection_url }}">Start with the shop →</a></p>
+          {%- endfor -%}
+          {%- if paginate.pages > 1 -%}<nav class="story__pagination">{{ paginate | default_pagination }}</nav>{%- endif -%}
+        {%- endpaginate -%}
+      </section>
+    </div>
+
+    <div class="account-layout">
+      <aside class="account-side">
+        <div class="account-card account-pickup">
+          <h2>Pickup store</h2>
+          <div class="account-pickup__row">
+            <div class="account-pickup__map">
+              <div class="account-pickup__map-el" data-pickup-map role="img" aria-label="Map of {{ settings.store_name | escape }} at {{ settings.store_address | escape }}"></div>
+              <a class="account-pickup__map-link" href="{{ map_href }}" target="_blank" rel="noopener noreferrer">Open map</a>
+            </div>
+            <div class="account-pickup__copy">
+              <p class="account-card__text">{{ settings.store_name }}<br />{{ settings.store_address | replace: ', ', '<br />' }}</p>
+              {%- if settings.store_hours != blank -%}<p class="account-card__text account-card__text--muted">{{ settings.store_hours }}</p>{%- endif -%}
+            </div>
+          </div>
+        </div>
+        <div class="account-card">
+          <h2>Account</h2>
+          <p class="account-card__text"><a href="{{ routes.account_addresses_url }}">Addresses ({{ customer.addresses_count }})</a></p>
+          <p class="account-card__text"><a href="{{ routes.account_logout_url }}" data-profile-action="signout">Sign out</a></p>
+        </div>
+      </aside>
+    </div>
+  </div>
 </main>
-<script src="{{ 'account.js' | asset_url }}" defer></script>

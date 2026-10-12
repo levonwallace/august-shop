@@ -4,8 +4,19 @@
    Re-show for testing: localStorage.removeItem("august_offer_dismissed") then reload. */
 (() => {
   const STORAGE_KEY = "august_offer_dismissed";
-  const DELAY_MS = 1800;
+  /* Theme: copy + timing come from Theme settings → Offer popup via
+     window.AugustBootstrap.offer (layout/theme.liquid). */
+  const CFG =
+    (window.AugustBootstrap && window.AugustBootstrap.live && window.AugustBootstrap.offer) || null;
+  const DELAY_MS = Number(CFG?.delay) > 0 ? Number(CFG.delay) : 1800;
   const SUCCESS_HOLD_MS = 2400;
+
+  const esc = (s) =>
+    String(s == null ? "" : s)
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;")
+      .replace(/"/g, "&quot;");
 
   const FOCUSABLE_SEL =
     'a[href], button:not([disabled]), input:not([disabled]):not([type="hidden"]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])';
@@ -26,20 +37,29 @@
     }
   };
 
+  const COPY = {
+    eyebrow: CFG?.eyebrow || "Welcome offer",
+    heading: CFG?.heading || "10% off",
+    lede: CFG?.lede || "Your first order — pickup on Williamson or checkout.",
+    success: CFG?.success || `Code ${CFG?.code || "AUGUST10"} — applied at pickup or checkout.`,
+    fine: CFG?.fine || "One use · new customers",
+  };
+
   const markup = `
     <div class="offer__backdrop" data-offer-dismiss></div>
     <div class="offer__panel" role="document">
-      <p class="offer__eyebrow">Welcome offer</p>
-      <h2 class="offer__title" id="offer-title">10% off</h2>
-      <p class="offer__lede">Your first order — pickup on Williamson or checkout.</p>
-      <form class="offer__form" data-offer-form novalidate>
+      <p class="offer__eyebrow">${esc(COPY.eyebrow)}</p>
+      <h2 class="offer__title" id="offer-title">${esc(COPY.heading)}</h2>
+      <p class="offer__lede">${esc(COPY.lede)}</p>
+      <form class="offer__form" data-offer-form novalidate${CFG ? ' method="post" action="/contact#offer-popup"' : ""}>
+        ${CFG ? '<input type="hidden" name="form_type" value="customer"><input type="hidden" name="utf8" value="✓"><input type="hidden" name="contact[tags]" value="newsletter,welcome-offer">' : ""}
         <label class="sr-only" for="offer-email">Email</label>
-        <input id="offer-email" type="email" name="email" inputmode="email" autocomplete="email" placeholder="Email" required />
+        <input id="offer-email" type="email" name="${CFG ? "contact[email]" : "email"}" inputmode="email" autocomplete="email" placeholder="Email" required />
         <button class="offer__join" type="submit">Join</button>
         <button class="offer__dismiss" type="button" data-offer-dismiss>No thanks</button>
       </form>
-      <p class="offer__success" data-offer-success hidden aria-live="polite">Code AUGUST10 — applied at pickup or checkout.</p>
-      <p class="offer__fine">One use · new customers</p>
+      <p class="offer__success" data-offer-success hidden aria-live="polite">${esc(COPY.success)}</p>
+      <p class="offer__fine">${esc(COPY.fine)}</p>
     </div>
   `;
 
@@ -125,6 +145,11 @@
         join.textContent = "Joined";
         join.disabled = true;
       }
+      // Theme: post to Shopify's customer form (creates/tags the customer)
+      if (CFG) {
+        const fd = new FormData(form);
+        fetch("/contact", { method: "POST", body: fd, credentials: "same-origin" }).catch(() => {});
+      }
       input.disabled = true;
       showSuccess(root);
     });
@@ -152,6 +177,7 @@
   };
 
   const init = () => {
+    if (CFG && CFG.enabled === false) return;
     if (isDismissed()) return;
     const root = build();
     bind(root);

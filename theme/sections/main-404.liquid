@@ -1,11 +1,20 @@
-<main class="account-gate" id="main">
-  <h1>Page not found</h1>
-  <a class="btn btn--primary" href="{{ routes.root_url }}">Back to the shop</a>
+<main class="cart-page" id="main" data-section-id="{{ section.id }}">
+  <div class="cart-empty">
+    <h2 class="cart-empty__title">{{ section.settings.title }}</h2>
+    <p class="cart-empty__sub">{{ section.settings.sub }}</p>
+    <a class="btn btn--primary" href="{{ section.settings.link | default: routes.root_url }}">{{ section.settings.cta }}</a>
+  </div>
 </main>
 
 {% schema %}
 {
   "name": "404",
-  "settings": []
+  "tag": "div",
+  "settings": [
+    { "type": "text", "id": "title", "label": "Title", "default": "Page not found" },
+    { "type": "text", "id": "sub", "label": "Subtitle", "default": "That link went somewhere we don't stock." },
+    { "type": "text", "id": "cta", "label": "Button", "default": "Back to the shop" },
+    { "type": "url", "id": "link", "label": "Button link" }
+  ]
 }
 {% endschema %}

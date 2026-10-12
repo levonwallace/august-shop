@@ -867,17 +867,26 @@ window.AugustCatalog = (() => {
   }
 ];
 
+  /* Theme: layout/theme.liquid + sections push real products into
+     window.AugustBootstrap.products (see snippets/catalog-json.liquid).
+     When that exists the sample above is ignored entirely. */
+  const BOOT = window.AugustBootstrap || null;
+  const LIVE = !!(BOOT && BOOT.live);
+  const SOURCE =
+    LIVE && Array.isArray(BOOT.products) && BOOT.products.length ? BOOT.products : PRODUCTS;
+
   /* Colorway duplicates share a title — collapse them so each PDP is a
-     distinct product. Port note: Shopify handles already unique products. */
-  const seenTitles = new Set();
-  const UNIQUE = PRODUCTS.filter((p) => {
-    const key = p.title.toLowerCase();
-    if (seenTitles.has(key)) return false;
-    seenTitles.add(key);
+     distinct product. Shopify products are already unique by id. */
+  const seenKeys = new Set();
+  const UNIQUE = SOURCE.filter((p) => {
+    const key = LIVE ? String(p.id || p.handle || p.title) : p.title.toLowerCase();
+    if (seenKeys.has(key)) return false;
+    seenKeys.add(key);
     return true;
   });
   UNIQUE.forEach((p, i) => {
-    p.id = "p" + i;
+    if (p.id == null || p.id === "") p.id = "p" + i;
+    p.id = String(p.id);
   });
 
   /* Infer August category types from titles so the directory can filter. */
@@ -898,6 +907,7 @@ window.AugustCatalog = (() => {
     { type: "boots", re: /\b(boot|martens)\b/i },
   ];
   UNIQUE.forEach((p) => {
+    if (p.type) return; // theme: `type:` tag already set it
     const hit = TYPE_RULES.find((r) => r.re.test(p.title));
     if (hit) p.type = hit.type;
     else if (p.cat === "shoes") p.type = "sneakers";
@@ -906,10 +916,19 @@ window.AugustCatalog = (() => {
   });
 
   const href = (p) =>
+    p?.url ||
     window.AugustShop?.href(p) ||
     (p?.handle ? `product.html?h=${encodeURIComponent(p.handle)}` : `product.html?p=${p?.id || ""}`);
 
-  const byId = (id) => UNIQUE.find((p) => p.id === id) || window.AugustShop?.cached(id) || null;
+  const byId = (id) => {
+    const key = id == null ? "" : String(id);
+    return (
+      UNIQUE.find((p) => p.id === key) ||
+      window.AugustShop?.cached(key) ||
+      window.AugustLive?.lookup?.(key) ||
+      null
+    );
+  };
 
   const unique = (list) => {
     const seen = new Set();
@@ -1039,6 +1058,11 @@ window.AugustCatalog = (() => {
       )
       .join("")}</div>`;
   };
+
+  /* Theme: shop.vendors replaces the hard-coded directory */
+  if (LIVE && Array.isArray(BOOT.brands) && BOOT.brands.length) {
+    BRANDS.splice(0, BRANDS.length, ...BOOT.brands.filter(Boolean));
+  }
 
   const brands = () => BRANDS.slice();
 

@@ -267,6 +267,25 @@
   .page--home[data-home-mode="everything"] .card-stack .home-grid .product-card__media {
     aspect-ratio: 3 / 4;
   }
+
+  /* Chip stays centered under the header, toggle follows */
+  .page--home .card-stack .home-copy > .feed-toggle ~ .announce-chip--hero {
+    order: -1;
+    margin-bottom: 14px;
+  }
+
+  .page--home[data-home-mode="feed"] .card-stack .home-lockup {
+    align-items: flex-start;
+    text-align: left;
+  }
+
+  .page--home[data-home-mode="feed"] .card-stack .home-grid__title {
+    display: none;
+  }
+
+  .page--home[data-home-mode="feed"] .card-stack .home-layout {
+    grid-template-rows: auto 1fr;
+  }
 }
 
 /* ══════════════════════════════════════════════════════════
@@ -404,11 +423,51 @@
   margin-top: 6px;
 }
 
+/* Push-notification style — drops in under the header */
+.swipe-toast--top {
+  top: calc(var(--header-top) + var(--header-h) + 10px);
+  bottom: auto;
+  padding-right: 40px;
+  transform: translate3d(0, -10px, 0);
+}
+
+.swipe-toast--top.is-open {
+  transform: translate3d(0, 0, 0);
+}
+
+.swipe-toast__close {
+  position: absolute;
+  top: 6px;
+  right: 6px;
+  display: grid;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: none;
+  color: var(--color-muted-2);
+  font-size: 18px;
+  line-height: 1;
+  cursor: pointer;
+}
+
+@media (hover: hover) {
+  .swipe-toast__close:hover {
+    color: var(--color-ink);
+  }
+}
+
 @media (max-width: 900px) {
   .swipe-toast {
     left: 12px;
     right: 12px;
     bottom: calc(var(--footer-inset, 12px) + var(--footer-h, 48px) + 64px);
+  }
+
+  .swipe-toast--top {
+    bottom: auto;
   }
 }
 

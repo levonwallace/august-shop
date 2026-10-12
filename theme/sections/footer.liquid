@@ -1,23 +1,31 @@
-{% comment %} Prototype: .site-footer {% endcomment %}
-<footer class="site-footer">
+{% comment %} Prototype: footer.site-footer (every page) {% endcomment %}
+<footer class="site-footer" data-section-id="{{ section.id }}">
   <div class="footer-brand">
-    <img class="footer-brand__logo" src="{{ 'footer-logo.svg' | asset_url }}" alt="{{ shop.name | escape }}">
-    <span class="footer-brand__tag">{{ section.settings.tagline }}</span>
+    {%- if section.settings.logo -%}
+      <img class="footer-brand__logo" src="{{ section.settings.logo | image_url: width: 240 }}" alt="{{ shop.name | escape }}" width="{{ section.settings.logo.width }}" height="{{ section.settings.logo.height }}">
+    {%- else -%}
+      <img class="footer-brand__logo" src="{{ 'footer-logo.svg' | asset_url }}" alt="{{ shop.name | escape }}" width="600" height="600">
+    {%- endif -%}
+    {%- if section.settings.tagline != blank -%}
+      <span class="footer-brand__tag">{{ section.settings.tagline }}</span>
+    {%- endif -%}
   </div>
   <nav class="footer-links" aria-label="Footer">
-    {% for link in section.settings.menu.links %}
+    {%- for link in section.settings.menu.links -%}
       <a href="{{ link.url }}">{{ link.title }}</a>
-    {% else %}
+    {%- else -%}
       <a href="{{ routes.all_products_collection_url }}">Shop</a>
-      <a href="{{ pages['august-inn'].url | default: '#' }}">August Inn</a>
-    {% endfor %}
+      {%- if pages[settings.inn_page].url != blank -%}<a href="{{ pages[settings.inn_page].url }}">August Inn</a>{%- endif -%}
+    {%- endfor -%}
   </nav>
 </footer>
 
 {% schema %}
 {
   "name": "Footer",
+  "class": "shopify-section-footer",
   "settings": [
+    { "type": "image_picker", "id": "logo", "label": "Logo", "info": "Falls back to the August wordmark SVG." },
     {
       "type": "text",
       "id": "tagline",
@@ -28,7 +36,8 @@
       "type": "link_list",
       "id": "menu",
       "label": "Footer menu",
-      "default": "footer"
+      "default": "footer",
+      "info": "Keep Shop, then Help, Shipping & returns, August Inn, Visit."
     }
   ]
 }

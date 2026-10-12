@@ -87,7 +87,8 @@ document.addEventListener("DOMContentLoaded", () => {
   /* ── Demo seed ────────────────────────────────────────────
      Prototype ships "already logged in" with the example prefs:
      homepage set to men's shoes on sale. Sign out to see logged-out. */
-  if (!load() && !localStorage.getItem(SIGNED_OUT_KEY)) {
+  // Theme: shopify-bridge.js seeds/clears the profile from the real customer.
+  if (!load() && !localStorage.getItem(SIGNED_OUT_KEY) && !window.AugustBootstrap?.live) {
     localStorage.setItem(
       STORAGE_KEY,
       JSON.stringify({
@@ -232,6 +233,9 @@ document.addEventListener("DOMContentLoaded", () => {
   if (!avatarEls.length) return;
 
   const desktopAvatar = document.querySelector(".header-desktop .avatar, .header-utilities .avatar");
+  /* Theme: the header <img.avatar> src is resolved by Liquid (asset_url /
+     settings.avatar_default), so reuse it for the large avatars. */
+  const AVATAR_SRC = (avatarEls[0] && avatarEls[0].getAttribute("src")) || "assets/avatar-demo.jpg";
 
   const injectProfileUI = () => {
     const shell = document.createElement("div");
@@ -246,7 +250,7 @@ document.addEventListener("DOMContentLoaded", () => {
         </div>
         <div class="profile-drop__signed-in" data-profile-signed-in hidden>
           <div class="profile-drop__user">
-            <img class="profile-drop__avatar-lg" src="assets/avatar-demo.jpg" alt="" />
+            <img class="profile-drop__avatar-lg" src="${AVATAR_SRC}" alt="" />
             <div>
               <p class="profile-drop__name" data-profile-display-name></p>
               <p class="profile-drop__email" data-profile-display-email></p>
@@ -345,7 +349,7 @@ document.addEventListener("DOMContentLoaded", () => {
     if (user && user.name) {
       profileSheetBody.innerHTML = `
         <div class="profile-sheet__user">
-          <img class="profile-sheet__avatar-lg" src="assets/avatar-demo.jpg" alt="" />
+          <img class="profile-sheet__avatar-lg" src="${AVATAR_SRC}" alt="" />
           <div class="profile-sheet__user-meta">
             <p class="profile-sheet__name">${user.name}</p>
             <p class="profile-sheet__email">${user.email}</p>

@@ -1,0 +1,9 @@
+{% comment %} story.js story-tile markup, server-rendered. {% endcomment %}
+{%- capture no %}{% render 'mix-meta', article: article, field: 'no', fallback_no: fallback_no %}{% endcapture -%}
+{%- capture name %}{% render 'mix-meta', article: article, field: 'name' %}{% endcapture -%}
+{%- capture genre %}{% render 'mix-meta', article: article, field: 'genre' %}{% endcapture -%}
+<a class="story-tile" href="{{ article.url }}" data-mix-no="{{ no }}">
+  <div class="story-tile__art">{% if article.image %}<img src="{{ article.image | image_url: width: 600 }}" alt="" loading="lazy" width="600" height="600">{% endif %}</div>
+  <span class="story-tile__no">{{ no }}{% if genre != blank %} · {{ genre }}{% endif %}</span>
+  <span class="story-tile__title">{{ name }}</span>
+</a>

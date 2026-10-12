@@ -172,6 +172,13 @@ document.addEventListener("DOMContentLoaded", () => {
     audio.addEventListener("loadedmetadata", paint);
   };
 
+  /* Theme: Liquid renders every story page (sections/main-blog.liquid,
+     main-article.liquid). Only the audio player needs JS. */
+  if (window.AugustBootstrap?.live) {
+    if (kind === "mix" && root.dataset.storySrc) bindPlayer(root.dataset.storySrc);
+    return;
+  }
+
   /* ── Mix detail ──────────────────────────────────────────── */
   if (kind === "mix") {
     const mix = Aux.mixByNo(params.get("m")) || Aux.MIXES[0];

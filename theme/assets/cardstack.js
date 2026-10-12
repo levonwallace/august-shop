@@ -102,8 +102,12 @@ document.addEventListener("DOMContentLoaded", () => {
 
   /* Tab bar reflects the active card: Radio lights up on the AUX card,
      Shop on everything else. */
-  const tabRadio = document.querySelector('.tabbar [data-card-jump="4"]');
-  const tabShop = document.querySelector('.tabbar a[href="index.html"]');
+  const tabRadio =
+    document.querySelector('.tabbar [data-card-jump="last"]') ||
+    document.querySelector('.tabbar [data-card-jump="4"]');
+  const tabShop =
+    document.querySelector('.tabbar [data-card-jump="0"]') ||
+    document.querySelector('.tabbar a[href="index.html"]');
   const syncTabs = () => {
     if (!tabRadio) return;
     const onAux = active === total - 1;
@@ -510,7 +514,10 @@ document.addEventListener("DOMContentLoaded", () => {
   document.querySelectorAll(".tabbar [data-card-jump]").forEach((el) => {
     el.addEventListener("click", (e) => {
       e.preventDefault();
-      const idx = Number(el.getAttribute("data-card-jump"));
+      const raw = el.getAttribute("data-card-jump");
+      // "last" = the AUX card regardless of how many brand cards the
+      // theme editor adds between home and radio.
+      const idx = raw === "last" ? total - 1 : Number(raw);
       goTo(idx, idx > active ? 1 : -1);
     });
   });

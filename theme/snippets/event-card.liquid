@@ -1,0 +1,39 @@
+{% comment %}
+  story.js eventCard() markup, server-rendered.
+  {% render 'event-card', article: article, variant: 'feature' %}
+{% endcomment %}
+{%- liquid
+  assign series = article.metafields.august.series | default: article.tags.first | default: 'Event'
+  assign when = article.metafields.august.event_date | default: article.published_at
+  assign venue = article.metafields.august.venue
+  if venue == blank
+    assign venue = settings.store_address | split: ',' | first
+  endif
+  assign today = 'now' | date: '%s' | plus: 0
+  assign event_ts = when | date: '%s' | plus: 86399
+  assign upcoming = false
+  if event_ts >= today
+    assign upcoming = true
+  endif
+  assign cta = 'Visit'
+  if upcoming
+    assign cta = 'RSVP'
+  endif
+-%}
+<a class="aux-event{% if variant != blank %} aux-event--{{ variant }}{% endif %}" href="{{ article.url }}" data-event-id="{{ article.handle }}">
+  <div class="aux-event__when" aria-hidden="true">
+    <span class="aux-event__mon">{{ when | date: '%b' }}</span>
+    <span class="aux-event__day">{{ when | date: '%-d' }}</span>
+    <span class="aux-event__yr">{{ when | date: '%Y' }}</span>
+  </div>
+  <div class="aux-event__poster">{% if article.image %}<img src="{{ article.image | image_url: width: 600 }}" alt="" loading="lazy" width="600" height="600">{% endif %}</div>
+  <div class="aux-event__copy">
+    <div class="aux-event__meta">
+      <span class="aux-event__series">{{ series }}</span>
+      <span class="aux-event__venue">{{ venue }}</span>
+    </div>
+    <h3 class="aux-event__title">{{ article.title }}</h3>
+    <p class="aux-event__excerpt">{{ article.excerpt_or_content | strip_html | truncate: 160 }}</p>
+    <span class="aux-event__cta">{{ cta }}</span>
+  </div>
+</a>

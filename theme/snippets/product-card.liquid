@@ -1,33 +1,44 @@
 {% comment %}
-  Prototype: js/catalog.js cardHtml()
-  Keep class names identical so css/components.css continues to apply.
+  Product card — identical markup to js/catalog.js cardHtml() so
+  components.css, swipe.js (data-product-id → AugustCatalog.byId) and the
+  feed logic keep working on server-rendered cards.
+
+  {% render 'product-card', product: product, class: 'product-card--desktop', sizes: '(min-width: 901px) 22vw, 45vw' %}
 {% endcomment %}
+{%- liquid
+  assign img_sizes = sizes | default: '(min-width: 901px) 22vw, 45vw'
+  assign on_sale = false
+  if product.compare_at_price > product.price
+    assign on_sale = true
+  endif
+-%}
 <a
-  class="product-card"
+  class="product-card{% if class != blank %} {{ class }}{% endif %}"
   data-swipe-card
-  href="{{ product.url }}"
-  data-product-id="{{ product.selected_or_first_available_variant.id }}"
+  href="{{ product.url | within: collection }}"
+  data-product-id="{{ product.id }}"
   data-product-handle="{{ product.handle }}"
+  data-cat="{{ product.type | handle }}"
 >
   <div class="product-card__media">
-    {% if product.featured_image %}
+    {%- if product.featured_image -%}
       <img
-        src="{{ product.featured_image | image_url: width: 800 }}"
+        src="{{ product.featured_image | image_url: width: 600 }}"
+        srcset="{{ product.featured_image | image_url: width: 400 }} 400w, {{ product.featured_image | image_url: width: 600 }} 600w, {{ product.featured_image | image_url: width: 900 }} 900w, {{ product.featured_image | image_url: width: 1400 }} 1400w"
+        sizes="{{ img_sizes }}"
         alt="{{ product.featured_image.alt | default: product.title | escape }}"
         loading="lazy"
         width="{{ product.featured_image.width }}"
         height="{{ product.featured_image.height }}"
       >
-    {% endif %}
+    {%- endif -%}
   </div>
   <div class="product-card__meta">
     <div class="product-card__brand">{{ product.vendor }}</div>
     <div class="product-card__title">{{ product.title }}</div>
     <div class="product-card__price">
-      {% if product.compare_at_price > product.price %}
-        <span class="price-was">{{ product.compare_at_price | money }}</span>
-      {% endif %}
-      {{ product.price | money }}
+      {%- if on_sale -%}<span class="price-was">{{ product.compare_at_price | money }}</span> {% endif -%}
+      {{- product.price | money -}}
     </div>
   </div>
 </a>

@@ -27,6 +27,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const audio = new Audio();
   audio.preload = "metadata";
   const MIXES = window.AugustAux.MIXES;
+  if (!MIXES.length) return; // theme: AUX blog not configured yet — keep Liquid markup
 
   const PAGE_SIZE = 9;
   const PAGES = Math.ceil(MIXES.length / PAGE_SIZE);
@@ -40,7 +41,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const slice = MIXES.slice(page * PAGE_SIZE, page * PAGE_SIZE + PAGE_SIZE);
     gridEl.innerHTML = slice
       .map((m) => `
-      <a class="radio-cover aux-tile${m.no === selectedNo ? " is-active" : ""}" href="mix.html?m=${m.no}" data-aux-no="${m.no}" aria-label="August AUX ${m.no} — ${m.name}">
+      <a class="radio-cover aux-tile${m.no === selectedNo ? " is-active" : ""}" href="${m.url || `mix.html?m=${m.no}`}" data-aux-no="${m.no}" aria-label="August AUX ${m.no} — ${m.name}">
         <div class="aux-tile__art"><img src="${m.art}" alt="" loading="lazy" /></div>
         <span class="aux-tile__no">AUX :: ${m.no} · ${m.genre}</span>
         <span class="aux-tile__title">${m.name}</span>
@@ -76,7 +77,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     if (titleEl) {
       titleEl.textContent = `August AUX :: ${mix.no}`;
-      if (titleEl.tagName === "A") titleEl.setAttribute("href", `mix.html?m=${mix.no}`);
+      if (titleEl.tagName === "A") titleEl.setAttribute("href", mix.url || `mix.html?m=${mix.no}`);
     }
     if (subEl) subEl.textContent = mix.name;
 
@@ -228,7 +229,7 @@ document.addEventListener("DOMContentLoaded", () => {
       .map(
         (ev) => `
       <li>
-        <a class="aux-event" href="event.html?e=${ev.id}">
+        <a class="aux-event" href="${ev.url || `event.html?e=${ev.id}`}">
           <div class="aux-event__meta">
             <span class="aux-event__series">${ev.series}</span>
             <span class="aux-event__date">${ev.date}</span>

@@ -1,0 +1,124 @@
+{% comment %}
+  Prototype: inn.html — the August Inn cabin page. Every piece of copy is a
+  setting; facts, amenities, booking links and gallery photos are blocks.
+  Assign the "page.august-inn" template to the Inn page in Shopify admin.
+{% endcomment %}
+{%- liquid
+  assign s = section.settings
+  assign facts = section.blocks | where: 'type', 'fact'
+  assign amenities = section.blocks | where: 'type', 'amenity'
+  assign links = section.blocks | where: 'type', 'book_link'
+  assign photos = section.blocks | where: 'type', 'photo'
+-%}
+<main class="story story--inn" id="main" data-section-id="{{ section.id }}">
+  <p class="story__kicker">{{ s.kicker | default: page.title }}</p>
+  <h1 class="story__title">{{ s.title | default: page.title }}</h1>
+  {%- if s.lead != blank -%}<p class="story__lead">{{ s.lead }}</p>{%- endif -%}
+
+  {%- if s.hero -%}
+    <figure class="inn-hero">
+      <img src="{{ s.hero | image_url: width: 1600 }}" srcset="{{ s.hero | image_url: width: 900 }} 900w, {{ s.hero | image_url: width: 1600 }} 1600w, {{ s.hero | image_url: width: 2400 }} 2400w" sizes="(min-width: 901px) 72rem, 100vw" alt="{{ s.hero.alt | default: s.title | escape }}" width="{{ s.hero.width }}" height="{{ s.hero.height }}">
+    </figure>
+  {%- endif -%}
+
+  {%- if facts.size > 0 -%}
+    <dl class="inn-facts">
+      {%- for block in facts -%}
+        <div class="inn-facts__item" {{ block.shopify_attributes }}><dt>{{ block.settings.label }}</dt><dd>{{ block.settings.value }}</dd></div>
+      {%- endfor -%}
+    </dl>
+  {%- endif -%}
+
+  <div class="story__body">
+    {%- if s.body != blank -%}{{ s.body }}{%- else -%}{{ page.content }}{%- endif -%}
+  </div>
+
+  {%- if links.size > 0 -%}
+    <div class="inn-book">
+      {%- for block in links -%}
+        <a class="btn {% if forloop.first %}btn--primary{% else %}btn--ghost{% endif %}" href="{{ block.settings.url }}" target="_blank" rel="noopener noreferrer" {{ block.shopify_attributes }}>{{ block.settings.label }}</a>
+      {%- endfor -%}
+    </div>
+  {%- endif -%}
+
+  {%- if amenities.size > 0 -%}
+    <section class="inn-amenities" aria-labelledby="inn-amenities-title">
+      <h2 id="inn-amenities-title">{{ s.amenities_title }}</h2>
+      <ul>
+        {%- for block in amenities -%}
+          <li {{ block.shopify_attributes }}>{{ block.settings.text }}</li>
+        {%- endfor -%}
+      </ul>
+    </section>
+  {%- endif -%}
+
+  {%- if photos.size > 0 -%}
+    <section class="inn-gallery" aria-labelledby="inn-gallery-title">
+      <h2 id="inn-gallery-title">{{ s.gallery_title }}</h2>
+      <div class="inn-gallery__grid">
+        {%- for block in photos -%}
+          {%- if block.settings.image -%}
+            <figure {{ block.shopify_attributes }}>
+              <img src="{{ block.settings.image | image_url: width: 1200 }}" alt="{{ block.settings.alt | default: block.settings.image.alt | escape }}" width="{{ block.settings.image.width }}" height="{{ block.settings.image.height }}" loading="lazy">
+              {%- if block.settings.caption != blank -%}<figcaption>{{ block.settings.caption }}</figcaption>{%- endif -%}
+            </figure>
+          {%- endif -%}
+        {%- endfor -%}
+      </div>
+    </section>
+  {%- endif -%}
+</main>
+
+{% schema %}
+{
+  "name": "August Inn page",
+  "tag": "div",
+  "class": "shopify-section-story",
+  "settings": [
+    { "type": "text", "id": "kicker", "label": "Kicker", "default": "August Inn" },
+    { "type": "text", "id": "title", "label": "Title", "default": "The shop’s cabin" },
+    { "type": "text", "id": "lead", "label": "Lead", "default": "2095 Wigwam St, Friendship, WI. Across the street from Castle Rock Lake." },
+    { "type": "image_picker", "id": "hero", "label": "Hero photo" },
+    { "type": "richtext", "id": "body", "label": "Body", "info": "Leave empty to use the page content from Online Store → Pages.", "default": "<p>Same people who run the floor at 414 State. The cabin is the overnight version — wood rooms, a deck hot tub, game room downstairs.</p><p>Castle Rock is across the street. Beach and food are five minutes. Full kitchen. Fire pit. Book it on Airbnb or VRBO when you want the lake, not a hotel.</p>" },
+    { "type": "text", "id": "amenities_title", "label": "Amenities heading", "default": "On site" },
+    { "type": "text", "id": "gallery_title", "label": "Gallery heading", "default": "The cabin" }
+  ],
+  "blocks": [
+    { "type": "fact", "name": "Fact", "limit": 6, "settings": [
+      { "type": "text", "id": "label", "label": "Label", "default": "Bedrooms" },
+      { "type": "text", "id": "value", "label": "Value", "default": "4" } ] },
+    { "type": "book_link", "name": "Booking link", "limit": 3, "settings": [
+      { "type": "text", "id": "label", "label": "Label", "default": "Book on Airbnb" },
+      { "type": "url", "id": "url", "label": "Link" } ] },
+    { "type": "amenity", "name": "Amenity", "settings": [
+      { "type": "text", "id": "text", "label": "Text", "default": "Hot tub on the deck" } ] },
+    { "type": "photo", "name": "Gallery photo", "limit": 8, "settings": [
+      { "type": "image_picker", "id": "image", "label": "Photo" },
+      { "type": "text", "id": "alt", "label": "Alt text" },
+      { "type": "text", "id": "caption", "label": "Caption" } ] }
+  ],
+  "presets": [
+    {
+      "name": "August Inn page",
+      "blocks": [
+        { "type": "fact", "settings": { "label": "Bedrooms", "value": "4" } },
+        { "type": "fact", "settings": { "label": "Beds", "value": "5" } },
+        { "type": "fact", "settings": { "label": "Baths", "value": "2.5" } },
+        { "type": "fact", "settings": { "label": "Sleeps", "value": "8" } },
+        { "type": "book_link", "settings": { "label": "Book on Airbnb", "url": "https://www.airbnb.com/rooms/1411564861854692476" } },
+        { "type": "book_link", "settings": { "label": "Book on VRBO", "url": "https://www.vrbo.com/4567368" } },
+        { "type": "amenity", "settings": { "text": "4 bedrooms, 5 beds, 2.5 baths" } },
+        { "type": "amenity", "settings": { "text": "Sleeps 8" } },
+        { "type": "amenity", "settings": { "text": "Across the street from Castle Rock Lake" } },
+        { "type": "amenity", "settings": { "text": "5 min to public beach and restaurants" } },
+        { "type": "amenity", "settings": { "text": "Game room — pool, shuffleboard, arcade, foosball" } },
+        { "type": "amenity", "settings": { "text": "BBQ and outdoor dining" } },
+        { "type": "amenity", "settings": { "text": "Patio and balcony" } },
+        { "type": "amenity", "settings": { "text": "Hot tub on the deck" } },
+        { "type": "photo" }, { "type": "photo" }, { "type": "photo" }, { "type": "photo" }
+      ]
+    }
+  ],
+  "enabled_on": { "templates": ["page"] }
+}
+{% endschema %}

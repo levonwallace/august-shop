@@ -1,0 +1,40 @@
+{% comment %}
+  Derives mix number / name / genre for an AUX article, mirroring aux-json.
+  Outputs ONE field, chosen by `field`: 'no' | 'name' | 'genre'
+
+    {% capture no %}{% render 'mix-meta', article: article, field: 'no', fallback_no: 12 %}{% endcapture %}
+{% endcomment %}
+{%- liquid
+  assign parts = article.title | split: '::'
+  assign tail = article.title
+  if parts.size > 1
+    assign tail = parts | last | strip
+  endif
+  assign first_word = tail | split: ' ' | first | strip
+  assign numeric = first_word | plus: 0
+  assign no = article.metafields.august.mix_number | strip
+  assign derived_name = tail
+  if no == blank
+    if numeric > 0 or first_word == '0' or first_word == '00' or first_word == '000'
+      assign no = first_word
+      assign derived_name = tail | remove_first: first_word | strip
+    else
+      assign no = fallback_no | default: 0 | append: ''
+    endif
+  endif
+  assign no = no | prepend: '00' | slice: -3, 3
+  assign name = article.metafields.august.mix_title | default: derived_name
+  if name == blank
+    assign name = article.title
+  endif
+  assign genre = article.metafields.august.genre | default: article.tags.first | default: ''
+
+  case field
+    when 'no'
+      echo no
+    when 'name'
+      echo name
+    when 'genre'
+      echo genre
+  endcase
+-%}

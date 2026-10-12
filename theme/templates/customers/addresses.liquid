@@ -1,6 +1,51 @@
 <main class="account-page" id="main">
-  <h1>Addresses</h1>
-  {% for address in customer.addresses %}
-    <p>{{ address | format_address }}</p>
-  {% endfor %}
+  <a class="story__back" href="{{ routes.account_url }}">← Account</a>
+  <header class="account-head">
+    <div class="account-head__meta">
+      <h1>Addresses</h1>
+      <p class="account-sub">{{ customer.addresses_count }} saved</p>
+    </div>
+  </header>
+
+  <div class="account-layout">
+    <section class="glass-panel account-orders" aria-label="Saved addresses">
+      {%- for address in customer.addresses -%}
+        <div class="order-row">
+          <div class="order-row__info">
+            <span class="order-row__title">{{ address.first_name }} {{ address.last_name }}{% if address == customer.default_address %} · Default{% endif %}</span>
+            <span class="order-row__meta">{{ address | format_address | strip_newlines | replace: '<br>', ', ' | replace: '<br/>', ', ' | strip_html }}</span>
+          </div>
+          {%- form 'customer_address', address, class: 'order-row__actions' -%}
+            <button class="profile-form__link" type="submit" formaction="{{ routes.account_addresses_url }}/{{ address.id }}" formmethod="post" name="_method" value="delete" onclick="return confirm('Remove this address?')">Remove</button>
+          {%- endform -%}
+        </div>
+        {%- unless forloop.last -%}<div class="cart-divider"></div>{%- endunless -%}
+      {%- else -%}
+        <p class="account-card__text account-card__text--muted">No saved addresses yet.</p>
+      {%- endfor -%}
+    </section>
+
+    <aside class="account-side">
+      <div class="account-card">
+        <h2>Add address</h2>
+        {%- form 'customer_address', customer.new_address, class: 'profile-form' -%}
+          <label class="profile-field profile-field--name"><span>First name</span><input type="text" name="address[first_name]" autocomplete="given-name"></label>
+          <label class="profile-field profile-field--name"><span>Last name</span><input type="text" name="address[last_name]" autocomplete="family-name"></label>
+          <label class="profile-field"><span>Address</span><input type="text" name="address[address1]" autocomplete="address-line1"></label>
+          <label class="profile-field"><span>Apt, suite</span><input type="text" name="address[address2]" autocomplete="address-line2"></label>
+          <label class="profile-field"><span>City</span><input type="text" name="address[city]" autocomplete="address-level2"></label>
+          <label class="profile-field"><span>Country</span><select name="address[country]" data-default="{{ form.country }}">{{ all_country_option_tags }}</select></label>
+          <label class="profile-field"><span>State</span><input type="text" name="address[province]" autocomplete="address-level1"></label>
+          <label class="profile-field"><span>ZIP</span><input type="text" name="address[zip]" autocomplete="postal-code"></label>
+          <label class="profile-field"><span>Phone</span><input type="tel" name="address[phone]" autocomplete="tel"></label>
+          <label class="pref-toggle">
+            <input type="checkbox" name="address[default]" value="1">
+            <span class="pref-toggle__track"><span class="pref-toggle__thumb"></span></span>
+            Set as default
+          </label>
+          <button class="btn btn--primary btn--block profile-form__submit" type="submit">Save address</button>
+        {%- endform -%}
+      </div>
+    </aside>
+  </div>
 </main>

@@ -77,20 +77,22 @@ document.addEventListener("DOMContentLoaded", () => {
 
   injectMobileSheets();
 
-  function fillMegaProducts(poolKey) {
+  function fillMegaProducts(poolKey, curated) {
     if (!window.AugustCatalog) return;
     const all = window.AugustCatalog.PRODUCTS;
     const pool =
-      poolKey === "sale"
-        ? all.filter((p) => p.sale)
-        : poolKey === "new"
-          ? all.filter((p) => p.cat === "shoes")
-          : all;
+      Array.isArray(curated) && curated.length
+        ? curated
+        : poolKey === "sale"
+          ? all.filter((p) => p.sale)
+          : poolKey === "new"
+            ? all.filter((p) => p.cat === "shoes")
+            : all;
     const items = window.AugustCatalog.unique(pool);
     document.querySelectorAll(".mega-product").forEach((el, i) => {
       const p = items[i % Math.max(items.length, 1)];
       if (!p) return;
-      el.href = `product.html?p=${p.id}`;
+      el.href = window.AugustCatalog.href(p);
       const img = el.querySelector("img");
       if (img) {
         img.src = p.img;
@@ -121,9 +123,12 @@ document.addEventListener("DOMContentLoaded", () => {
 
     const dirToggles = [];
     const wireMobileDir = (label, html) => {
-      const nav = [...panel.querySelectorAll(".mobile-nav__links a")].find(
-        (a) => a.textContent.trim().toLowerCase() === label
-      );
+      // Theme: <a data-mobile-dir="brands">; prototype: match by link text
+      const nav =
+        panel.querySelector(`.mobile-nav__links a[data-mobile-dir="${label}"]`) ||
+        [...panel.querySelectorAll(".mobile-nav__links a")].find(
+          (a) => !a.hasAttribute("data-mobile-dir") && a.textContent.trim().toLowerCase() === label
+        );
       if (!nav || !html) return;
       dirToggles.push(nav);
       nav.addEventListener("click", (e) => {
@@ -166,7 +171,9 @@ document.addEventListener("DOMContentLoaded", () => {
   const megaLinks = document.querySelector("[data-mega-links]");
   const megaAll = document.querySelector("[data-mega-all]");
 
-  const megaPanels = {
+  // Theme: sections/header.liquid emits window.AugustMegaPanels keyed by
+  // block id (label, all, href, directory, links, editorial, products).
+  const megaPanels = window.AugustMegaPanels || {
     "new-arrivals": {
       label: "New arrivals",
       all: "Shop all new arrivals →",
@@ -248,11 +255,18 @@ document.addEventListener("DOMContentLoaded", () => {
     });
 
     const megaBody = document.querySelector(".morph-menu__body");
-    const isDirectory = !!(open && (section === "brands" || section === "categories"));
+    const panelData = (open && section && megaPanels[section]) || null;
+    const directory =
+      panelData?.directory && panelData.directory !== "none"
+        ? panelData.directory
+        : section === "brands" || section === "categories"
+          ? section
+          : null;
+    const isDirectory = !!(open && directory);
     megaBody?.classList.toggle("is-directory", isDirectory);
 
-    if (open && section && megaPanels[section]) {
-      const data = megaPanels[section];
+    if (panelData) {
+      const data = panelData;
       if (megaLabel) {
         megaLabel.textContent = data.label;
         megaLabel.hidden = isDirectory;
@@ -262,10 +276,23 @@ document.addEventListener("DOMContentLoaded", () => {
         megaAll.href = data.href || "collection.html";
         megaAll.hidden = isDirectory;
       }
+      if (data.editorial) {
+        const ed = document.querySelector("[data-mega-editorial]");
+        if (ed) {
+          if (data.editorial.href) ed.href = data.editorial.href;
+          const set = (sel, text) => {
+            const el = ed.querySelector(sel);
+            if (el && text != null) el.textContent = text;
+          };
+          set("[data-mega-editorial-label]", data.editorial.label);
+          set("[data-mega-editorial-title]", data.editorial.title);
+          set("[data-mega-editorial-cta]", data.editorial.cta);
+        }
+      }
       if (megaLinks) {
-        if (section === "brands" && window.AugustCatalog) {
+        if (directory === "brands" && window.AugustCatalog) {
           megaLinks.innerHTML = window.AugustCatalog.brandDirHtml();
-        } else if (section === "categories" && window.AugustCatalog) {
+        } else if (directory === "categories" && window.AugustCatalog) {
           megaLinks.innerHTML = window.AugustCatalog.catDirHtml();
         } else {
           megaLinks.innerHTML = data.links
@@ -277,7 +304,7 @@ document.addEventListener("DOMContentLoaded", () => {
             .join("");
         }
       }
-      if (!isDirectory) fillMegaProducts(data.pool);
+      if (!isDirectory) fillMegaProducts(data.pool, data.products);
     }
   };
 
@@ -451,21 +478,22 @@ document.addEventListener("DOMContentLoaded", () => {
       recents.innerHTML = window.AugustCatalog.PRODUCTS.slice(0, 4)
         .map(
           (p) => `
-        <a class="sheet-list__row" href="product.html?p=${p.id}">
+        <a class="sheet-list__row" href="${window.AugustCatalog.href(p)}">
           <span>${p.title}</span>
           <svg width="10" height="10" viewBox="0 0 10 10" fill="none" aria-hidden="true"><path d="M3 1l4 4-4 4" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
         </a>`
         )
         .join("");
     }
-    fillMegaProducts("new");
+    const firstPanel = megaPanels[Object.keys(megaPanels)[0]];
+    fillMegaProducts(firstPanel?.pool || "new", firstPanel?.products);
   }
 
   /* ── PLP: render the grid from the real catalog ───────────── */
   const grid = document.querySelector(".plp-main .product-grid");
   if (grid && window.AugustCatalog) {
     const params = new URLSearchParams(location.search);
-    const isSalePage = /sale\.html$/i.test(location.pathname);
+    const isSalePage = /sale\.html$/i.test(location.pathname) || !!grid.closest("[data-plp-sale]");
     const catParam = params.get("cat");
     const catAlias = catParam === "footwear" ? "shoes" : catParam;
 
@@ -491,7 +519,8 @@ document.addEventListener("DOMContentLoaded", () => {
     const brandHost =
       sheet?.querySelector("[data-filter-brands]") ||
       sheet?.querySelector("[data-filter-brand]")?.parentElement;
-    if (brandHost) {
+    // Theme: Liquid already rendered this collection's vendors as chips
+    if (brandHost && !brandHost.querySelector("[data-filter-brand]")) {
       brandHost.setAttribute("data-filter-brands", "");
       brandHost.innerHTML = window.AugustCatalog
         .brands()
@@ -542,6 +571,9 @@ document.addEventListener("DOMContentLoaded", () => {
         return `${state.brands[0]}${sale} · ${count}`;
       if (state.dept !== "all" || state.cats.length || state.type || state.sale || state.brands.length || state.price)
         return `${dept}${cat}${sale}${state.brands.length ? " · " + state.brands.join(", ") : ""} · ${count}`;
+      // Theme: the collection section renders its own intro (title/description)
+      const serverDefault = document.querySelector(".plp-intro__island p")?.getAttribute("data-island-default");
+      if (serverDefault) return serverDefault;
       return `New arrivals from Nike, Adidas, Carhartt WIP, and more · ${count}`;
     };
 
@@ -760,7 +792,10 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   /* ── Home: shelves render from the real catalog ───────────── */
-  if (document.querySelector(".page--home") && window.AugustCatalog) {
+  // Theme: the home section renders curated collections server-side
+  // ([data-card-stack] + [data-shelf-curated]) — leave them alone.
+  const homeCurated = !!document.querySelector(".page--home [data-shelf-curated]");
+  if (document.querySelector(".page--home") && window.AugustCatalog && !homeCurated) {
     const all = window.AugustCatalog.PRODUCTS;
     const unique = window.AugustCatalog.unique;
     const shoes = unique(all.filter((p) => p.cat === "shoes"));
@@ -808,7 +843,7 @@ document.addEventListener("DOMContentLoaded", () => {
   if (window.AugustCatalog) {
     document.querySelectorAll('a[href="product.html"]').forEach((a, i) => {
       const p = window.AugustCatalog.PRODUCTS[i % window.AugustCatalog.PRODUCTS.length];
-      a.href = `product.html?p=${p.id}`;
+      if (p) a.href = window.AugustCatalog.href(p);
     });
   }
 });

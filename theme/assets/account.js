@@ -140,7 +140,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     set("[data-account-name-display]", user.name);
     set("[data-account-email]", user.email);
-    set("[data-account-since]", monthYear(user.createdAt));
+    if (user.createdAt || !window.AugustBootstrap?.live) set("[data-account-since]", monthYear(user.createdAt));
 
     const nameInput = page.querySelector("[data-account-name-input]");
     const emailInput = page.querySelector("[data-account-email-input]");
@@ -239,6 +239,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const renderPlacedOrders = () => {
     const ordersPanel = page.querySelector(".account-orders");
     if (!ordersPanel || !window.AugustCart || !window.AugustCatalog) return;
+    if (window.AugustBootstrap?.live) return; // theme: customer.orders is rendered by Liquid
 
     // Clear any previously injected rows, keep the static samples
     ordersPanel.querySelectorAll("[data-placed-order]").forEach((el) => el.remove());

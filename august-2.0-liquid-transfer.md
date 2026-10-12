@@ -3,7 +3,7 @@
 **For:** whoever is helping port the prototype onto Shopify  
 **From:** Levon / August Shop  
 **Date:** 12 Oct 2026  
-**Status:** Plan only. Nothing has been published. Live [august-shop.com](https://august-shop.com) stays on the current theme until Mason signs off.
+**Status:** Superseded 12 Oct 2026. The "fork the live export" plan below was dropped — the Pipeline export is a clone of the current site. August 2.0 is built from this repo's prototype into `theme/` (see `theme/README.md`, `npm run theme:zip`). Kept for the live-theme analysis and the do-not-publish rules. Live [august-shop.com](https://august-shop.com) stays on the current theme until Mason signs off.
 
 This file is the package. It is the analysis of the live theme export (9 Oct 2026), the transfer plan, and the rules. You do not need the Cursor chat to follow it.
 

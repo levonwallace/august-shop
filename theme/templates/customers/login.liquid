@@ -1,9 +1,68 @@
-<main class="account-gate" id="main">
-  <h1>Sign in</h1>
-  {% form 'customer_login' %}
-    <label>Email <input type="email" name="customer[email]" autocomplete="email"></label>
-    <label>Password <input type="password" name="customer[password]" autocomplete="current-password"></label>
-    <button class="btn btn--primary" type="submit">Sign in</button>
-  {% endform %}
-  <a href="{{ routes.account_register_url }}">Create account</a>
+{% comment %} Prototype: profile.js auth modal (sign in tab) as a page {% endcomment %}
+<main class="account-page" id="main">
+  <div class="account-gate">
+    <div class="glass-panel account-gate__card">
+      <div class="auth-tabs" role="tablist" aria-label="Sign in or create account">
+        <a class="auth-tab is-active" role="tab" aria-selected="true" href="{{ routes.account_login_url }}">Sign in</a>
+        <a class="auth-tab" role="tab" aria-selected="false" href="{{ routes.account_register_url }}">Create account</a>
+      </div>
+
+      <div id="login" data-login-panel>
+        <h1>Sign in</h1>
+        <p class="account-gate__why">Save a feed, track orders.</p>
+        {%- form 'customer_login', class: 'profile-form' -%}
+          {%- if form.errors -%}
+            <p class="profile-form__error" role="alert">{{ form.errors | default_errors }}</p>
+          {%- endif -%}
+          <label class="profile-field">
+            <span>Email</span>
+            <input type="email" name="customer[email]" required autocomplete="email" autocapitalize="off">
+          </label>
+          <label class="profile-field">
+            <span>Password</span>
+            <input type="password" name="customer[password]" required autocomplete="current-password">
+          </label>
+          <button class="btn btn--primary btn--block profile-form__submit" type="submit">Sign in</button>
+          <p class="auth-footnote"><a href="#recover">Forgot your password?</a></p>
+        {%- endform -%}
+      </div>
+
+      <div id="recover" data-recover-panel hidden>
+        <h1>Reset password</h1>
+        <p class="account-gate__why">We'll email you a link to reset it.</p>
+        {%- form 'recover_customer_password', class: 'profile-form' -%}
+          {%- if form.posted_successfully? -%}
+            <p class="profile-form__ok" role="status" data-recover-posted>Check your email for the reset link.</p>
+          {%- endif -%}
+          {%- if form.errors -%}
+            <p class="profile-form__error" role="alert">{{ form.errors | default_errors }}</p>
+          {%- endif -%}
+          <label class="profile-field">
+            <span>Email</span>
+            <input type="email" name="email" required autocomplete="email" autocapitalize="off">
+          </label>
+          <button class="btn btn--primary btn--block profile-form__submit" type="submit">Send reset link</button>
+          <p class="auth-footnote"><a href="#login">Back to sign in</a></p>
+        {%- endform -%}
+      </div>
+
+      {%- if shop.checkout.guest_login -%}
+        <p class="auth-footnote">{% form 'guest_login' %}<button class="profile-form__link" type="submit">Continue as guest</button>{% endform %}</p>
+      {%- endif -%}
+      <p class="auth-footnote">By continuing, you agree to {{ shop.name }}'s <a href="{{ shop.terms_of_service.url | default: '/policies/terms-of-service' }}">Terms</a> and <a href="{{ shop.privacy_policy.url | default: '/policies/privacy-policy' }}">Privacy Policy</a>.</p>
+    </div>
+  </div>
 </main>
+<script>
+  (() => {
+    const login = document.querySelector("[data-login-panel]");
+    const recover = document.querySelector("[data-recover-panel]");
+    const sync = () => {
+      const on = location.hash === "#recover" || !!document.querySelector("[data-recover-posted]");
+      if (login) login.hidden = on;
+      if (recover) recover.hidden = !on;
+    };
+    window.addEventListener("hashchange", sync);
+    sync();
+  })();
+</script>

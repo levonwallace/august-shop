@@ -1,0 +1,78 @@
+{
+  "type": "header",
+  "name": "Header",
+  "sections": {
+    "header": {
+      "type": "header",
+      "settings": {
+        "wordmark": "August",
+        "menu_label": "Menu",
+        "search_placeholder": "Search"
+      },
+      "blocks": {
+        "new": {
+          "type": "mega_panel",
+          "settings": {
+            "title": "New arrivals",
+            "directory": "none",
+            "menu": "new-arrivals",
+            "all_label": "Shop all new arrivals →",
+            "editorial_label": "Editorial",
+            "editorial_title": "New\narrivals",
+            "editorial_cta": "Explore →"
+          }
+        },
+        "brands": {
+          "type": "mega_panel",
+          "settings": {
+            "title": "Brands",
+            "directory": "brands",
+            "all_label": "View all brands →"
+          }
+        },
+        "categories": {
+          "type": "mega_panel",
+          "settings": {
+            "title": "Categories",
+            "directory": "categories",
+            "all_label": "Shop all categories →"
+          }
+        },
+        "color": {
+          "type": "mega_panel",
+          "settings": {
+            "title": "Shop by color",
+            "directory": "none",
+            "menu": "shop-by-color",
+            "all_label": "Browse all colors →",
+            "editorial_label": "Editorial",
+            "editorial_title": "Shop by\ncolor",
+            "editorial_cta": "Explore →"
+          }
+        },
+        "sale": {
+          "type": "mega_panel",
+          "settings": {
+            "title": "Sale",
+            "directory": "none",
+            "menu": "sale",
+            "all_label": "Shop all sale →",
+            "editorial_label": "Editorial",
+            "editorial_title": "Sale",
+            "editorial_cta": "Explore →"
+          }
+        },
+        "promo_new": {
+          "type": "promo",
+          "settings": { "label": "New arrivals" }
+        },
+        "promo_sale": {
+          "type": "promo",
+          "settings": { "label": "Sale" }
+        }
+      },
+      "block_order": ["new", "brands", "categories", "color", "sale", "promo_new", "promo_sale"]
+    }
+  },
+  "order": ["header"]
+}

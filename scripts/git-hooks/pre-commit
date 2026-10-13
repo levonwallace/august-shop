@@ -1,0 +1,39 @@
+#!/usr/bin/env bash
+# Refuse commits that would leak Shopify credentials.
+# Installed with: git config core.hooksPath scripts/git-hooks
+set -euo pipefail
+root="$(git rev-parse --show-toplevel)"
+fail=0
+
+# 1. No .env files except the template.
+while IFS= read -r f; do
+  base="$(basename "$f")"
+  if [[ "$base" == .env* && "$base" != ".env.example" ]]; then
+    echo "✗ refusing to commit $f (secrets file)"; fail=1
+  fi
+done < <(git diff --cached --name-only --diff-filter=ACMR)
+
+# 2. No Shopify token shapes in added lines.
+if git diff --cached -U0 --diff-filter=ACMR | grep -E '^\+' | grep -qE 'shp(at|ca|pa|ss|tka)_[A-Za-z0-9]{16,}'; then
+  echo "✗ staged changes contain a Shopify access token (shpat_/shpca_/…)"; fail=1
+fi
+
+# 3. None of the actual values from .env (checked without printing them).
+if [[ -f "$root/.env" ]]; then
+  added="$(git diff --cached -U0 --diff-filter=ACMR | grep -E '^\+' || true)"
+  while IFS='=' read -r key value; do
+    [[ -z "$key" || "$key" == \#* ]] && continue
+    value="${value%\"}"; value="${value#\"}"; value="${value%\'}"; value="${value#\'}"
+    [[ ${#value} -lt 12 ]] && continue
+    if [[ "$key" == *TOKEN* || "$key" == *SECRET* || "$key" == *KEY* || "$key" == *PASSWORD* ]]; then
+      if grep -qF -- "$value" <<<"$added"; then
+        echo "✗ staged changes contain the value of $key from .env"; fail=1
+      fi
+    fi
+  done < "$root/.env"
+fi
+
+if [[ $fail -ne 0 ]]; then
+  echo "Commit blocked. Unstage the file/line (git restore --staged <file>) and retry."
+  exit 1
+fi

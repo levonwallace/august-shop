@@ -5,7 +5,7 @@
   "description": "August Shop — iOS-inspired UX prototype (pre-Shopify Liquid). No build step required.",
   "scripts": {
     "dev": "./scripts/dev.sh",
-    "start": "serve . -l tcp://0.0.0.0:${PORT:-5173} --no-clipboard",
+    "start": "python3 scripts/dev-server.py ${PORT:-5173}",
     "open": "open http://localhost:5173/index.html",
     "theme:sync": "bash ./scripts/sync-theme-assets.sh",
     "theme:push": "npm run theme:sync && shopify theme push --unpublished --path theme",

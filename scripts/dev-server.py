@@ -338,7 +338,24 @@ def refresh_catalog():
     sys.stderr.write("cached %s products from august-shop.com\n" % len(collected))
 
 
+# Never serve secrets or tooling: .env, .git, data/ (Storefront snapshots), etc.
+BLOCKED_DIRS = {"scripts", "data", "node_modules", "dist"}
+
+
+def is_blocked(url_path):
+    parts = [p for p in urllib.parse.unquote(url_path).replace("\\", "/").split("/") if p]
+    if any(p.startswith(".") for p in parts):
+        return True
+    return bool(parts) and parts[0] in BLOCKED_DIRS
+
+
 class NoCacheHandler(SimpleHTTPRequestHandler):
+    def send_head(self):
+        if is_blocked(urllib.parse.urlparse(self.path).path):
+            self.send_error(404)
+            return None
+        return super().send_head()
+
     def end_headers(self):
         self.send_header("Cache-Control", "no-store, must-revalidate")
         self.send_header("Pragma", "no-cache")
@@ -471,7 +488,9 @@ if __name__ == "__main__":
     port = int(sys.argv[1]) if len(sys.argv) > 1 else 5173
     os.chdir(os.path.join(os.path.dirname(__file__), ".."))
     threading.Thread(target=refresh_catalog, daemon=True).start()
-    server = ThreadingHTTPServer(("", port), NoCacheHandler)
+    # Localhost only by default; HOST=0.0.0.0 to test from a phone on the LAN.
+    host = os.environ.get("HOST", "127.0.0.1")
+    server = ThreadingHTTPServer((host, port), NoCacheHandler)
     print(f"Serving with no-store caching on :{port}")
     print("Shopify proxy: /api/search?q=  /api/product?handle=  /api/catalog.js")
     if storefront.configured():

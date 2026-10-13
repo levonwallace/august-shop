@@ -30,6 +30,12 @@ npm run shopify:check   # token access + every handle the theme references exist
 npm run shopify:pull    # snapshot collections, blogs, menus, products → data/
 ```
 
+`.env` is git-ignored and a pre-commit hook (`scripts/git-hooks`, enable on
+a fresh clone with `git config core.hooksPath scripts/git-hooks`) blocks
+`.env*` files, Shopify token shapes and the literal `.env` values. The dev
+server listens on localhost only (`HOST=0.0.0.0 npm run dev` for LAN
+testing) and never serves dotfiles, `scripts/`, `data/` or `dist/`.
+
 To view mobile pixels in Chrome/Safari DevTools, toggle the device toolbar
 and pick **iPhone 15 Pro**. The layout is mobile-first from `≤900px` down.
 

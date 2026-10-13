@@ -7,10 +7,14 @@
           "type": "hero",
           "settings": {
             "show_announce": true,
-            "word_1": "Streetwear,", "ink_1": "ink-leather",
-            "word_2": "sneakers,", "ink_2": "ink-slate",
-            "word_3": "art,", "ink_3": "ink-madder",
-            "word_4": "music.", "ink_4": "ink-cobalt",
+            "word_1": "Streetwear,",
+            "ink_1": "ink-leather",
+            "word_2": "sneakers,",
+            "ink_2": "ink-slate",
+            "word_3": "art,",
+            "ink_3": "ink-madder",
+            "word_4": "music.",
+            "ink_4": "ink-cobalt",
             "grid_title": "In stock now",
             "grid_tag": "New arrivals",
             "collection": "new-arrivals",
@@ -19,10 +23,61 @@
             "scroll_note": "keep scrolling — up next:"
           }
         },
-        "shelf_new": { "type": "shelf", "settings": { "title": "New arrivals", "collection": "new-arrivals", "count": 8, "mobile_count": 6 } },
-        "shelf_nike": { "type": "shelf", "settings": { "title": "Nike", "collection": "nike", "count": 8, "mobile_count": 6 } },
-        "shelf_aiaiai": { "type": "shelf", "settings": { "title": "AIAIAI", "collection": "aiaiai", "count": 8, "mobile_count": 6 } },
-        "shelf_sale": { "type": "shelf", "settings": { "title": "Sale", "collection": "sale", "count": 8, "mobile_count": 6 } },
+        "shelf_new": {
+          "type": "shelf",
+          "settings": {
+            "title": "New arrivals",
+            "collection": "new-arrivals",
+            "count": 8,
+            "mobile_count": 6
+          }
+        },
+        "shelf_nike": {
+          "type": "shelf",
+          "settings": {
+            "title": "Nike",
+            "collection": "nike",
+            "count": 8,
+            "mobile_count": 6
+          }
+        },
+        "shelf_aiaiai": {
+          "type": "shelf",
+          "settings": {
+            "title": "AIAIAI",
+            "collection": "aiaiai",
+            "count": 8,
+            "mobile_count": 6
+          }
+        },
+        "shelf_sale": {
+          "type": "shelf",
+          "settings": {
+            "title": "Sale",
+            "collection": "sale",
+            "count": 8,
+            "mobile_count": 6
+          }
+        },
+        "brand_ootd": {
+          "type": "brand",
+          "settings": {
+            "title": "One Of These Days",
+            "collection": "one-of-these-days",
+            "image": "shopify://shop_images/WEB_2_1.jpg",
+            "cta": "Shop now"
+          }
+        },
+        "brand_sorel": {
+          "type": "brand",
+          "settings": {
+            "title": "Sorel × Needles",
+            "link": "shopify://products/sorel-x-needles-ambler-chukka-waterproof-boot",
+            "image": "shopify://shop_images/HOMEPAGE_bdac6822-66c1-458f-8f10-e5a5335f6c30.jpg",
+            "image_mobile": "shopify://shop_images/HOMEPAGE_MOBILE_06e8be6c-a678-4d25-85ca-29d62340fcc4.jpg",
+            "cta": "Shop now"
+          }
+        },
         "brand_stussy": {
           "type": "brand",
           "settings": {
@@ -63,25 +118,6 @@
             "cta": "Shop now"
           }
         },
-        "brand_sorel": {
-          "type": "brand",
-          "settings": {
-            "title": "Sorel × Needles",
-            "link": "shopify://products/sorel-x-needles-ambler-chukka-waterproof-boot",
-            "image": "shopify://shop_images/HOMEPAGE_bdac6822-66c1-458f-8f10-e5a5335f6c30.jpg",
-            "image_mobile": "shopify://shop_images/HOMEPAGE_MOBILE_06e8be6c-a678-4d25-85ca-29d62340fcc4.jpg",
-            "cta": "Shop now"
-          }
-        },
-        "brand_august": {
-          "type": "brand",
-          "settings": {
-            "title": "August",
-            "collection": "august",
-            "image": "shopify://shop_images/carousel_7_a6302092-7fd5-4254-88b1-467bf57c80a2.jpg",
-            "cta": "Shop now"
-          }
-        },
         "aux": {
           "type": "aux",
           "settings": {
@@ -102,9 +138,24 @@
           }
         }
       },
-      "block_order": ["hero", "shelf_new", "shelf_nike", "shelf_aiaiai", "shelf_sale", "brand_stussy", "brand_saucony", "brand_kardo", "brand_asics", "brand_sorel", "brand_august", "aux"],
+      "block_order": [
+        "hero",
+        "shelf_new",
+        "shelf_nike",
+        "shelf_aiaiai",
+        "shelf_sale",
+        "brand_ootd",
+        "brand_sorel",
+        "brand_stussy",
+        "brand_saucony",
+        "brand_kardo",
+        "brand_asics",
+        "aux"
+      ],
       "settings": {}
     }
   },
-  "order": ["home"]
+  "order": [
+    "home"
+  ]
 }

@@ -42,7 +42,12 @@
     for block in panel_blocks
       assign block_key = block.settings.title | handleize
       if block_key == key
-        if block.settings.directory != 'none' or block.settings.menu != blank
+        comment
+          An extras block turns a childless item (e.g. New Arrivals) into a
+          panel when it brings a directory, a replacement menu, product
+          tiles or an editorial card.
+        endcomment
+        if block.settings.directory != 'none' or block.settings.menu != blank or block.settings.products_collection != blank or block.settings.editorial_title != blank
           assign has_panel = true
         endif
       endif

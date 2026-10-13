@@ -59,6 +59,8 @@
   width: 100%;
   height: 100%;
   object-fit: cover;
+  /* Live store's "image position" (left / center / right) per banner */
+  object-position: var(--banner-focal, center) center;
 }
 
 .brand-banner--full .brand-banner__content {

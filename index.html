@@ -164,19 +164,19 @@
               <span>New arrivals</span>
             </a>
             <a class="mobile-nav__promo" href="collection.html?brand=One%20Of%20These%20Days">
-              <img src="assets/banner-one-of-these-days.jpg" alt="" loading="lazy" />
+              <img src="assets/banner-one-of-these-days-mobile.jpg" alt="" loading="lazy" />
               <span>One Of These Days</span>
             </a>
             <a class="mobile-nav__promo" href="product.html?h=sorel-x-needles-ambler-chukka-waterproof-boot">
-              <img src="assets/banner-sorel-needles.jpg" alt="" loading="lazy" />
+              <img src="assets/banner-sorel-needles-mobile.jpg" alt="" loading="lazy" />
               <span>Sorel × Needles</span>
             </a>
             <a class="mobile-nav__promo" href="collection.html?brand=Stussy">
-              <img src="assets/banner-stussy.jpg" alt="" loading="lazy" />
+              <img src="assets/banner-stussy-mobile.jpg" alt="" loading="lazy" />
               <span>Stüssy</span>
             </a>
             <a class="mobile-nav__promo" href="collection.html?brand=Saucony">
-              <img src="assets/banner-saucony.jpg" alt="" loading="lazy" />
+              <img src="assets/banner-saucony-mobile.jpg" alt="" loading="lazy" />
               <span>Saucony</span>
             </a>
             <a class="mobile-nav__promo" href="sale.html">
@@ -368,11 +368,16 @@
         </div>
 
         <!-- Brand banners — mirrors the live august-shop.com homepage
-             (One Of These Days slideshow + the five brand bricks), Oct 13 2026 -->
+             (One Of These Days slideshow + the five brand bricks, with their
+             mobile art), Oct 13 2026 -->
         <!-- Card 1: One Of These Days -->
         <div class="card-stack__card card-stack__card--brand" data-card="1">
           <a class="brand-banner brand-banner--full" href="collection.html?brand=One%20Of%20These%20Days">
-            <img class="brand-banner__media" src="assets/banner-one-of-these-days.jpg" alt="" width="1600" height="640" loading="lazy" />
+            <picture>
+              <!-- Portrait art for the tall mobile card; landscape everywhere else -->
+              <source media="(max-width: 900px)" srcset="assets/banner-one-of-these-days-mobile.jpg" width="640" height="800" />
+              <img class="brand-banner__media" src="assets/banner-one-of-these-days.jpg" alt="" width="2000" height="800" loading="lazy" />
+            </picture>
             <span class="brand-banner__overlay" aria-hidden="true"></span>
             <span class="brand-banner__content">
               <span class="brand-banner__title">One Of These Days</span>
@@ -384,7 +389,11 @@
         <!-- Card 2: Sorel × Needles -->
         <div class="card-stack__card card-stack__card--brand" data-card="2">
           <a class="brand-banner brand-banner--full" href="product.html?h=sorel-x-needles-ambler-chukka-waterproof-boot">
-            <img class="brand-banner__media" src="assets/banner-sorel-needles.jpg" alt="" width="1600" height="900" loading="lazy" />
+            <picture>
+              <!-- Portrait art for the tall mobile card; landscape everywhere else -->
+              <source media="(max-width: 900px)" srcset="assets/banner-sorel-needles-mobile.jpg" width="1000" height="1250" />
+              <img class="brand-banner__media" src="assets/banner-sorel-needles.jpg" alt="" width="1600" height="900" loading="lazy" />
+            </picture>
             <span class="brand-banner__overlay" aria-hidden="true"></span>
             <span class="brand-banner__content">
               <span class="brand-banner__title">Sorel × Needles</span>
@@ -396,7 +405,11 @@
         <!-- Card 3: Stüssy -->
         <div class="card-stack__card card-stack__card--brand" data-card="3">
           <a class="brand-banner brand-banner--full" href="collection.html?brand=Stussy">
-            <img class="brand-banner__media" src="assets/banner-stussy.jpg" alt="" width="1600" height="900" loading="lazy" />
+            <picture>
+              <!-- Portrait art for the tall mobile card; landscape everywhere else -->
+              <source media="(max-width: 900px)" srcset="assets/banner-stussy-mobile.jpg" width="1000" height="1250" />
+              <img class="brand-banner__media" src="assets/banner-stussy.jpg" alt="" width="1600" height="900" loading="lazy" />
+            </picture>
             <span class="brand-banner__overlay" aria-hidden="true"></span>
             <span class="brand-banner__content">
               <span class="brand-banner__title">Stüssy</span>
@@ -408,7 +421,11 @@
         <!-- Card 4: Saucony -->
         <div class="card-stack__card card-stack__card--brand" data-card="4">
           <a class="brand-banner brand-banner--full" href="collection.html?brand=Saucony">
-            <img class="brand-banner__media" src="assets/banner-saucony.jpg" alt="" width="1600" height="900" loading="lazy" />
+            <picture>
+              <!-- Portrait art for the tall mobile card; landscape everywhere else -->
+              <source media="(max-width: 900px)" srcset="assets/banner-saucony-mobile.jpg" width="1000" height="1250" />
+              <img class="brand-banner__media" src="assets/banner-saucony.jpg" alt="" width="1600" height="900" loading="lazy" />
+            </picture>
             <span class="brand-banner__overlay" aria-hidden="true"></span>
             <span class="brand-banner__content">
               <span class="brand-banner__title">Saucony</span>
@@ -419,8 +436,12 @@
 
         <!-- Card 5: Kardo -->
         <div class="card-stack__card card-stack__card--brand" data-card="5">
-          <a class="brand-banner brand-banner--full" href="collection.html?brand=Kardo">
-            <img class="brand-banner__media" src="assets/banner-kardo.jpg" alt="" width="1600" height="900" loading="lazy" />
+          <a class="brand-banner brand-banner--full" href="collection.html?brand=Kardo" style="--banner-focal: left">
+            <picture>
+              <!-- Portrait art for the tall mobile card; landscape everywhere else -->
+              <source media="(max-width: 900px)" srcset="assets/banner-kardo-mobile.jpg" width="1000" height="1250" />
+              <img class="brand-banner__media" src="assets/banner-kardo.jpg" alt="" width="1600" height="900" loading="lazy" />
+            </picture>
             <span class="brand-banner__overlay" aria-hidden="true"></span>
             <span class="brand-banner__content">
               <span class="brand-banner__title">Kardo</span>
@@ -432,7 +453,11 @@
         <!-- Card 6: ASICS -->
         <div class="card-stack__card card-stack__card--brand" data-card="6">
           <a class="brand-banner brand-banner--full" href="collection.html?brand=ASICS">
-            <img class="brand-banner__media" src="assets/banner-asics.jpg" alt="" width="1600" height="900" loading="lazy" />
+            <picture>
+              <!-- Portrait art for the tall mobile card; landscape everywhere else -->
+              <source media="(max-width: 900px)" srcset="assets/banner-asics-mobile.jpg" width="1000" height="1250" />
+              <img class="brand-banner__media" src="assets/banner-asics.jpg" alt="" width="1600" height="900" loading="lazy" />
+            </picture>
             <span class="brand-banner__overlay" aria-hidden="true"></span>
             <span class="brand-banner__content">
               <span class="brand-banner__title">ASICS</span>
@@ -539,10 +564,13 @@
            sit above the player without being clipped. -->
       <div class="card-stack__dots" data-card-dots>
         <button class="card-stack__dot is-active" data-dot="0" aria-label="Home"></button>
-        <button class="card-stack__dot" data-dot="1" aria-label="Vans"></button>
-        <button class="card-stack__dot" data-dot="2" aria-label="Square Trade Goods"></button>
-        <button class="card-stack__dot" data-dot="3" aria-label="Dr. Martens"></button>
-        <button class="card-stack__dot" data-dot="4" aria-label="August AUX"></button>
+        <button class="card-stack__dot" data-dot="1" aria-label="One Of These Days"></button>
+        <button class="card-stack__dot" data-dot="2" aria-label="Sorel × Needles"></button>
+        <button class="card-stack__dot" data-dot="3" aria-label="Stüssy"></button>
+        <button class="card-stack__dot" data-dot="4" aria-label="Saucony"></button>
+        <button class="card-stack__dot" data-dot="5" aria-label="Kardo"></button>
+        <button class="card-stack__dot" data-dot="6" aria-label="ASICS"></button>
+        <button class="card-stack__dot" data-dot="7" aria-label="August AUX"></button>
       </div>
 
       <!-- liquid:section footer → theme/sections/footer.liquid -->

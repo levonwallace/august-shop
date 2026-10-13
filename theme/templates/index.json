@@ -65,7 +65,8 @@
             "title": "One Of These Days",
             "collection": "one-of-these-days",
             "image": "shopify://shop_images/WEB_2_1.jpg",
-            "cta": "Shop now"
+            "cta": "Shop now",
+            "focal": "left"
           }
         },
         "brand_sorel": {
@@ -105,7 +106,8 @@
             "collection": "kardo",
             "image": "shopify://shop_images/HOMEPAGE_DESKTOP.jpg",
             "image_mobile": "shopify://shop_images/HOMEPAGE_MOBILE.jpg",
-            "cta": "Shop now"
+            "cta": "Shop now",
+            "focal": "left"
           }
         },
         "brand_asics": {

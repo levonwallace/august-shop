@@ -55,6 +55,20 @@
             "editorial_link": "shopify://collections/sale"
           }
         },
+        "color": {
+          "type": "mega_panel",
+          "settings": {
+            "title": "Shop by color",
+            "directory": "colors",
+            "all_label": "Browse all colors →",
+            "all_link": "shopify://collections/all",
+            "products_collection": "new-arrivals",
+            "editorial_label": "Editorial",
+            "editorial_title": "Shop by\ncolor",
+            "editorial_cta": "Explore →",
+            "editorial_link": "shopify://collections/all"
+          }
+        },
         "promo_new": {
           "type": "promo",
           "settings": {
@@ -95,6 +109,7 @@
         "brands",
         "categories",
         "sale",
+        "color",
         "promo_new",
         "promo_sale",
         "promo_aux",

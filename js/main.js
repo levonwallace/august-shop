@@ -31,6 +31,53 @@ document.addEventListener("DOMContentLoaded", () => {
       .map((i) => `<a href="${i.href}">${i.label}</a>`)
       .join("")}</div></div>`;
 
+  /* ── Shop by color ───────────────────────────────────────────
+     Swatch picker for the "Shop by color" mega panel. Products are matched
+     on the colourway in their title — "(Ultra Violet/Black)",
+     "(White/White/Ftw Silver)" — so it works on the local catalog with no
+     extra data; Shop.search fills in when the local match is thin. */
+  const MENU_COLORS = [
+    { key: "black", label: "Black", hex: "#141414", terms: ["black", "noir", "obsidian", "onyx", "jet"] },
+    { key: "white", label: "White", hex: "#ffffff", terms: ["white", "ivory", "blanc", "bone", "chalk"] },
+    { key: "cream", label: "Cream", hex: "#f1e9d6", terms: ["cream", "ecru", "oatmeal", "natural", "off white", "off-white", "vanilla", "eggshell"] },
+    { key: "grey", label: "Grey", hex: "#9a9a96", terms: ["grey", "gray", "charcoal", "heather", "ash", "slate", "graphite", "silver", "cement", "pewter", "smoke"] },
+    { key: "navy", label: "Navy", hex: "#1f2a4a", terms: ["navy", "midnight", "marine", "ink"] },
+    { key: "blue", label: "Blue", hex: "#3b63b8", terms: ["blue", "cobalt", "indigo", "denim", "royal", "sky", "azure", "teal", "aqua", "turquoise", "petrol"] },
+    { key: "green", label: "Green", hex: "#3d6b4a", terms: ["green", "forest", "sage", "moss", "emerald", "mint", "pine", "jade", "evergreen"] },
+    { key: "olive", label: "Olive", hex: "#6b6a3c", terms: ["olive", "army", "military", "khaki", "fatigue"] },
+    { key: "brown", label: "Brown", hex: "#6b4a2e", terms: ["brown", "chocolate", "mocha", "coffee", "cognac", "espresso", "walnut", "tobacco", "bark", "bison", "earth"] },
+    { key: "tan", label: "Tan", hex: "#c9ad7f", terms: ["tan", "beige", "sand", "camel", "stone", "taupe", "wheat", "khaki", "dune", "sahara", "nude"] },
+    { key: "red", label: "Red", hex: "#b33a2c", terms: ["red", "burgundy", "maroon", "wine", "crimson", "cherry", "scarlet", "oxblood", "brick"] },
+    { key: "orange", label: "Orange", hex: "#e07a2f", terms: ["orange", "rust", "coral", "peach", "clay", "terracotta", "apricot", "tangerine"] },
+    { key: "yellow", label: "Yellow", hex: "#e3c23c", terms: ["yellow", "mustard", "gold", "lemon", "sunshine", "butter", "citron"] },
+    { key: "pink", label: "Pink", hex: "#e8a3b8", terms: ["pink", "rose", "blush", "salmon", "magenta", "fuchsia"] },
+    { key: "purple", label: "Purple", hex: "#6e4a9e", terms: ["purple", "violet", "lavender", "lilac", "plum", "grape", "mauve", "amethyst"] },
+    { key: "multi", label: "Multi", hex: "conic-gradient(#e07a2f, #e3c23c, #3d6b4a, #3b63b8, #6e4a9e, #b33a2c, #e07a2f)", terms: ["multi", "multicolor", "multi-color", "rainbow", "print", "allover", "tie dye", "tie-dye", "camo"] },
+  ];
+  const colorOf = (key) => MENU_COLORS.find((c) => c.key === key);
+  // Prototype: the PLP search; theme: /search (routes come from AugustBootstrap).
+  const searchHref = (term) => {
+    const r = window.AugustBootstrap?.routes;
+    return r?.search
+      ? `${r.search}?q=${encodeURIComponent(term)}&type=product`
+      : `collection.html?q=${encodeURIComponent(term)}`;
+  };
+  const colorMatch = (p, color) => {
+    if (!p || !color) return false;
+    const title = String(p.title || "").toLowerCase();
+    // Prefer the colourway in parentheses; fall back to the whole title.
+    const m = title.match(/\(([^)]+)\)\s*$/);
+    const hay = ` ${(m ? m[1] : title).replace(/[\/,+&-]/g, " ")} `;
+    return color.terms.some((t) => hay.includes(` ${t} `) || hay.includes(` ${t}s `));
+  };
+  const colorPickerHtml = (active) =>
+    `<div class="color-picker" data-color-picker role="group" aria-label="Shop by color">${MENU_COLORS.map(
+      (c) =>
+        `<button type="button" class="color-chip${c.key === active ? " is-active" : ""}" data-color="${c.key}" aria-pressed="${c.key === active}">
+          <span class="color-chip__dot" style="background:${c.hex}" aria-hidden="true"></span><span class="color-chip__label">${c.label}</span>
+        </button>`
+    ).join("")}</div>`;
+
   /* ── Inject mobile-only sheets used by the tab bar ────────────
      Kept here (not in each HTML page) so they stay in sync. */
   const injectMobileSheets = () => {
@@ -174,7 +221,7 @@ document.addEventListener("DOMContentLoaded", () => {
           }))
         : [];
       const href = item.url && item.url !== "/" ? liveHref(item) : extra?.href || "collection.html";
-      const isPanel = kids.length > 0 || !!(extra && (extra.links?.length || extra.pool));
+      const isPanel = kids.length > 0 || !!(extra && (extra.links?.length || extra.pool || extra.colors));
       nav.push({ key, label: navLabel(item.title), href, panel: isPanel });
       if (!isPanel) return;
       built[key] = {
@@ -182,6 +229,7 @@ document.addEventListener("DOMContentLoaded", () => {
         href,
         all: extra?.all || `Shop all ${navLabel(item.title).toLowerCase()} →`,
         directory: "none",
+        colors: !!extra?.colors,
         links: kids.length ? links : extra?.links || [],
         columns,
         pool: extra?.pool || (key === "sale" ? "sale" : key === "new-arrivals" ? "new" : "all"),
@@ -297,14 +345,9 @@ document.addEventListener("DOMContentLoaded", () => {
       label: "Shop by color",
       all: "Browse all colors →",
       href: "collection.html",
-      links: [
-        { label: "Black", href: "collection.html?q=Black" },
-        { label: "White", href: "collection.html?q=White" },
-        { label: "Navy", href: "collection.html?q=Navy" },
-        { label: "Olive", href: "collection.html?q=Olive" },
-        { label: "Brown", href: "collection.html?q=Brown" },
-        { label: "Grey", href: "collection.html?q=Grey" },
-      ],
+      // Desktop renders the swatch picker (colorPickerHtml); mobile uses these.
+      colors: true,
+      links: MENU_COLORS.map((c) => ({ label: c.label, href: `collection.html?q=${encodeURIComponent(c.label)}` })),
       pool: "all",
     },
     sale: {
@@ -384,7 +427,12 @@ document.addEventListener("DOMContentLoaded", () => {
     if (themePanels) {
       Object.entries(themePanels).forEach(([key, data]) => {
         const explicit = data.directory && data.directory !== "none" ? data.directory : null;
-        if (explicit === "brands" && window.AugustCatalog) {
+        if (explicit === "colors" || data.colors) {
+          const links = data.links?.length
+            ? data.links
+            : MENU_COLORS.map((c) => ({ label: c.label, href: searchHref(c.label) }));
+          wireMobileDir(key, linksHtml(links));
+        } else if (explicit === "brands" && window.AugustCatalog) {
           wireMobileDir(key, window.AugustCatalog.brandDirHtml());
         } else if (explicit === "categories" && window.AugustCatalog) {
           wireMobileDir(key, window.AugustCatalog.catDirHtml());
@@ -452,8 +500,11 @@ document.addEventListener("DOMContentLoaded", () => {
     const megaBody = document.querySelector(".morph-menu__body");
     const panelData = (open && section && megaPanels[section]) || null;
     const hasColumns = !!(panelData?.columns && panelData.columns.length);
-    const directory =
-      panelData?.directory && panelData.directory !== "none"
+    // Colour picker panels keep the tiles layout; the swatches live in the links column.
+    const isColors = !!(panelData && (panelData.colors || panelData.directory === "colors"));
+    const directory = isColors
+      ? null
+      : panelData?.directory && panelData.directory !== "none"
         ? panelData.directory
         : hasColumns
           ? "menu"
@@ -488,7 +539,9 @@ document.addEventListener("DOMContentLoaded", () => {
         }
       }
       if (megaLinks) {
-        if (directory === "menu") {
+        if (isColors) {
+          megaLinks.innerHTML = colorPickerHtml();
+        } else if (directory === "menu") {
           megaLinks.innerHTML = columnsHtml(data.columns);
         } else if (directory === "brands" && window.AugustCatalog) {
           megaLinks.innerHTML = window.AugustCatalog.brandDirHtml();
@@ -527,6 +580,22 @@ document.addEventListener("DOMContentLoaded", () => {
   // the tile grid instead of leaving the page. Product tiles, "Shop all" and
   // the editorial card still navigate. Works on prototype URLs
   // (collection.html?brand=…) and theme URLs (/collections/handle).
+  // Products for a swatch: local colourway match first, Shop.search to top up.
+  const colorProducts = async (color) => {
+    const Cat = window.AugustCatalog;
+    const Shop = window.AugustShop;
+    const local = Cat ? Cat.PRODUCTS.filter((p) => colorMatch(p, color)) : [];
+    if (local.length >= 8 || !Shop?.search) return local;
+    try {
+      const extra = await Shop.search(color.label, 24);
+      const list = (Array.isArray(extra) ? extra : extra?.products || []).filter((p) => colorMatch(p, color));
+      const seen = new Set(local.map((p) => String(p.id)));
+      return local.concat(list.filter((p) => !seen.has(String(p.id))));
+    } catch {
+      return local;
+    }
+  };
+
   const menuPreviewFetch = (href) => {
     const Shop = window.AugustShop;
     const Cat = window.AugustCatalog;
@@ -541,6 +610,14 @@ document.addEventListener("DOMContentLoaded", () => {
     const path = u.pathname;
     const local = (fn) => Promise.resolve(Cat ? Cat.PRODUCTS.filter(fn) : []);
     const asList = (r) => (Array.isArray(r) ? r : r?.products || []);
+    const term = q.get("q");
+    if (term) {
+      // Colour links (collection.html?q=Black) match the colourway locally;
+      // anything else is a plain search.
+      const color = MENU_COLORS.find((c) => c.label.toLowerCase() === term.trim().toLowerCase());
+      if (color) return colorProducts(color);
+      return Shop?.search ? Shop.search(term, 24).then(asList) : local(() => false);
+    }
     const brand = q.get("brand") || (/\/collections\/vendors\/?$/.test(path) ? q.get("q") : null);
     if (brand) {
       return Shop?.byBrand
@@ -613,6 +690,39 @@ document.addEventListener("DOMContentLoaded", () => {
 
   if (morph) {
     morph.addEventListener("click", (e) => {
+      const chip = e.target.closest("[data-color]");
+      if (chip && morph.contains(chip)) {
+        const color = colorOf(chip.getAttribute("data-color"));
+        if (!color) return;
+        morph.querySelectorAll("[data-color]").forEach((c) => {
+          const on = c === chip;
+          c.classList.toggle("is-active", on);
+          c.setAttribute("aria-pressed", String(on));
+        });
+        if (megaLabel) megaLabel.textContent = color.label;
+        if (megaAll) {
+          megaAll.textContent = `Shop all ${color.label.toLowerCase()} →`;
+          megaAll.href = searchHref(color.label);
+        }
+        const grid = document.querySelector(".morph-products");
+        grid?.classList.add("is-loading");
+        const seq = ++previewSeq;
+        colorProducts(color)
+          .catch(() => [])
+          .then((list) => {
+            if (seq !== previewSeq) return;
+            grid?.classList.remove("is-loading");
+            const items = (list || []).filter((p) => p && p.img);
+            fillMegaProducts("all", items);
+            if (!items.length && grid) {
+              grid.insertAdjacentHTML(
+                "beforeend",
+                `<p class="morph-products__empty">Nothing in ${color.label.toLowerCase()} right now. <a href="${megaAll?.href || "collection.html"}">Search ${color.label.toLowerCase()} →</a></p>`
+              );
+            }
+          });
+        return;
+      }
       const a = e.target.closest("a");
       if (!a || !morph.contains(a)) return;
       if (a.hasAttribute("data-mega-back")) {

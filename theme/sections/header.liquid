@@ -172,7 +172,7 @@
             assign mega_source = collections.all
           endif
         -%}
-        {%- for product in mega_source.products limit: 4 -%}
+        {%- for product in mega_source.products limit: 8 -%}
           <a class="mega-product" href="{{ product.url }}">
             <div class="mega-product__media">
               {%- if product.featured_image -%}
@@ -292,7 +292,7 @@
             href: {{ ov.settings.editorial_link | default: all_href | json }}
           },
           products: [
-            {%- for product in tiles.products limit: 4 -%}
+            {%- for product in tiles.products limit: 8 -%}
               {%- render 'product-json', product: product -%}{% unless forloop.last %},{% endunless %}
             {%- endfor -%}
           ]
@@ -367,7 +367,7 @@
         { "type": "text", "id": "all_label", "label": "“View all” label" },
         { "type": "url", "id": "all_link", "label": "“View all” link" },
         { "type": "header", "content": "Product tiles" },
-        { "type": "collection", "id": "products_collection", "label": "Collection for the four tiles" },
+        { "type": "collection", "id": "products_collection", "label": "Collection for the product tiles (two rows of four)" },
         { "type": "header", "content": "Editorial card" },
         { "type": "text", "id": "editorial_label", "label": "Eyebrow", "default": "Editorial" },
         { "type": "textarea", "id": "editorial_title", "label": "Title" },

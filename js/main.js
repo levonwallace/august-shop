@@ -219,6 +219,7 @@ document.addEventListener("DOMContentLoaded", () => {
     document.documentElement.classList.add("has-live-menu");
   };
 
+  const MEGA_TILES = 8;
   function fillMegaProducts(poolKey, curated) {
     if (!window.AugustCatalog) return;
     const all = window.AugustCatalog.PRODUCTS;
@@ -231,7 +232,20 @@ document.addEventListener("DOMContentLoaded", () => {
             ? all.filter((p) => p.cat === "shoes")
             : all;
     const items = window.AugustCatalog.unique(pool);
+    // Two rows of four on desktop. The markup ships with one row; clone the
+    // first tile up to MEGA_TILES so every page (and the theme) gets both rows.
+    const grid = document.querySelector(".morph-products");
+    if (grid) {
+      const want = Number(grid.dataset.megaTiles) || MEGA_TILES;
+      const have = grid.querySelectorAll(".mega-product").length;
+      const tpl = grid.querySelector(".mega-product");
+      if (tpl) {
+        for (let n = have; n < want; n++) grid.appendChild(tpl.cloneNode(true));
+      }
+    }
     document.querySelectorAll(".mega-product").forEach((el, i) => {
+      // Don't repeat products to pad the second row; show a partial row instead.
+      el.hidden = items.length >= 4 && i >= items.length;
       const p = items[i % Math.max(items.length, 1)];
       if (!p) return;
       el.href = window.AugustCatalog.href(p);

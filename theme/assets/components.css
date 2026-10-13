@@ -323,10 +323,11 @@ body.mega-open .mega-backdrop {
   /* Full header width — the header spans the viewport (minus its 32px insets),
      and the open menu should match it rather than cap at a centred column. */
   max-width: none;
-  /* Shop-scale mega: ~42% of the visual viewport. dvh is pre-zoom,
+  /* Shop-scale mega sized for two rows of product tiles. dvh is pre-zoom,
      so divide by --ui-scale to get layout px (same as the page stage). */
-  height: calc(42dvh / var(--ui-scale));
-  min-height: 380px;
+  height: auto;
+  min-height: 520px;
+  max-height: calc(84dvh / var(--ui-scale));
   margin: 0 auto;
   border-radius: var(--radius-panel);
   background: var(--color-island);
@@ -658,7 +659,9 @@ a.brand-dir__head {
 .morph-products {
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: 18px;
+  grid-auto-rows: max-content;
+  gap: 22px 18px;
+  align-content: start;
   min-width: 0;
 }
 
@@ -672,6 +675,8 @@ a.brand-dir__head {
 .mega-product__media {
   width: 100%;
   aspect-ratio: 178 / 118;
+  /* Keep two rows on ultra-wide screens from ballooning the panel. */
+  max-height: 200px;
   border-radius: var(--radius-card);
   border: 1px solid var(--color-border);
   background: #fff;

@@ -148,19 +148,6 @@ a.account-head__settings {
   color: var(--color-madder, #b4322a);
 }
 
-/* Mega menu: plain-link sub-menus and nav links from Navigation */
-.brand-dir--links {
-  grid-template-columns: minmax(0, 1fr);
-}
-.morph-menu__nav a {
-  font: inherit;
-  font-size: 13px;
-  font-weight: 500;
-  letter-spacing: 1.1px;
-  color: var(--color-ink);
-  opacity: 0.6;
-}
-
 /* Contact page form (sections/main-contact.liquid) + app-block container */
 .contact-form {
   padding: 22px;

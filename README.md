@@ -25,6 +25,19 @@ newest in-stock products from the real shop (`/api/catalog.js`), and PDP /
 search lookups read live availability. Without `.env` it falls back to the
 sample catalog and the public `products.json` proxy.
 
+Navigation is live too: `/api/menu.js` emits the store's nested `main-menu`
+(the same menu the Liquid theme's header reads) and `js/main.js` rebuilds
+the desktop links, morph-menu panels (Brands / Categories directories from
+the menu's sub-links) and the mobile menu from it. Live URLs map onto the
+prototype pages (`/collections/tees` → `collection.html?collection=tees`,
+`/blogs/events` → `events.html` …); the prototype's own panel extras —
+product tiles, editorial card, Shop-by-colour links — are merged in by
+label, like the theme's "Menu item extras" blocks. Without `.env` the static
+nav in each HTML page is used as-is.
+
+The Railway deploy (`Dockerfile`) runs the same server; the Storefront
+variables live on the Railway service, not in the image.
+
 ```bash
 npm run shopify:check   # token access + every handle the theme references exists
 npm run shopify:pull    # snapshot collections, blogs, menus, products → data/

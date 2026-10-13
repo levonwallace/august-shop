@@ -247,6 +247,10 @@
       ).slice(0, limit);
     };
 
+    // Collection landing pages are Liquid-rendered in the theme; the
+    // prototype-only ?collection= PLP path is never reached here.
+    Shop.byCollection = async () => ({ title: "", products: [] });
+
     Shop.product = async (handle) => {
       const hit = Shop.cached("h:" + handle) || Shop.cached(handle);
       if (hit && hit.variants) return hit;

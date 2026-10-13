@@ -288,6 +288,23 @@ def merge_results(primary, extra, limit):
 
 
 FULL_CATALOG_LOADED = False
+MENU = None  # live main-menu (Storefront) → /api/menu.js
+MENU_EVENT = threading.Event()
+
+
+def refresh_menu():
+    """Pull the store's `main-menu` so the prototype nav matches the live site."""
+    global MENU
+    if not storefront.configured():
+        MENU_EVENT.set()
+        return
+    try:
+        MENU = storefront.menu(os.environ.get("SHOPIFY_MAIN_MENU", "main-menu"))
+        sys.stderr.write("storefront: menu %s → %s top-level items\n" % (MENU and MENU["handle"], len(MENU["items"]) if MENU else 0))
+    except storefront.StorefrontError as exc:
+        sys.stderr.write("storefront menu failed (%s) — prototype keeps its static nav\n" % exc)
+    finally:
+        MENU_EVENT.set()
 
 
 def refresh_from_storefront():
@@ -409,6 +426,19 @@ class NoCacheHandler(SimpleHTTPRequestHandler):
 
     def do_GET(self):
         parsed = urllib.parse.urlparse(self.path)
+        if parsed.path == "/api/menu.js":
+            # Loaded before js/main.js: the live main-menu drives the nav
+            # (desktop links, morph menu panels, mobile menu). Without the
+            # Storefront API the prototype keeps its static nav.
+            if not storefront.configured():
+                self._js("/* Storefront API not configured (.env) — static nav */\n")
+                return
+            MENU_EVENT.wait(timeout=10)
+            if not MENU:
+                self._js("/* live menu not available — static nav */\n")
+                return
+            self._js("window.AugustLiveMenu = %s;\n" % json.dumps(MENU, ensure_ascii=False))
+            return
         if parsed.path == "/api/catalog.js":
             # Loaded before js/catalog.js: swaps the sample catalog for the
             # real shop when the Storefront API is configured.
@@ -431,6 +461,24 @@ class NoCacheHandler(SimpleHTTPRequestHandler):
                 limit = max(1, min(48, int((qs.get("limit") or ["24"])[0])))
             except ValueError:
                 limit = 24
+            collection = (qs.get("collection") or [""])[0].strip().lower()
+            if collection:
+                collection = re.sub(r"[^a-z0-9-]+", "", collection)
+                title = collection.replace("-", " ").title()
+                items = None
+                if storefront.configured():
+                    try:
+                        # over-fetch: unreleased (image-less) products are dropped below
+                        found = storefront.collection_products(collection, min(250, limit * 3))
+                        if found:
+                            title = found["title"]
+                            items = [p for p in found["products"] if p.get("img")]
+                    except storefront.StorefrontError as exc:
+                        sys.stderr.write("storefront collection %s failed: %s\n" % (collection, exc))
+                if items is None:
+                    items = collection_products(collection, limit)
+                self._json({"collection": collection, "title": title, "products": items[:limit], "cached": CACHE_READY})
+                return
             if brand:
                 coll = collection_products(
                     re.sub(r"[^a-z0-9]+", "-", brand.lower()).strip("-"), limit
@@ -527,12 +575,13 @@ if __name__ == "__main__":
                 return
             time.sleep(refresh_every)
 
+    threading.Thread(target=refresh_menu, daemon=True).start()
     threading.Thread(target=refresh_loop, daemon=True).start()
     # Localhost only by default; HOST=0.0.0.0 to test from a phone on the LAN.
     host = os.environ.get("HOST", "127.0.0.1")
     server = ThreadingHTTPServer((host, port), NoCacheHandler)
     print(f"Serving with no-store caching on :{port}")
-    print("Shopify proxy: /api/search?q=  /api/product?handle=  /api/catalog.js")
+    print("Shopify proxy: /api/search?q=|brand=|collection=  /api/product?handle=  /api/catalog.js  /api/menu.js")
     if storefront.configured():
         print("Storefront API: %s (API %s) — prototype uses the live catalog" % (storefront.DOMAIN, storefront.VERSION))
     else:

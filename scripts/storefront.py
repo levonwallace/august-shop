@@ -295,6 +295,50 @@ def products(limit=None, query=None, page_size=100):
     return collected
 
 
+def menu(handle="main-menu"):
+    """Nested Online Store menu (3 levels) — the same `main-menu` the live
+    theme renders. Items: {title, url, type, items:[...]}."""
+    item = "title url type resourceId"
+    data = gql(
+        f"""query($h: String!) {{ menu(handle: $h) {{ handle title
+          items {{ {item} items {{ {item} items {{ {item} }} }} }} }} }}""",
+        {"h": handle},
+    )
+    m = data.get("menu")
+    if not m:
+        return None
+
+    def strip(items):
+        out = []
+        for it in items or []:
+            url = it.get("url") or ""
+            url = re.sub(r"^https?://[^/]+", "", url) or "/"
+            out.append({
+                "title": it.get("title") or "",
+                "url": url,
+                "type": it.get("type") or "",
+                "items": strip(it.get("items")),
+            })
+        return out
+
+    return {"handle": m["handle"], "title": m.get("title") or "", "items": strip(m["items"])}
+
+
+def collection_products(handle, limit=48):
+    """Products in a collection, newest first (title returned alongside)."""
+    def run(inv):
+        return gql(
+            f"""query($h: String!, $n: Int!) {{ collection(handle: $h) {{ title handle
+              products(first: $n, sortKey: CREATED, reverse: true, filters: [{{ available: true }}]) {{ nodes {{ {_product_fields(inv)} }} }} }} }}""",
+            {"h": handle, "n": max(1, min(250, limit))},
+        )
+    data = _with_inventory_fallback(run)
+    c = data.get("collection")
+    if not c:
+        return None
+    return {"title": c["title"], "handle": c["handle"], "products": [normalize(p) for p in c["products"]["nodes"]]}
+
+
 def product(handle):
     data = _with_inventory_fallback(
         lambda inv: gql(

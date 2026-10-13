@@ -5,19 +5,8 @@ document.addEventListener("DOMContentLoaded", () => {
      directory grid the prototype uses for brands / categories. Long
      columns are split so the grid stays scannable. */
   const COL_MAX = 14;
-  const columnsHtml = (columns, mobile = false) => {
-    const cols = [];
-    (columns || []).forEach((col) => {
-      const items = col.items || [];
-      if (!items.length) {
-        cols.push({ head: col.head, href: col.href, items: [] });
-        return;
-      }
-      const per = mobile ? items.length : COL_MAX;
-      for (let i = 0; i < items.length; i += per) {
-        cols.push({ head: i === 0 ? col.head : "", href: col.href, items: items.slice(i, i + per) });
-      }
-    });
+  const columnsHtml = (columns) => {
+    const cols = columns || [];
     const cls = cols.length > 3 ? "brand-dir brand-dir--cats" : "brand-dir";
     return `<div class="${cls}" data-menu-dir>${cols
       .map(
@@ -28,9 +17,11 @@ document.addEventListener("DOMContentLoaded", () => {
             ? col.href
               ? `<a class="brand-dir__head" href="${col.href}">${col.head}</a>`
               : `<p class="brand-dir__head">${col.head}</p>`
-            : `<p class="brand-dir__head" aria-hidden="true">&nbsp;</p>`
+            : ""
         }
-        ${col.items.map((i) => `<a href="${i.href}">${i.label}</a>`).join("")}
+        <div class="brand-dir__items${(col.items || []).length > COL_MAX ? " brand-dir__items--split" : ""}">
+          ${(col.items || []).map((i) => `<a href="${i.href}">${i.label}</a>`).join("")}
+        </div>
       </div>`
       )
       .join("")}</div>`;
@@ -117,6 +108,117 @@ document.addEventListener("DOMContentLoaded", () => {
 
   injectMobileSheets();
 
+  /* ── Live navigation (prototype) ─────────────────────────────────
+     scripts/dev-server.py emits window.AugustLiveMenu from the store's
+     `main-menu` (same source the theme's header.liquid reads). Rebuild the
+     desktop links, morph-menu tabs and mobile menu from it; the prototype's
+     own panel extras (product pools, editorial card, colour links) are
+     merged in by label, like the theme's "Menu item extras" blocks. */
+  const handleize = (t) =>
+    String(t || "")
+      .toLowerCase()
+      .normalize("NFD")
+      .replace(/[\u0300-\u036f]/g, "")
+      .replace(/[^a-z0-9]+/g, "-")
+      .replace(/^-+|-+$/g, "");
+  const navLabel = (t) => {
+    const s = String(t || "").trim();
+    if (!s) return s;
+    // The live menu shouts (SHOP BY COLOR); the prototype speaks in sentence case.
+    return s === s.toUpperCase() && /[A-Z]{3,}/.test(s) ? s[0] + s.slice(1).toLowerCase() : s;
+  };
+  const CAT_PAGES = { apparel: "apparel", footwear: "shoes", accessories: "accessories", objects: "objects" };
+  const liveHref = (item) => {
+    const url = item.url || "/";
+    const title = item.title || "";
+    let m;
+    if (url === "/" || url === "") return "index.html";
+    if (/^\/\?InfiniteColorSearch/i.test(url)) return "collection.html";
+    if ((m = url.match(/^\/collections\/([a-z0-9-]+)\/?$/i))) {
+      const h = m[1].toLowerCase();
+      if (h === "all") return "collection.html";
+      if (h === "new-arrivals") return "collection.html";
+      if (h === "sale") return "sale.html";
+      if (CAT_PAGES[h]) return `collection.html?cat=${CAT_PAGES[h]}`;
+      const page = /clearance|sale/.test(h) ? "sale.html" : "collection.html";
+      return `${page}?collection=${encodeURIComponent(h)}&title=${encodeURIComponent(title)}`;
+    }
+    if ((m = url.match(/^\/products\/([a-z0-9-]+)/i))) return `product.html?h=${encodeURIComponent(m[1])}`;
+    if (/^\/blogs\/events/i.test(url)) return "events.html";
+    if (/^\/blogs\/august-aux/i.test(url)) return "aux.html";
+    if (/^\/blogs\/august-inn/i.test(url)) return "inn.html";
+    if (/^\/pages\/august-inn/i.test(url)) return "inn.html";
+    if (/^\/account/i.test(url)) return "account.html";
+    if (/^\/cart/i.test(url)) return "cart.html";
+    if (/^https?:\/\//i.test(url)) return url;
+    return `https://august-shop.com${url}`;
+  };
+
+  const applyLiveMenu = () => {
+    const live = window.AugustLiveMenu;
+    if (!live || !Array.isArray(live.items) || !live.items.length) return;
+    const extras = window.AugustProtoPanels || {};
+    const built = {};
+    const nav = [];
+    live.items.forEach((item) => {
+      const key = handleize(item.title);
+      const kids = item.items || [];
+      const extra = extras[key];
+      const links = kids.map((k) => ({ label: navLabel(k.title), href: liveHref(k) }));
+      const hasGrand = kids.some((k) => (k.items || []).length);
+      const columns = hasGrand
+        ? kids.map((k) => ({
+            head: navLabel(k.title),
+            href: k.url && k.url !== "/" ? liveHref(k) : "",
+            items: (k.items || []).map((g) => ({ label: navLabel(g.title), href: liveHref(g) })),
+          }))
+        : [];
+      const href = item.url && item.url !== "/" ? liveHref(item) : extra?.href || "collection.html";
+      const isPanel = kids.length > 0 || !!(extra && (extra.links?.length || extra.pool));
+      nav.push({ key, label: navLabel(item.title), href, panel: isPanel });
+      if (!isPanel) return;
+      built[key] = {
+        label: navLabel(item.title),
+        href,
+        all: extra?.all || `Shop all ${navLabel(item.title).toLowerCase()} →`,
+        directory: "none",
+        links: kids.length ? links : extra?.links || [],
+        columns,
+        pool: extra?.pool || (key === "sale" ? "sale" : key === "new-arrivals" ? "new" : "all"),
+        editorial: extra?.editorial || { label: "Editorial", title: navLabel(item.title), cta: "Explore →", href },
+      };
+      // Product tiles: the panel's own collection (new-arrivals, sale…) via the
+      // Storefront proxy, so the tiles match what the live site is pushing.
+      const cm = (item.url || "").match(/^\/collections\/([a-z0-9-]+)\/?$/i);
+      if (cm && cm[1] !== "all" && window.AugustShop?.byCollection) {
+        window.AugustShop.byCollection(cm[1], 8).then((res) => {
+          const hits = (Array.isArray(res) ? res : res?.products || []).filter((p) => p.img);
+          if (hits.length) built[key].products = hits;
+        });
+      }
+    });
+    if (!Object.keys(built).length) return;
+
+    const btn = (n) =>
+      `<button type="button" aria-expanded="false" data-mega-trigger="${n.key}">${n.label}</button>`;
+    const link = (n) => `<a href="${n.href}">${n.label}</a>`;
+    document.querySelectorAll(".nav-links").forEach((el) => {
+      el.innerHTML = nav.map((n) => (n.panel ? btn(n) : link(n))).join("");
+    });
+    document.querySelectorAll(".morph-menu__nav").forEach((el) => {
+      el.innerHTML = nav.filter((n) => n.panel).map(btn).join("");
+    });
+    document.querySelectorAll(".mobile-nav__links").forEach((el) => {
+      const keep = [...el.querySelectorAll("a")].filter((a) => /cart\.html|account\.html/.test(a.getAttribute("href") || ""));
+      el.innerHTML =
+        nav
+          .map((n) => `<a href="${n.href}"${n.panel ? ` data-mobile-dir="${n.key}"` : ""}>${n.label}</a>`)
+          .join("") + keep.map((a) => a.outerHTML).join("");
+    });
+    window.AugustMegaPanels = built;
+    document.documentElement.classList.add("has-live-menu");
+  };
+
   function fillMegaProducts(poolKey, curated) {
     if (!window.AugustCatalog) return;
     const all = window.AugustCatalog.PRODUCTS;
@@ -145,89 +247,9 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
-  // Mobile nav
-  const toggle = document.querySelector("[data-nav-toggle]");
-  const panel = document.querySelector("[data-mobile-nav]");
-  if (toggle && panel) {
-    const setOpen = (open) => {
-      toggle.setAttribute("aria-expanded", String(open));
-      toggle.setAttribute("aria-label", open ? "Close menu" : "Open menu");
-      panel.hidden = !open;
-      panel.classList.toggle("is-open", open);
-      document.body.classList.toggle("nav-open", open);
-    };
-    setOpen(false);
-    toggle.addEventListener("click", () => {
-      setOpen(toggle.getAttribute("aria-expanded") !== "true");
-    });
-
-    const dirToggles = [];
-    const wireMobileDir = (label, html) => {
-      // Theme: <a data-mobile-dir="brands">; prototype: match by link text
-      const nav =
-        panel.querySelector(`.mobile-nav__links a[data-mobile-dir="${label}"]`) ||
-        [...panel.querySelectorAll(".mobile-nav__links a")].find(
-          (a) => !a.hasAttribute("data-mobile-dir") && a.textContent.trim().toLowerCase() === label
-        );
-      if (!nav || !html) return;
-      dirToggles.push(nav);
-      nav.addEventListener("click", (e) => {
-        e.preventDefault();
-        const attr = `data-mobile-${label}`;
-        let dir = panel.querySelector(`[${attr}]`);
-        if (!dir) {
-          nav.insertAdjacentHTML("afterend", html);
-          dir = nav.nextElementSibling;
-          dir?.classList.add("brand-dir--mobile");
-          dir?.setAttribute(attr, "");
-        } else {
-          dir.hidden = !dir.hidden;
-        }
-        nav.classList.toggle("is-open", !dir?.hidden);
-      });
-    };
-    const themePanels = window.AugustMegaPanels;
-    if (themePanels) {
-      Object.entries(themePanels).forEach(([key, data]) => {
-        const explicit = data.directory && data.directory !== "none" ? data.directory : null;
-        if (explicit === "brands" && window.AugustCatalog) {
-          wireMobileDir(key, window.AugustCatalog.brandDirHtml());
-        } else if (explicit === "categories" && window.AugustCatalog) {
-          wireMobileDir(key, window.AugustCatalog.catDirHtml());
-        } else if (data.columns && data.columns.length) {
-          wireMobileDir(key, columnsHtml(data.columns, true));
-        } else if (data.links && data.links.length) {
-          wireMobileDir(key, linksHtml(data.links));
-        }
-      });
-    } else if (window.AugustCatalog) {
-      wireMobileDir("brands", window.AugustCatalog.brandDirHtml());
-      wireMobileDir("categories", window.AugustCatalog.catDirHtml());
-    }
-
-    panel.addEventListener("click", (e) => {
-      const link = e.target.closest("a");
-      if (!link || dirToggles.includes(link)) return;
-      setOpen(false);
-    });
-    window.addEventListener("keydown", (e) => {
-      if (e.key === "Escape") setOpen(false);
-    });
-  }
-
-  // Expanding mega menu (island-morph-card)
-  const header = document.querySelector(".site-header");
-  const morph = document.querySelector("[data-morph-menu]");
-  const backdrop = document.querySelector("[data-mega-backdrop]");
-  const megaTriggers = document.querySelectorAll("[data-mega-trigger]");
-  const megaClose = document.querySelectorAll("[data-mega-close]");
-  const megaLabel = document.querySelector("[data-mega-label]");
-  const megaLinks = document.querySelector("[data-mega-links]");
-  const megaAll = document.querySelector("[data-mega-all]");
-
-  // Theme: sections/header.liquid emits window.AugustMegaPanels keyed by
-  // block id (label, all, href, directory, links, editorial, products).
-  const megaPanels = window.AugustMegaPanels || {
+  // Prototype's static mega panels — also the per-label "extras" merged into
+  // the live menu (pools, editorial card, colour links, "all" labels).
+  const protoPanels = {
     "new-arrivals": {
       label: "New arrivals",
       all: "Shop all new arrivals →",
@@ -285,6 +307,92 @@ document.addEventListener("DOMContentLoaded", () => {
       pool: "sale",
     },
   };
+  window.AugustProtoPanels = protoPanels;
+  applyLiveMenu();
+
+  // Mobile nav (the live menu, when present, has already rebuilt .mobile-nav__links)
+  const toggle = document.querySelector("[data-nav-toggle]");
+  const panel = document.querySelector("[data-mobile-nav]");
+  if (toggle && panel) {
+    const setOpen = (open) => {
+      toggle.setAttribute("aria-expanded", String(open));
+      toggle.setAttribute("aria-label", open ? "Close menu" : "Open menu");
+      panel.hidden = !open;
+      panel.classList.toggle("is-open", open);
+      document.body.classList.toggle("nav-open", open);
+    };
+    setOpen(false);
+    toggle.addEventListener("click", () => {
+      setOpen(toggle.getAttribute("aria-expanded") !== "true");
+    });
+
+    const dirToggles = [];
+    const wireMobileDir = (label, html) => {
+      // Theme: <a data-mobile-dir="brands">; prototype: match by link text
+      const nav =
+        panel.querySelector(`.mobile-nav__links a[data-mobile-dir="${label}"]`) ||
+        [...panel.querySelectorAll(".mobile-nav__links a")].find(
+          (a) => !a.hasAttribute("data-mobile-dir") && a.textContent.trim().toLowerCase() === label
+        );
+      if (!nav || !html) return;
+      dirToggles.push(nav);
+      nav.addEventListener("click", (e) => {
+        e.preventDefault();
+        const attr = `data-mobile-${label}`;
+        let dir = panel.querySelector(`[${attr}]`);
+        if (!dir) {
+          nav.insertAdjacentHTML("afterend", html);
+          dir = nav.nextElementSibling;
+          dir?.classList.add("brand-dir--mobile");
+          dir?.setAttribute(attr, "");
+        } else {
+          dir.hidden = !dir.hidden;
+        }
+        nav.classList.toggle("is-open", !dir?.hidden);
+      });
+    };
+    const themePanels = window.AugustMegaPanels;
+    if (themePanels) {
+      Object.entries(themePanels).forEach(([key, data]) => {
+        const explicit = data.directory && data.directory !== "none" ? data.directory : null;
+        if (explicit === "brands" && window.AugustCatalog) {
+          wireMobileDir(key, window.AugustCatalog.brandDirHtml());
+        } else if (explicit === "categories" && window.AugustCatalog) {
+          wireMobileDir(key, window.AugustCatalog.catDirHtml());
+        } else if (data.columns && data.columns.length) {
+          wireMobileDir(key, columnsHtml(data.columns));
+        } else if (data.links && data.links.length) {
+          wireMobileDir(key, linksHtml(data.links));
+        }
+      });
+    } else if (window.AugustCatalog) {
+      wireMobileDir("brands", window.AugustCatalog.brandDirHtml());
+      wireMobileDir("categories", window.AugustCatalog.catDirHtml());
+    }
+
+    panel.addEventListener("click", (e) => {
+      const link = e.target.closest("a");
+      if (!link || dirToggles.includes(link)) return;
+      setOpen(false);
+    });
+    window.addEventListener("keydown", (e) => {
+      if (e.key === "Escape") setOpen(false);
+    });
+  }
+
+  // Expanding mega menu (island-morph-card)
+  const header = document.querySelector(".site-header");
+  const morph = document.querySelector("[data-morph-menu]");
+  const backdrop = document.querySelector("[data-mega-backdrop]");
+  const megaTriggers = document.querySelectorAll("[data-mega-trigger]");
+  const megaClose = document.querySelectorAll("[data-mega-close]");
+  const megaLabel = document.querySelector("[data-mega-label]");
+  const megaLinks = document.querySelector("[data-mega-links]");
+  const megaAll = document.querySelector("[data-mega-all]");
+
+  // Theme: sections/header.liquid emits window.AugustMegaPanels; prototype:
+  // the live menu (applyLiveMenu above) or the static protoPanels.
+  const megaPanels = window.AugustMegaPanels || protoPanels;
 
   const headerDesktop = document.querySelector(".header-desktop");
 
@@ -563,6 +671,8 @@ document.addEventListener("DOMContentLoaded", () => {
       sale: isSalePage || params.get("sale") === "1",
       feed: !!params.get("feed"),
       brands: params.get("brand") ? [params.get("brand")] : [],
+      collection: (params.get("collection") || "").toLowerCase(),
+      collectionTitle: params.get("title") || "",
       type: params.get("type") || "",
       sort: params.get("sort") || "featured",
       price: null,
@@ -625,6 +735,11 @@ document.addEventListener("DOMContentLoaded", () => {
       const sale = state.sale ? " on sale" : "";
       const count = `${n} product${n === 1 ? "" : "s"}`;
       if (state.q) return `Results for “${state.q}” · ${count}`;
+      if (state.collection) {
+        const name = state.collectionTitle || state.collection.replace(/-/g, " ");
+        const extra = state.dept !== "all" || state.cats.length || state.type || state.price ? ` — ${dept}${cat}` : "";
+        return `${name}${extra}${state.sale && !/sale|clearance/i.test(name) ? sale : ""} · ${count}`;
+      }
       if (state.feed) return `Your feed — ${dept}${cat}${sale} · ${count}`;
       if (state.brands.length === 1 && !state.cats.length && state.dept === "all" && !state.type)
         return `${state.brands[0]}${sale} · ${count}`;
@@ -726,6 +841,10 @@ document.addEventListener("DOMContentLoaded", () => {
     const heading = document.querySelector(".plp-main > h1");
     if (heading && state.brands.length === 1) heading.textContent = state.brands[0];
     if (state.brands.length === 1) document.title = `${state.brands[0]} — August`;
+    if (state.collection && state.collectionTitle) {
+      if (heading) heading.textContent = state.collectionTitle;
+      document.title = `${state.collectionTitle} — August`;
+    }
 
     const mergeBrandHits = (live) => {
       const local = window.AugustCatalog.PRODUCTS.filter((p) =>
@@ -783,6 +902,24 @@ document.addEventListener("DOMContentLoaded", () => {
         liveHitsRaw = hits.length ? hits : null;
         liveHits = liveHitsRaw ? window.AugustCatalog.visible(hits) : null;
         hits.forEach((p) => window.AugustShop.remember(p));
+        renderPLP();
+      });
+    } else if (state.collection && window.AugustShop?.byCollection) {
+      grid.innerHTML = '<p class="plp-empty">Loading…</p>';
+      window.AugustShop.byCollection(state.collection, 48).then((res) => {
+        const hits = Array.isArray(res) ? res : res?.products || [];
+        if (!state.collectionTitle && res?.title) {
+          state.collectionTitle = res.title;
+          if (heading) heading.textContent = res.title;
+          document.title = `${res.title} — August`;
+        }
+        hits.forEach((p) => window.AugustShop.remember?.(p));
+        liveHitsRaw = hits.length ? hits : null;
+        liveHits = liveHitsRaw ? window.AugustCatalog.visible(liveHitsRaw) : null;
+        if (!liveHitsRaw) {
+          grid.innerHTML = '<p class="plp-empty">This collection is empty right now.</p>';
+          return;
+        }
         renderPLP();
       });
     } else if (state.brands.length && window.AugustShop?.byBrand) {

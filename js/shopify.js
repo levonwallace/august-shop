@@ -73,6 +73,19 @@ window.AugustShop = (() => {
     return window.AugustCatalog.PRODUCTS.filter(match).slice(0, limit);
   };
 
+  const byCollection = async (handle, limit = 48) => {
+    const h = String(handle || "").trim().toLowerCase();
+    if (!h) return { title: "", products: [] };
+    try {
+      const res = await fetch(`/api/search?collection=${encodeURIComponent(h)}&limit=${limit}`);
+      if (!res.ok) throw new Error("collection " + res.status);
+      const data = await res.json();
+      return { title: data.title || "", products: (data.products || []).map(remember) };
+    } catch {
+      return { title: "", products: [] };
+    }
+  };
+
   const product = async (handle) => {
     const hit = cached("h:" + handle) || cached(handle);
     if (hit && hit.body && (hit.images?.length || hit.sizes?.length)) return hit;
@@ -228,6 +241,7 @@ window.AugustShop = (() => {
   return {
     search,
     byBrand,
+    byCollection,
     product,
     remember,
     cached,

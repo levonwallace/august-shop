@@ -527,6 +527,47 @@ a.brand-dir__head {
   text-decoration: none;
 }
 
+/* Mega menu driven by the store's main-menu (theme header.liquid /
+   prototype /api/menu.js): plain-link sub-menus, nav links, long columns. */
+.brand-dir--links {
+  grid-template-columns: minmax(0, 1fr);
+}
+.brand-dir__items {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+/* Long menu columns (Brands "123 - F" has ~28 links) flow into two text
+   columns under one heading instead of one very tall list. */
+.brand-dir__items--split {
+  display: block;
+  columns: 2;
+  column-gap: 40px;
+}
+.brand-dir__items--split a {
+  display: block;
+  break-inside: avoid;
+  margin-bottom: 12px;
+}
+@media (max-width: 900px) {
+  .brand-dir__items--split {
+    display: flex;
+    columns: auto;
+  }
+  .brand-dir__items--split a {
+    margin-bottom: 0;
+  }
+}
+.morph-menu__nav a {
+  font: inherit;
+  font-size: 13px;
+  font-weight: 500;
+  letter-spacing: 1.1px;
+  color: var(--color-ink);
+  opacity: 0.6;
+}
+
+
 .brand-dir__col {
   display: flex;
   flex-direction: column;

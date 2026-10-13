@@ -300,10 +300,15 @@ def refresh_from_storefront():
     """
     global CACHE_READY, FULL_CATALOG_LOADED
     try:
-        live = storefront.products(limit=storefront.PROTOTYPE_LIMIT, query="available_for_sale:true")
+        fetched = storefront.products(limit=storefront.PROTOTYPE_LIMIT + 100, query="available_for_sale:true")
     except storefront.StorefrontError as exc:
         sys.stderr.write("storefront catalog failed (%s) — falling back to products.json\n" % exc)
         return False
+    # The Headless channel also sees products staged for upcoming drops
+    # (in stock, no photos yet, not published to the Online Store). Skip
+    # anything without an image so the prototype only shows shoppable items.
+    live = [p for p in fetched if p.get("img")][: storefront.PROTOTYPE_LIMIT]
+    skipped = len(fetched) - len([p for p in fetched if p.get("img")])
     with CACHE_LOCK:
         LIVE_CATALOG[:] = live
         for p in live:
@@ -312,7 +317,7 @@ def refresh_from_storefront():
             PRODUCTS[:] = live
         CACHE_READY = True
     CACHE_EVENT.set()
-    sys.stderr.write("storefront: prototype catalog = %s newest in stock\n" % len(live))
+    sys.stderr.write("storefront: prototype catalog = %s newest in stock (%s unreleased, no image, skipped)\n" % (len(live), skipped))
 
     if FULL_CATALOG_LOADED or os.environ.get("CATALOG_FULL", "1") == "0":
         return True

@@ -307,18 +307,28 @@
 }
 
 /* —— PDP —— */
+/* Full-width product page: the gallery takes whatever the viewport offers,
+   the buy box stays a readable column, and a light gutter (matching the
+   header's 32px insets) frames everything on large desktops. */
+.page--pdp {
+  --pdp-pad: 32px;
+}
+
 .pdp-main {
   display: grid;
-  grid-template-columns: minmax(0, 800px) minmax(240px, 508px);
+  grid-template-columns: minmax(0, 1fr) minmax(300px, 560px);
   gap: 36px;
-  justify-content: center;
-  padding: var(--chrome-top) 32px 32px;
+  justify-content: stretch;
+  padding: var(--chrome-top) var(--pdp-pad) 32px;
 }
 
 .pdp-gallery {
   position: relative;
-  min-height: 680px;
-  height: auto;
+  /* Fill the first screen (header + footer chrome excluded) but never grow
+     with the column — a wide gallery would otherwise scale a square product
+     shot past the viewport. The buy box stretches to match. */
+  min-height: 0;
+  height: clamp(620px, calc(100dvh / var(--ui-scale) - var(--chrome-top) - var(--chrome-bottom) + 24px), 960px);
   align-self: stretch;
   border-radius: var(--radius-card);
   background: #fff;
@@ -433,13 +443,13 @@
   display: flex;
   flex-direction: column;
   gap: 24px;
-  width: min(1364px, calc(100% - 64px));
+  width: calc(100% - var(--pdp-pad) * 2);
   margin: 0 auto;
   padding-bottom: var(--chrome-bottom);
 }
 
 .pdp-related {
-  width: min(1364px, calc(100% - 64px));
+  width: calc(100% - var(--pdp-pad) * 2);
   margin: 0 auto 48px;
 }
 
@@ -1402,6 +1412,10 @@
     gap: 16px 24px;
   }
 
+  .page--pdp {
+    --pdp-pad: 24px;
+  }
+
   .pdp-main {
     grid-template-columns: minmax(0, 1.45fr) minmax(240px, 0.9fr);
     gap: 20px;
@@ -1761,6 +1775,10 @@
 
   .product-grid {
     gap: 20px 12px;
+  }
+
+  .page--pdp {
+    --pdp-pad: 16px;
   }
 
   .pdp-main {

@@ -287,26 +287,46 @@ def merge_results(primary, extra, limit):
     return out
 
 
+FULL_CATALOG_LOADED = False
+
+
 def refresh_from_storefront():
-    """Real catalog + availability via the Storefront API (.env)."""
-    global CACHE_READY
+    """Real catalog + availability via the Storefront API (.env / Railway vars).
+
+    Two passes so the prototype never waits on the whole store (7k+ products,
+    ~70s): first the newest in-stock products (what the UI renders — ready in
+    a few seconds), then, once per process, the full catalog for search /
+    product lookups. Periodic refreshes only redo the fast pass.
+    """
+    global CACHE_READY, FULL_CATALOG_LOADED
     try:
-        collected = storefront.products()
+        live = storefront.products(limit=storefront.PROTOTYPE_LIMIT, query="available_for_sale:true")
     except storefront.StorefrontError as exc:
         sys.stderr.write("storefront catalog failed (%s) — falling back to products.json\n" % exc)
         return False
-    by_handle = {p["handle"]: p for p in collected}
-    live = [p for p in collected if p.get("available")][: storefront.PROTOTYPE_LIMIT]
+    with CACHE_LOCK:
+        LIVE_CATALOG[:] = live
+        for p in live:
+            PRODUCTS_BY_HANDLE[p["handle"]] = p
+        if not PRODUCTS:
+            PRODUCTS[:] = live
+        CACHE_READY = True
+    CACHE_EVENT.set()
+    sys.stderr.write("storefront: prototype catalog = %s newest in stock\n" % len(live))
+
+    if FULL_CATALOG_LOADED or os.environ.get("CATALOG_FULL", "1") == "0":
+        return True
+    try:
+        collected = storefront.products()
+    except storefront.StorefrontError as exc:
+        sys.stderr.write("storefront full catalog failed (%s) — keeping the in-stock set\n" % exc)
+        return True
     with CACHE_LOCK:
         PRODUCTS[:] = collected
         PRODUCTS_BY_HANDLE.clear()
-        PRODUCTS_BY_HANDLE.update(by_handle)
-        LIVE_CATALOG[:] = live
-        CACHE_READY = True
-    CACHE_EVENT.set()
-    sys.stderr.write(
-        "storefront: cached %s products, prototype catalog = %s newest in stock\n" % (len(collected), len(live))
-    )
+        PRODUCTS_BY_HANDLE.update({p["handle"]: p for p in collected})
+        FULL_CATALOG_LOADED = True
+    sys.stderr.write("storefront: cached %s products for search / lookups\n" % len(collected))
     return True
 
 
@@ -487,7 +507,22 @@ class NoCacheHandler(SimpleHTTPRequestHandler):
 if __name__ == "__main__":
     port = int(sys.argv[1]) if len(sys.argv) > 1 else 5173
     os.chdir(os.path.join(os.path.dirname(__file__), ".."))
-    threading.Thread(target=refresh_catalog, daemon=True).start()
+    # Catalog: fetched once at boot; on a long-running deploy (Railway) set
+    # CATALOG_REFRESH_SECONDS so stock / new arrivals stay current.
+    refresh_every = int(os.environ.get("CATALOG_REFRESH_SECONDS") or 0)
+
+    def refresh_loop():
+        while True:
+            try:
+                refresh_catalog()
+            except Exception as exc:  # never let the refresher die
+                sys.stderr.write("catalog refresh failed: %s\n" % exc)
+                CACHE_EVENT.set()
+            if refresh_every <= 0:
+                return
+            time.sleep(refresh_every)
+
+    threading.Thread(target=refresh_loop, daemon=True).start()
     # Localhost only by default; HOST=0.0.0.0 to test from a phone on the LAN.
     host = os.environ.get("HOST", "127.0.0.1")
     server = ThreadingHTTPServer((host, port), NoCacheHandler)

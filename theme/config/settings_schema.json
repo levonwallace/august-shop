@@ -2,7 +2,7 @@
   {
     "name": "theme_info",
     "theme_name": "August 2.0",
-    "theme_version": "0.2.0",
+    "theme_version": "2.1.0",
     "theme_author": "August × Scissor Studio",
     "theme_documentation_url": "https://github.com/levonwallace/august-shop",
     "theme_support_url": "https://august-shop.com"
@@ -10,97 +10,391 @@
   {
     "name": "Brand",
     "settings": [
-      { "type": "image_picker", "id": "favicon", "label": "Favicon", "info": "Square PNG, at least 180×180. Falls back to the August SVG." },
-      { "type": "image_picker", "id": "og_image", "label": "Social share image", "info": "1200×630. Used when a page has no image of its own." },
-      { "type": "image_picker", "id": "avatar_default", "label": "Default avatar", "info": "Shown in the header and on the account page." }
+      {
+        "type": "image_picker",
+        "id": "favicon",
+        "label": "Favicon",
+        "info": "Square PNG, at least 180×180. Falls back to the August SVG."
+      },
+      {
+        "type": "image_picker",
+        "id": "og_image",
+        "label": "Social share image",
+        "info": "1200×630. Used when a page has no image of its own."
+      },
+      {
+        "type": "image_picker",
+        "id": "avatar_default",
+        "label": "Default avatar",
+        "info": "Shown in the header and on the account page."
+      }
     ]
   },
   {
     "name": "Catalog",
     "settings": [
-      { "type": "paragraph", "content": "Collections that power the home card stack, the mega menu, filters and the Radio card. Products need tags dept:men / dept:women, cat:shoes / cat:apparel / cat:accessories / cat:objects (optional, falls back to product type) and type:tees etc. for the category directory." },
-      { "type": "collection", "id": "everything_collection", "label": "Everything", "info": "Defaults to all products." },
-      { "type": "collection", "id": "new_collection", "label": "New arrivals" },
-      { "type": "collection", "id": "sale_collection", "label": "Sale" },
-      { "type": "collection", "id": "footwear_collection", "label": "Footwear" },
-      { "type": "collection", "id": "apparel_collection", "label": "Apparel" },
-      { "type": "collection", "id": "accessories_collection", "label": "Accessories" },
-      { "type": "collection", "id": "objects_collection", "label": "Objects" },
-      { "type": "header", "content": "Editorial" },
-      { "type": "blog", "id": "aux_blog", "label": "AUX mixes blog" },
-      { "type": "blog", "id": "events_blog", "label": "Events blog" },
-      { "type": "page", "id": "inn_page", "label": "August Inn page", "info": "Assign this page the “August Inn” template too. Leave empty to use the blog below." },
-      { "type": "blog", "id": "inn_blog", "label": "August Inn blog", "info": "The live store runs the Inn as a blog on the “inn” template; this theme renders it with the Inn section." },
-      { "type": "textarea", "id": "soundcloud_map", "label": "SoundCloud track IDs", "info": "One per line, mix number = track id (078=1982757851). Used when an AUX article has no august.soundcloud_track_id metafield." }
+      {
+        "type": "paragraph",
+        "content": "Collections that power the home card stack, filters and the Radio card — pre-set to the live store’s handles. Navigation (mega menu, footer) comes from the main-menu, shop and socials menus under Online Store → Navigation. Optional product tags dept:men / dept:women and cat:shoes / cat:apparel / cat:accessories / cat:objects refine filtering (falls back to product type)."
+      },
+      {
+        "type": "collection",
+        "id": "everything_collection",
+        "label": "Everything",
+        "info": "Defaults to all products."
+      },
+      {
+        "type": "collection",
+        "id": "new_collection",
+        "label": "New arrivals",
+        "info": "Live handle: new-arrivals"
+      },
+      {
+        "type": "collection",
+        "id": "sale_collection",
+        "label": "Sale",
+        "info": "Live handle: sale"
+      },
+      {
+        "type": "collection",
+        "id": "footwear_collection",
+        "label": "Footwear",
+        "info": "Live handle: footwear"
+      },
+      {
+        "type": "collection",
+        "id": "apparel_collection",
+        "label": "Apparel",
+        "info": "Live handle: apparel"
+      },
+      {
+        "type": "collection",
+        "id": "accessories_collection",
+        "label": "Accessories",
+        "info": "Live handle: accessories"
+      },
+      {
+        "type": "collection",
+        "id": "objects_collection",
+        "label": "Objects",
+        "info": "Live handle: objects"
+      },
+      {
+        "type": "header",
+        "content": "Editorial"
+      },
+      {
+        "type": "blog",
+        "id": "aux_blog",
+        "label": "AUX mixes blog",
+        "info": "Live handle: august-aux (mixes ≤075; 076–078 are still in “news”)"
+      },
+      {
+        "type": "blog",
+        "id": "events_blog",
+        "label": "Events blog",
+        "info": "Live handle: events"
+      },
+      {
+        "type": "page",
+        "id": "inn_page",
+        "label": "August Inn page",
+        "info": "Assign this page the “August Inn” template too. Leave empty to use the blog below."
+      },
+      {
+        "type": "blog",
+        "id": "inn_blog",
+        "label": "August Inn blog",
+        "info": "The live store runs the Inn as a blog on the “inn” template; this theme renders it with the Inn section."
+      },
+      {
+        "type": "textarea",
+        "id": "soundcloud_map",
+        "label": "SoundCloud track IDs",
+        "info": "One per line, mix number = track id (078=1982757851). Used when an AUX article has no august.soundcloud_track_id metafield."
+      },
+      {
+        "type": "header",
+        "content": "Product cards"
+      },
+      {
+        "type": "checkbox",
+        "id": "card_sale_badge",
+        "label": "Show a “Sale” badge on discounted cards",
+        "default": true,
+        "info": "Cards always show theme.badge / Pre-order first (the live store’s metafields)."
+      }
     ]
   },
   {
     "name": "Social",
     "settings": [
-      { "type": "url", "id": "social_instagram", "label": "Instagram" },
-      { "type": "url", "id": "social_facebook", "label": "Facebook" },
-      { "type": "url", "id": "social_twitter", "label": "X / Twitter" },
-      { "type": "url", "id": "social_vimeo", "label": "Vimeo" },
-      { "type": "url", "id": "social_soundcloud", "label": "SoundCloud" },
-      { "type": "url", "id": "social_spotify", "label": "Spotify" }
+      {
+        "type": "url",
+        "id": "social_instagram",
+        "label": "Instagram"
+      },
+      {
+        "type": "url",
+        "id": "social_facebook",
+        "label": "Facebook"
+      },
+      {
+        "type": "url",
+        "id": "social_twitter",
+        "label": "X / Twitter"
+      },
+      {
+        "type": "url",
+        "id": "social_vimeo",
+        "label": "Vimeo"
+      },
+      {
+        "type": "url",
+        "id": "social_soundcloud",
+        "label": "SoundCloud"
+      },
+      {
+        "type": "url",
+        "id": "social_spotify",
+        "label": "Spotify"
+      }
     ]
   },
   {
     "name": "Colors",
     "settings": [
-      { "type": "paragraph", "content": "Overrides css/tokens.css at runtime (snippets/css-variables.liquid)." },
-      { "type": "color", "id": "color_ink", "label": "Ink", "default": "#0f0f0f" },
-      { "type": "color", "id": "color_page", "label": "Page", "default": "#ffffff" },
-      { "type": "color", "id": "color_muted", "label": "Muted", "default": "#6b6b66" },
-      { "type": "color", "id": "color_link", "label": "Link / cobalt", "default": "#2b55a8" },
-      { "type": "color", "id": "color_verdigris", "label": "Verdigris (buttons)", "default": "#24382d" },
-      { "type": "header", "content": "Accents" },
-      { "type": "color", "id": "color_madder", "label": "Madder", "default": "#a8432e" },
-      { "type": "color", "id": "color_verdigris_soft", "label": "Verdigris (soft)", "default": "#4a6f5e" },
-      { "type": "color", "id": "color_cognac", "label": "Cognac", "default": "#b0703a" },
-      { "type": "color", "id": "color_ochre", "label": "Ochre", "default": "#d9a326" },
-      { "type": "color", "id": "color_dot", "label": "Live dot", "default": "#4fbf7a" }
+      {
+        "type": "paragraph",
+        "content": "Overrides css/tokens.css at runtime (snippets/css-variables.liquid)."
+      },
+      {
+        "type": "color",
+        "id": "color_ink",
+        "label": "Ink",
+        "default": "#0f0f0f"
+      },
+      {
+        "type": "color",
+        "id": "color_page",
+        "label": "Page",
+        "default": "#ffffff"
+      },
+      {
+        "type": "color",
+        "id": "color_muted",
+        "label": "Muted",
+        "default": "#6b6b66"
+      },
+      {
+        "type": "color",
+        "id": "color_link",
+        "label": "Link / cobalt",
+        "default": "#2b55a8"
+      },
+      {
+        "type": "color",
+        "id": "color_verdigris",
+        "label": "Verdigris (buttons)",
+        "default": "#24382d"
+      },
+      {
+        "type": "header",
+        "content": "Accents"
+      },
+      {
+        "type": "color",
+        "id": "color_madder",
+        "label": "Madder",
+        "default": "#a8432e"
+      },
+      {
+        "type": "color",
+        "id": "color_verdigris_soft",
+        "label": "Verdigris (soft)",
+        "default": "#4a6f5e"
+      },
+      {
+        "type": "color",
+        "id": "color_cognac",
+        "label": "Cognac",
+        "default": "#b0703a"
+      },
+      {
+        "type": "color",
+        "id": "color_ochre",
+        "label": "Ochre",
+        "default": "#d9a326"
+      },
+      {
+        "type": "color",
+        "id": "color_dot",
+        "label": "Live dot",
+        "default": "#4fbf7a"
+      }
     ]
   },
   {
     "name": "Typography & chrome",
     "settings": [
-      { "type": "text", "id": "font_stack", "label": "Font stack", "info": "CSS font-family list. Leave blank for Helvetica Neue.", "default": "" },
-      { "type": "range", "id": "ui_scale", "min": 60, "max": 100, "step": 5, "unit": "%", "label": "Desktop UI scale", "default": 75 },
-      { "type": "range", "id": "radius_card", "min": 0, "max": 24, "step": 1, "unit": "px", "label": "Card radius", "default": 6 },
-      { "type": "range", "id": "radius_chrome", "min": 0, "max": 24, "step": 1, "unit": "px", "label": "Chrome radius", "default": 8 }
+      {
+        "type": "text",
+        "id": "font_stack",
+        "label": "Font stack",
+        "info": "CSS font-family list. Leave blank for Helvetica Neue.",
+        "default": ""
+      },
+      {
+        "type": "range",
+        "id": "ui_scale",
+        "min": 60,
+        "max": 100,
+        "step": 5,
+        "unit": "%",
+        "label": "Desktop UI scale",
+        "default": 75
+      },
+      {
+        "type": "range",
+        "id": "radius_card",
+        "min": 0,
+        "max": 24,
+        "step": 1,
+        "unit": "px",
+        "label": "Card radius",
+        "default": 6
+      },
+      {
+        "type": "range",
+        "id": "radius_chrome",
+        "min": 0,
+        "max": 24,
+        "step": 1,
+        "unit": "px",
+        "label": "Chrome radius",
+        "default": 8
+      }
     ]
   },
   {
     "name": "Announcement",
     "settings": [
-      { "type": "checkbox", "id": "announce_enable", "label": "Show announcement chip", "default": true },
-      { "type": "text", "id": "announce_text", "label": "Announcement", "default": "Back to school sale" },
-      { "type": "url", "id": "announce_link", "label": "Announcement link" }
+      {
+        "type": "checkbox",
+        "id": "announce_enable",
+        "label": "Show announcement chip",
+        "default": true
+      },
+      {
+        "type": "text",
+        "id": "announce_text",
+        "label": "Announcement",
+        "default": "Back to school sale"
+      },
+      {
+        "type": "url",
+        "id": "announce_link",
+        "label": "Announcement link"
+      }
     ]
   },
   {
     "name": "Pickup store",
     "settings": [
-      { "type": "text", "id": "store_name", "label": "Store name", "default": "August" },
-      { "type": "text", "id": "store_address", "label": "Address", "default": "414 State St, Madison, WI 53703", "info": "Comma-separated; the street is used on its own in short copy." },
-      { "type": "text", "id": "store_hours", "label": "Hours", "default": "Mon–Sat 11–7 · Sun 12–5" },
-      { "type": "url", "id": "store_map_url", "label": "Map link" },
-      { "type": "text", "id": "store_lat", "label": "Latitude", "default": "43.07492" },
-      { "type": "text", "id": "store_lng", "label": "Longitude", "default": "-89.38755" }
+      {
+        "type": "text",
+        "id": "store_name",
+        "label": "Store name",
+        "default": "August"
+      },
+      {
+        "type": "text",
+        "id": "store_address",
+        "label": "Address",
+        "default": "414 State St, Madison, WI 53703",
+        "info": "Comma-separated; the street is used on its own in short copy."
+      },
+      {
+        "type": "text",
+        "id": "store_hours",
+        "label": "Hours",
+        "default": "Mon–Sat 11–7 · Sun 12–5"
+      },
+      {
+        "type": "url",
+        "id": "store_map_url",
+        "label": "Map link"
+      },
+      {
+        "type": "text",
+        "id": "store_lat",
+        "label": "Latitude",
+        "default": "43.07492"
+      },
+      {
+        "type": "text",
+        "id": "store_lng",
+        "label": "Longitude",
+        "default": "-89.38755"
+      }
     ]
   },
   {
     "name": "Offer popup",
     "settings": [
-      { "type": "checkbox", "id": "offer_enable", "label": "Show welcome offer", "default": true },
-      { "type": "text", "id": "offer_eyebrow", "label": "Eyebrow", "default": "Welcome offer" },
-      { "type": "text", "id": "offer_heading", "label": "Heading", "default": "10% off" },
-      { "type": "text", "id": "offer_lede", "label": "Lede", "default": "Your first order — pickup on State Street or checkout." },
-      { "type": "text", "id": "offer_code", "label": "Discount code", "default": "AUGUST10", "info": "Create the matching code under Discounts." },
-      { "type": "text", "id": "offer_success", "label": "Success message", "default": "Code AUGUST10 — applied at pickup or checkout." },
-      { "type": "text", "id": "offer_fine", "label": "Fine print", "default": "One use · new customers" },
-      { "type": "range", "id": "offer_delay", "label": "Delay", "min": 500, "max": 10000, "step": 500, "unit": "ms", "default": 1500 }
+      {
+        "type": "checkbox",
+        "id": "offer_enable",
+        "label": "Show welcome offer",
+        "default": true
+      },
+      {
+        "type": "text",
+        "id": "offer_eyebrow",
+        "label": "Eyebrow",
+        "default": "Welcome offer"
+      },
+      {
+        "type": "text",
+        "id": "offer_heading",
+        "label": "Heading",
+        "default": "10% off"
+      },
+      {
+        "type": "text",
+        "id": "offer_lede",
+        "label": "Lede",
+        "default": "Your first order — pickup on State Street or checkout."
+      },
+      {
+        "type": "text",
+        "id": "offer_code",
+        "label": "Discount code",
+        "default": "AUGUST10",
+        "info": "Create the matching code under Discounts."
+      },
+      {
+        "type": "text",
+        "id": "offer_success",
+        "label": "Success message",
+        "default": "Code AUGUST10 — applied at pickup or checkout."
+      },
+      {
+        "type": "text",
+        "id": "offer_fine",
+        "label": "Fine print",
+        "default": "One use · new customers"
+      },
+      {
+        "type": "range",
+        "id": "offer_delay",
+        "label": "Delay",
+        "min": 500,
+        "max": 10000,
+        "step": 500,
+        "unit": "ms",
+        "default": 1500
+      }
     ]
   }
 ]

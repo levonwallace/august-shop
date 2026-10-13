@@ -7,21 +7,19 @@
       "settings": {
         "wordmark": "August",
         "menu_label": "Menu",
-        "search_placeholder": "Search"
+        "search_placeholder": "Search",
+        "menu": "main-menu"
       },
       "blocks": {
         "new": {
           "type": "mega_panel",
           "settings": {
-            "title": "New arrivals",
+            "title": "New Arrivals",
             "directory": "none",
-            "menu": "",
-            "all_label": "Shop all new arrivals →",
+            "products_collection": "new-arrivals",
             "editorial_label": "Editorial",
             "editorial_title": "New\narrivals",
             "editorial_cta": "Explore →",
-            "all_link": "shopify://collections/new-arrivals",
-            "products_collection": "new-arrivals",
             "editorial_link": "shopify://collections/new-arrivals"
           }
         },
@@ -29,9 +27,9 @@
           "type": "mega_panel",
           "settings": {
             "title": "Brands",
-            "directory": "brands",
+            "directory": "none",
             "all_label": "View all brands →",
-            "all_link": "shopify://collections/vendors",
+            "all_link": "shopify://collections/all",
             "products_collection": "stussy"
           }
         },
@@ -39,25 +37,10 @@
           "type": "mega_panel",
           "settings": {
             "title": "Categories",
-            "directory": "categories",
-            "all_label": "Shop all categories →",
+            "directory": "none",
+            "all_label": "Shop everything →",
             "all_link": "shopify://collections/all",
             "products_collection": "footwear"
-          }
-        },
-        "color": {
-          "type": "mega_panel",
-          "settings": {
-            "title": "Shop by color",
-            "directory": "none",
-            "menu": "",
-            "all_label": "Browse all colors →",
-            "editorial_label": "Editorial",
-            "editorial_title": "Shop by\ncolor",
-            "editorial_cta": "Explore →",
-            "all_link": "shopify://collections/all",
-            "products_collection": "apparel",
-            "editorial_link": "shopify://collections/all"
           }
         },
         "sale": {
@@ -65,13 +48,10 @@
           "settings": {
             "title": "Sale",
             "directory": "none",
-            "menu": "",
-            "all_label": "Shop all sale →",
+            "products_collection": "sale",
             "editorial_label": "Editorial",
             "editorial_title": "Sale",
             "editorial_cta": "Explore →",
-            "all_link": "shopify://collections/sale",
-            "products_collection": "sale",
             "editorial_link": "shopify://collections/sale"
           }
         },
@@ -114,7 +94,6 @@
         "new",
         "brands",
         "categories",
-        "color",
         "sale",
         "promo_new",
         "promo_sale",

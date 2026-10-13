@@ -2,8 +2,50 @@
   "sections": {
     "main": {
       "type": "main-cart",
-      "settings": {}
+      "settings": {},
+      "blocks": {
+        "sezzle_checkout": {
+          "type": "shopify://apps/sezzle-widget/blocks/checkout-block/f3a53793-e118-4764-a86b-a79bfedb0d5f",
+          "settings": {
+            "heading": "Sezzle Checkout Button",
+            "template": "Checkout with %%logo%%",
+            "mode": "light",
+            "default_placement": true
+          }
+        },
+        "afterpay": {
+          "type": "shopify://apps/afterpay-on-site-messaging/blocks/payments-messaging/f45a5524-d177-4475-bf59-281efd2215a8",
+          "settings": {
+            "text_align": "right",
+            "margin_top": 0,
+            "margin_bottom": 0,
+            "color": "",
+            "size": "sm",
+            "intro_text": "Pay",
+            "show_interest_free": false,
+            "payment_amount_is_bold": true,
+            "show_with": false,
+            "logo_type": "compact-badge",
+            "logo_theme": "white-on-black",
+            "modal_link_style": "circled-info-icon",
+            "modal_theme": "white",
+            "breakpoint": 749,
+            "text_align_mobile": "inherit",
+            "margin_top_mobile": 0,
+            "margin_bottom_mobile": 0,
+            "show_lower_limit": true,
+            "show_upper_limit": true,
+            "show_if_outside_limits": true
+          }
+        }
+      },
+      "block_order": [
+        "sezzle_checkout",
+        "afterpay"
+      ]
     }
   },
-  "order": ["main"]
+  "order": [
+    "main"
+  ]
 }

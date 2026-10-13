@@ -1,0 +1,21 @@
+{% comment %}
+  App blocks container. Required by the HireUp metaobject templates
+  (templates/metaobject/app--138334732289--hireup.*.json) copied from the
+  live theme, and usable on any JSON template for app-provided blocks.
+{% endcomment %}
+<div class="apps-section page" data-section-id="{{ section.id }}">
+  {%- for block in section.blocks -%}
+    <div class="apps-section__block" {{ block.shopify_attributes }}>{% render block %}</div>
+  {%- endfor -%}
+</div>
+
+{% schema %}
+{
+  "name": "Apps",
+  "tag": "section",
+  "class": "shopify-section-apps",
+  "settings": [],
+  "blocks": [{ "type": "@app" }],
+  "presets": [{ "name": "Apps" }]
+}
+{% endschema %}

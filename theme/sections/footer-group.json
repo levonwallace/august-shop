@@ -7,7 +7,8 @@
       "settings": {
         "tagline": "Streetwear, sneakers, art & music — 414 State St, Madison, WI.",
         "menu": "shop",
-        "show_social": true
+        "show_social": true,
+        "social_menu": "socials"
       }
     },
     "tabbar": {

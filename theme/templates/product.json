@@ -30,9 +30,61 @@
             "heading": "Returns",
             "body": "<p>Returns will be accepted only for store credit within 14 days of receipt. If 14 days have gone by since your purchase, unfortunately, we can’t offer you a credit or exchange.</p><p><strong>Special and limited releases are final sale – no returns.</strong></p><p><strong>Items bought on sale are final sale.</strong></p>"
           }
+        },
+        "afterpay": {
+          "type": "shopify://apps/afterpay-on-site-messaging/blocks/payments-messaging/f45a5524-d177-4475-bf59-281efd2215a8",
+          "settings": {
+            "text_align": "inherit",
+            "margin_top": 16,
+            "margin_bottom": 0,
+            "color": "",
+            "size": "xs",
+            "intro_text": "Pay in",
+            "show_interest_free": false,
+            "payment_amount_is_bold": true,
+            "show_with": true,
+            "logo_type": "compact-badge",
+            "logo_theme": "white-on-black",
+            "modal_link_style": "circled-info-icon",
+            "modal_theme": "white",
+            "breakpoint": 749,
+            "text_align_mobile": "inherit",
+            "margin_top_mobile": 16,
+            "margin_bottom_mobile": 0,
+            "show_lower_limit": true,
+            "show_upper_limit": true,
+            "show_if_outside_limits": true,
+            "product": ""
+          }
+        },
+        "sezzle": {
+          "type": "shopify://apps/sezzle-widget/blocks/widget-block/f3a53793-e118-4764-a86b-a79bfedb0d5f",
+          "settings": {
+            "heading": "Sezzle Widget",
+            "font_size": 10,
+            "font_family": "inherit"
+          }
+        },
+        "redo_try_on": {
+          "type": "shopify://apps/redo/blocks/try_it_on_suggestion/c613644b-6df4-4d11-b336-43a5c06745a1",
+          "settings": {
+            "messageText": "Comparing colors?",
+            "buttonText": "See them on yourself",
+            "backgroundColor": "#F5F5F5",
+            "textColor": "#000000",
+            "buttonColor": "#000000",
+            "fontSize": "14px",
+            "fontWeight": "400",
+            "borderRadius": "8px",
+            "padding": "12px 16px",
+            "fontFamily": "inherit"
+          }
         }
       },
       "block_order": [
+        "afterpay",
+        "sezzle",
+        "redo_try_on",
         "ask",
         "contact",
         "shipping",

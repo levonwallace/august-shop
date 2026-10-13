@@ -11,6 +11,22 @@
   if product.compare_at_price > product.price
     assign on_sale = true
   endif
+  comment
+    Same signals the live theme reads: theme.badge (or a `_badge_New_in` tag),
+    theme.cutline (colorway), theme.preorder (boolean).
+  endcomment
+  assign badge = product.metafields.theme.badge.value
+  if badge == blank
+    for tag in product.tags
+      if tag contains '_badge_'
+        assign badge = tag | remove: '_badge_' | replace: '_', ' '
+      endif
+    endfor
+  endif
+  if badge == blank and product.metafields.theme.preorder.value == true
+    assign badge = 'Pre-order'
+  endif
+  assign cutline = product.metafields.theme.cutline.value
 -%}
 <a
   class="product-card{% if class != blank %} {{ class }}{% endif %}"
@@ -19,6 +35,7 @@
   data-product-id="{{ product.id }}"
   data-product-handle="{{ product.handle }}"
   data-cat="{{ product.type | handle }}"
+  {%- if cutline != blank %} data-cutline="{{ cutline | escape }}"{% endif -%}
 >
   <div class="product-card__media">
     {%- if product.featured_image -%}
@@ -32,10 +49,11 @@
         height="{{ product.featured_image.height }}"
       >
     {%- endif -%}
+    {%- if badge != blank -%}<span class="product-card__badge">{{ badge }}</span>{%- endif -%}
   </div>
   <div class="product-card__meta">
     <div class="product-card__brand">{{ product.vendor }}</div>
-    <div class="product-card__title">{{ product.title }}</div>
+    <div class="product-card__title">{{ product.title }}{%- if cutline != blank -%}<span class="product-card__cutline"> · {{ cutline }}</span>{%- endif -%}</div>
     <div class="product-card__price">
       {%- if on_sale -%}<span class="price-was">{{ product.compare_at_price | money }}</span> {% endif -%}
       {{- product.price | money -}}

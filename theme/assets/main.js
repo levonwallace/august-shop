@@ -1,5 +1,45 @@
 /* Tiny interactions for the UX prototype */
 document.addEventListener("DOMContentLoaded", () => {
+  /* Theme: nested menu sub-sub-links arrive as panel.columns
+     [{ head, href, items: [{ label, href }] }] — render them in the same
+     directory grid the prototype uses for brands / categories. Long
+     columns are split so the grid stays scannable. */
+  const COL_MAX = 14;
+  const columnsHtml = (columns, mobile = false) => {
+    const cols = [];
+    (columns || []).forEach((col) => {
+      const items = col.items || [];
+      if (!items.length) {
+        cols.push({ head: col.head, href: col.href, items: [] });
+        return;
+      }
+      const per = mobile ? items.length : COL_MAX;
+      for (let i = 0; i < items.length; i += per) {
+        cols.push({ head: i === 0 ? col.head : "", href: col.href, items: items.slice(i, i + per) });
+      }
+    });
+    const cls = cols.length > 3 ? "brand-dir brand-dir--cats" : "brand-dir";
+    return `<div class="${cls}" data-menu-dir>${cols
+      .map(
+        (col) => `
+      <div class="brand-dir__col">
+        ${
+          col.head
+            ? col.href
+              ? `<a class="brand-dir__head" href="${col.href}">${col.head}</a>`
+              : `<p class="brand-dir__head">${col.head}</p>`
+            : `<p class="brand-dir__head" aria-hidden="true">&nbsp;</p>`
+        }
+        ${col.items.map((i) => `<a href="${i.href}">${i.label}</a>`).join("")}
+      </div>`
+      )
+      .join("")}</div>`;
+  };
+  const linksHtml = (links) =>
+    `<div class="brand-dir brand-dir--links" data-menu-dir><div class="brand-dir__col">${(links || [])
+      .map((i) => `<a href="${i.href}">${i.label}</a>`)
+      .join("")}</div></div>`;
+
   /* ── Inject mobile-only sheets used by the tab bar ────────────
      Kept here (not in each HTML page) so they stay in sync. */
   const injectMobileSheets = () => {
@@ -146,7 +186,21 @@ document.addEventListener("DOMContentLoaded", () => {
         nav.classList.toggle("is-open", !dir?.hidden);
       });
     };
-    if (window.AugustCatalog) {
+    const themePanels = window.AugustMegaPanels;
+    if (themePanels) {
+      Object.entries(themePanels).forEach(([key, data]) => {
+        const explicit = data.directory && data.directory !== "none" ? data.directory : null;
+        if (explicit === "brands" && window.AugustCatalog) {
+          wireMobileDir(key, window.AugustCatalog.brandDirHtml());
+        } else if (explicit === "categories" && window.AugustCatalog) {
+          wireMobileDir(key, window.AugustCatalog.catDirHtml());
+        } else if (data.columns && data.columns.length) {
+          wireMobileDir(key, columnsHtml(data.columns, true));
+        } else if (data.links && data.links.length) {
+          wireMobileDir(key, linksHtml(data.links));
+        }
+      });
+    } else if (window.AugustCatalog) {
       wireMobileDir("brands", window.AugustCatalog.brandDirHtml());
       wireMobileDir("categories", window.AugustCatalog.catDirHtml());
     }
@@ -256,12 +310,15 @@ document.addEventListener("DOMContentLoaded", () => {
 
     const megaBody = document.querySelector(".morph-menu__body");
     const panelData = (open && section && megaPanels[section]) || null;
+    const hasColumns = !!(panelData?.columns && panelData.columns.length);
     const directory =
       panelData?.directory && panelData.directory !== "none"
         ? panelData.directory
-        : section === "brands" || section === "categories"
-          ? section
-          : null;
+        : hasColumns
+          ? "menu"
+          : section === "brands" || section === "categories"
+            ? section
+            : null;
     const isDirectory = !!(open && directory);
     megaBody?.classList.toggle("is-directory", isDirectory);
 
@@ -290,7 +347,9 @@ document.addEventListener("DOMContentLoaded", () => {
         }
       }
       if (megaLinks) {
-        if (directory === "brands" && window.AugustCatalog) {
+        if (directory === "menu") {
+          megaLinks.innerHTML = columnsHtml(data.columns);
+        } else if (directory === "brands" && window.AugustCatalog) {
           megaLinks.innerHTML = window.AugustCatalog.brandDirHtml();
         } else if (directory === "categories" && window.AugustCatalog) {
           megaLinks.innerHTML = window.AugustCatalog.catDirHtml();

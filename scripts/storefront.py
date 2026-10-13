@@ -102,6 +102,11 @@ def _product_fields(inventory):
     qty = "quantityAvailable" if inventory else ""
     return f"""
       id handle title vendor productType tags availableForSale description
+      cutline: metafield(namespace: "theme", key: "cutline") {{ value }}
+      siblings: metafield(namespace: "theme", key: "siblings") {{ value }}
+      badge: metafield(namespace: "theme", key: "badge") {{ value }}
+      preorder: metafield(namespace: "theme", key: "preorder") {{ value }}
+      short: metafield(namespace: "august", key: "short_description") {{ value }}
       featuredImage {{ url(transform: {{maxWidth: 600}}) }}
       images(first: 5) {{ nodes {{ url(transform: {{maxWidth: 1200}}) }} }}
       options {{ name optionValues {{ name }} }}
@@ -208,6 +213,21 @@ def normalize(p):
                 if so["name"] == name and so["value"] not in sizes:
                     sizes.append(so["value"])
 
+    # Live-store metafields (same keys the old theme and snippets/product-json.liquid read).
+    # Metafields only come through the Storefront API once they are exposed in
+    # Settings → Custom data → Storefront access; until then they're null.
+    mf = lambda key: ((p.get(key) or {}).get("value") or "").strip()  # noqa: E731
+    badge = mf("badge")
+    if not badge:
+        for tag in tags:
+            if "_badge_" in tag:
+                badge = tag.replace("_badge_", "").replace("_", " ").strip() or badge
+    preorder = mf("preorder").lower() == "true"
+    if not badge and preorder:
+        badge = "Pre-order"
+    body = re.sub(r"\s+", " ", p.get("description") or "").strip()
+    short = mf("short") or (body[:177].rstrip() + "…" if len(body) > 180 else body)
+
     images = [n["url"] for n in (p.get("images") or {}).get("nodes") or [] if n.get("url")]
     img = ((p.get("featuredImage") or {}).get("url")) or (images[0] if images else "")
     out = {
@@ -226,7 +246,12 @@ def normalize(p):
         "images": images,
         "sizes": sizes,
         "tags": tags,
-        "body": re.sub(r"\s+", " ", p.get("description") or "").strip()[:600],
+        "badge": badge or None,
+        "cutline": mf("cutline") or None,
+        "siblings": mf("siblings") or None,
+        "preorder": preorder,
+        "short": short,
+        "body": body[:600],
         "variants": [
             {
                 "id": v["id"].rsplit("/", 1)[-1],

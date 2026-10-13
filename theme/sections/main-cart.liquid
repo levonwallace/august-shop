@@ -73,6 +73,11 @@
         <span>Total</span><span data-cart-total>{{ cart.total_price | money }}</span>
       </div>
       <a href="/checkout" class="btn btn--primary btn--block{% if cart.item_count == 0 %} is-disabled{% endif %}" data-cart-checkout role="button">{{ s.checkout_label }}</a>
+      {%- for block in section.blocks -%}
+        {%- if block.type == '@app' -%}
+          <div class="bag-summary__app" {{ block.shopify_attributes }}>{% render block %}</div>
+        {%- endif -%}
+      {%- endfor -%}
     </aside>
   </div>
 </main>
@@ -97,6 +102,7 @@
     { "type": "text", "id": "empty_sub", "label": "Subtitle", "default": "Pickup at [address] or ship nationwide." },
     { "type": "text", "id": "empty_cta", "label": "Button", "default": "Shop" },
     { "type": "url", "id": "empty_link", "label": "Button link" }
-  ]
+  ],
+  "blocks": [{ "type": "@app" }]
 }
 {% endschema %}

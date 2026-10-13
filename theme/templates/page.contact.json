@@ -1,0 +1,13 @@
+{
+  "sections": {
+    "main": {
+      "type": "main-contact",
+      "settings": {
+        "kicker": "August",
+        "show_form": true,
+        "form_title": "Send us a note"
+      }
+    }
+  },
+  "order": ["main"]
+}

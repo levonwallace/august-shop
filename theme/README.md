@@ -47,8 +47,23 @@ content on first upload — no editor work needed to see it:
   Sale; brand cards Stüssy, Saucony, Kardo, ASICS, Sorel × Needles, August
   with the live homepage imagery (`shopify://shop_images/...`); AUX card
   copy from the Mixtapes page; newsletter copy from the live footer.
-- Header: mega panels fed by collections; mobile promos Stüssy / ASICS /
-  AUX / Inn. Footer menu `shop`, social links from Theme settings → Social.
+- Header: navigation is the store's nested `main-menu` (Online Store →
+  Navigation), exactly as on the live theme. Top-level items with children
+  open the morph menu; grandchildren (Brands "123 - F/G - O/P - Z",
+  Categories → Apparel / Footwear / …) render as the directory grid; items
+  without children are plain links. "Menu item extras" blocks (matched by
+  label: New Arrivals, Brands, Categories, Sale) only add product tiles /
+  editorial card / "view all". Mobile promos Stüssy / ASICS / AUX / Inn.
+- Footer: menu `shop` (Contact, Policies, Returns, Security) and the
+  `socials` menu, same as the live footer. Theme settings → Social is the
+  fallback if the `socials` menu is empty.
+- Product data from the live store's `theme.*` metafields (see below) —
+  colorway swatches, cutline, badges, Pre-order — plus the same app blocks
+  as the live PDP / bag: Afterpay messaging, Sezzle widget, Redo try-on
+  (product); Sezzle checkout + Afterpay (bag). App blocks render once the
+  apps are installed on the store, which they already are.
+- Templates carried over from the live theme: `page.contact` (page copy +
+  native contact form) and the HireUp metaobject templates for Careers.
 - Product tabs: live Contact / Shipping / Returns copy; final-sale note.
 - Inn page: full copy, hero, amenities, Airbnb + VRBO links, 7 photos.
 - Announcement "Free shipping on orders $225+", favicon, offer popup
@@ -65,7 +80,10 @@ store's Files library, so they only work on the August store itself.
    `page.august-inn`, and set Theme settings → Catalog → August Inn page.
 3. **Theme settings → Pickup store** lat/lng and **Offer popup** code —
    create the matching `CLUB10` discount under Discounts.
-4. Metafields (below) are optional; everything falls back to title parsing.
+4. Assign `page.contact` to the Contact page (Pages → Contact → Theme
+   template) if Shopify does not keep the assignment on theme switch.
+5. `august.*` metafields (below) are optional; everything falls back to
+   title parsing. `theme.*` metafields already exist on the live store.
 
 ## What the content / sales team can edit
 
@@ -99,7 +117,21 @@ Override with tags when the guess is wrong:
 - `cat:shoes` · `cat:apparel` · `cat:accessories` · `cat:objects`
 - `type:sneakers` (free text, used for sub-filters)
 
-## Metafields (namespace `august`)
+## Metafields
+
+### Live store (namespace `theme`) — already populated
+
+These are the Pipeline theme's metafields the store has been using; the
+theme reads them without any setup.
+
+| Owner | Key | Type | Used for |
+| --- | --- | --- | --- |
+| Product | `cutline` | text | colorway name under the PDP title, card suffix, `Color` line-item property when the color is not in the title |
+| Product | `siblings` | text (collection handle) | colorway swatches on the PDP — every product in that collection is one color of the style |
+| Product | `badge` | text | card badge (also honours `_badge_New_in` style tags) |
+| Product | `preorder` | boolean | "Pre-order" button + badge, `Sale type: Pre-order` line-item property |
+
+### August 2.0 (namespace `august`) — optional
 
 Create these in Settings → Custom data. Enable storefront access.
 

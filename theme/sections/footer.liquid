@@ -21,24 +21,35 @@
   </nav>
   {%- if section.settings.show_social -%}
     {%- liquid
+      comment
+        Social links: the store's `socials` menu first (same source as the
+        live theme's footer), then Theme settings → Social as a fallback.
+      endcomment
+      assign social_menu = linklists[section.settings.social_menu]
       assign socials = ''
-      if settings.social_instagram != blank
-        assign socials = socials | append: 'Instagram|' | append: settings.social_instagram | append: ','
-      endif
-      if settings.social_soundcloud != blank
-        assign socials = socials | append: 'SoundCloud|' | append: settings.social_soundcloud | append: ','
-      endif
-      if settings.social_spotify != blank
-        assign socials = socials | append: 'Spotify|' | append: settings.social_spotify | append: ','
-      endif
-      if settings.social_facebook != blank
-        assign socials = socials | append: 'Facebook|' | append: settings.social_facebook | append: ','
-      endif
-      if settings.social_twitter != blank
-        assign socials = socials | append: 'X|' | append: settings.social_twitter | append: ','
-      endif
-      if settings.social_vimeo != blank
-        assign socials = socials | append: 'Vimeo|' | append: settings.social_vimeo | append: ','
+      if social_menu != blank and social_menu.links.size > 0
+        for link in social_menu.links
+          assign socials = socials | append: link.title | append: '|' | append: link.url | append: ','
+        endfor
+      else
+        if settings.social_instagram != blank
+          assign socials = socials | append: 'Instagram|' | append: settings.social_instagram | append: ','
+        endif
+        if settings.social_soundcloud != blank
+          assign socials = socials | append: 'SoundCloud|' | append: settings.social_soundcloud | append: ','
+        endif
+        if settings.social_spotify != blank
+          assign socials = socials | append: 'Spotify|' | append: settings.social_spotify | append: ','
+        endif
+        if settings.social_facebook != blank
+          assign socials = socials | append: 'Facebook|' | append: settings.social_facebook | append: ','
+        endif
+        if settings.social_twitter != blank
+          assign socials = socials | append: 'X|' | append: settings.social_twitter | append: ','
+        endif
+        if settings.social_vimeo != blank
+          assign socials = socials | append: 'Vimeo|' | append: settings.social_vimeo | append: ','
+        endif
       endif
       assign social_list = socials | split: ','
     -%}
@@ -69,10 +80,17 @@
       "type": "link_list",
       "id": "menu",
       "label": "Footer menu",
-      "default": "footer",
-      "info": "Keep Shop, then Help, Shipping & returns, August Inn, Visit."
+      "default": "shop",
+      "info": "The live store's “shop” menu: Contact, Policies, Returns, Security."
     },
-    { "type": "checkbox", "id": "show_social", "label": "Show social links", "default": true, "info": "Links come from Theme settings → Social." }
+    { "type": "checkbox", "id": "show_social", "label": "Show social links", "default": true },
+    {
+      "type": "link_list",
+      "id": "social_menu",
+      "label": "Social menu",
+      "default": "socials",
+      "info": "Falls back to Theme settings → Social when this menu is empty."
+    }
   ]
 }
 {% endschema %}

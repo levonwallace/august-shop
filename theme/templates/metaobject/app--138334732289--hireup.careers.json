@@ -1,0 +1,20 @@
+{
+  "sections": {
+    "hireup-section-23ec996d-a7a7-49b5-906d-8d411979e6be": {
+      "type": "apps",
+      "blocks": {
+        "hireup-block-238322f3-c847-4559-afbf-4c5c8e1e54df": {
+          "type": "shopify://apps/hireup/blocks/careers/3cb123ce-3518-44ed-a036-ac74e405bc76",
+          "settings": {}
+        }
+      },
+      "block_order": [
+        "hireup-block-238322f3-c847-4559-afbf-4c5c8e1e54df"
+      ],
+      "settings": {}
+    }
+  },
+  "order": [
+    "hireup-section-23ec996d-a7a7-49b5-906d-8d411979e6be"
+  ]
+}

@@ -1,0 +1,75 @@
+{% comment %}
+  Contact page — page body (the live store keeps hours / emails / address in
+  the page content) followed by a native Shopify contact form. Submissions
+  land in the store's "Customer contact" email exactly like the old theme's
+  section-contact.
+{% endcomment %}
+{%- liquid
+  assign s = section.settings
+  assign form_id = 'contact-' | append: section.id
+-%}
+<main class="story story--page story--contact" id="main" data-section-id="{{ section.id }}">
+  {%- if s.kicker != blank -%}<p class="story__kicker">{{ s.kicker }}</p>{%- endif -%}
+  <h1 class="story__title">{{ page.title }}</h1>
+  {%- if page.content != blank -%}<div class="story__body">{{ page.content }}</div>{%- endif -%}
+
+  {%- if s.show_form -%}
+    <section class="contact-form glass-panel" aria-labelledby="{{ form_id }}-title">
+      {%- if s.form_title != blank -%}<h2 class="contact-form__title" id="{{ form_id }}-title">{{ s.form_title }}</h2>{%- endif -%}
+      {%- form 'contact', id: form_id, class: 'contact-form__form' -%}
+        {%- if form.posted_successfully? -%}
+          <p class="contact-form__status contact-form__status--ok" role="status">{{ s.success_text }}</p>
+        {%- elsif form.errors -%}
+          <div class="contact-form__status contact-form__status--error" role="alert">
+            {{ form.errors | default_errors }}
+          </div>
+        {%- endif -%}
+
+        <div class="contact-form__row">
+          <label class="contact-form__field">
+            <span>{{ s.name_label }}</span>
+            <input type="text" name="contact[name]" autocomplete="name" value="{% if form.name %}{{ form.name }}{% elsif customer %}{{ customer.name }}{% endif %}">
+          </label>
+          <label class="contact-form__field">
+            <span>{{ s.email_label }} *</span>
+            <input type="email" name="contact[email]" autocomplete="email" required value="{% if form.email %}{{ form.email }}{% elsif customer %}{{ customer.email }}{% endif %}">
+          </label>
+        </div>
+        {%- if s.show_phone -%}
+          <label class="contact-form__field">
+            <span>{{ s.phone_label }}</span>
+            <input type="tel" name="contact[phone]" autocomplete="tel" value="{{ form.phone }}">
+          </label>
+        {%- endif -%}
+        <label class="contact-form__field">
+          <span>{{ s.message_label }} *</span>
+          <textarea name="contact[body]" rows="6" required>{{ form.body }}</textarea>
+        </label>
+        <button type="submit" class="btn btn--primary">{{ s.submit_label }}</button>
+      {%- endform -%}
+    </section>
+  {%- endif -%}
+</main>
+
+{% schema %}
+{
+  "name": "Contact page",
+  "tag": "div",
+  "class": "shopify-section-story",
+  "settings": [
+    { "type": "text", "id": "kicker", "label": "Kicker", "default": "August" },
+    { "type": "header", "content": "Form" },
+    { "type": "checkbox", "id": "show_form", "label": "Show contact form", "default": true },
+    { "type": "text", "id": "form_title", "label": "Form title", "default": "Send us a note" },
+    { "type": "text", "id": "name_label", "label": "Name label", "default": "Full name" },
+    { "type": "text", "id": "email_label", "label": "Email label", "default": "Email" },
+    { "type": "checkbox", "id": "show_phone", "label": "Show phone field", "default": false },
+    { "type": "text", "id": "phone_label", "label": "Phone label", "default": "Phone" },
+    { "type": "text", "id": "message_label", "label": "Message label", "default": "Message" },
+    { "type": "text", "id": "submit_label", "label": "Submit button", "default": "Send" },
+    { "type": "text", "id": "success_text", "label": "Success message", "default": "Thanks — we’ll get back to you within a business day." }
+  ],
+  "enabled_on": { "templates": ["page"] },
+  "presets": [{ "name": "Contact page" }]
+}
+{% endschema %}

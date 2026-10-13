@@ -1,0 +1,20 @@
+{
+  "sections": {
+    "hireup-section-a7399059-96fe-4e15-983d-96d423878575": {
+      "type": "apps",
+      "blocks": {
+        "hireup-block-f571cd89-c0d3-44da-86b3-31612df3d06e": {
+          "type": "shopify://apps/hireup/blocks/job-listing/3cb123ce-3518-44ed-a036-ac74e405bc76",
+          "settings": {}
+        }
+      },
+      "block_order": [
+        "hireup-block-f571cd89-c0d3-44da-86b3-31612df3d06e"
+      ],
+      "settings": {}
+    }
+  },
+  "order": [
+    "hireup-section-a7399059-96fe-4e15-983d-96d423878575"
+  ]
+}

@@ -1,12 +1,18 @@
 {% comment %}
   Prototype: header.site-header + morph-menu (mega) + mobile-nav in every page.
+
+  Navigation comes from ONE nested menu (Online Store → Navigation), the same
+  `main-menu` the live theme uses:
+    top-level link            → nav item
+    …with child links         → opens the morph menu with those links
+    …with grandchildren       → directory grid (Brands "123 - F" …, Categories)
+    …without children         → plain link
   Blocks:
-    mega_panel — one top-level nav item. Opens the morph menu with its links,
-                 four product tiles from a collection, and an editorial card.
-                 Directory mode swaps the links for the brand / category grid.
+    mega_panel — optional override for one top-level item (matched by label):
+                 product tiles collection, editorial card, "view all" link,
+                 or a computed brand / category directory.
     promo      — a tile in the mobile menu's "Featured" strip.
-  main.js reads window.AugustMegaPanels (emitted below) instead of its
-  hard-coded panels when it exists.
+  main.js reads window.AugustMegaPanels (emitted below).
 {% endcomment %}
 {%- liquid
   assign avatar_src = 'avatar-demo.jpg' | asset_url
@@ -16,7 +22,64 @@
   assign announce_href = settings.announce_link | default: routes.all_products_collection_url
   assign panel_blocks = section.blocks | where: 'type', 'mega_panel'
   assign promo_blocks = section.blocks | where: 'type', 'promo'
-  assign first_panel = panel_blocks | first
+  assign nav_menu = linklists[section.settings.menu]
+  if nav_menu == blank or nav_menu.links.size == 0
+    assign nav_menu = linklists['main-menu']
+  endif
+
+  comment
+    Work out which top-level links open a panel. "panel_keys" is a
+    pipe-separated list of handleized labels; the first one seeds the
+    server-rendered panel body.
+  endcomment
+  assign panel_keys = ''
+  for link in nav_menu.links
+    assign key = link.title | handleize
+    assign has_panel = false
+    if link.links.size > 0
+      assign has_panel = true
+    endif
+    for block in panel_blocks
+      assign block_key = block.settings.title | handleize
+      if block_key == key
+        if block.settings.directory != 'none' or block.settings.menu != blank
+          assign has_panel = true
+        endif
+      endif
+    endfor
+    if has_panel
+      assign panel_keys = panel_keys | append: key | append: '|'
+    endif
+  endfor
+  assign panel_key_list = panel_keys | split: '|'
+  assign first_key = panel_key_list | first
+
+  assign first_link = nil
+  assign first_block = nil
+  for link in nav_menu.links
+    assign key = link.title | handleize
+    if key == first_key
+      assign first_link = link
+      for block in panel_blocks
+        assign block_key = block.settings.title | handleize
+        if block_key == key
+          assign first_block = block
+        endif
+      endfor
+    endif
+  endfor
+  assign first_title = first_link.title
+  assign first_href = first_block.settings.all_link | default: first_link.url | default: routes.all_products_collection_url
+  assign first_all = first_block.settings.all_label
+  if first_all == blank
+    assign lowered = first_title | downcase
+    assign first_all = 'Shop all ' | append: lowered | append: ' →'
+  endif
+  assign first_links = first_block.settings.menu.links | default: first_link.links
+  assign mega_source = first_block.settings.products_collection
+  if mega_source == blank and first_link.type == 'collection_link'
+    assign mega_source = first_link.object
+  endif
 -%}
 
 <header class="site-header" data-section-id="{{ section.id }}">
@@ -33,8 +96,13 @@
     <div class="header-island header-nav" data-header-nav>
       <a class="wordmark" href="{{ routes.root_url }}">{{ section.settings.wordmark | default: shop.name }}</a>
       <nav class="nav-links" aria-label="Primary">
-        {%- for block in panel_blocks -%}
-          <button type="button" aria-expanded="false" data-mega-trigger="{{ block.id }}" {{ block.shopify_attributes }}>{{ block.settings.title }}</button>
+        {%- for link in nav_menu.links -%}
+          {%- assign key = link.title | handleize -%}
+          {%- if panel_key_list contains key -%}
+            <button type="button" aria-expanded="false" data-mega-trigger="{{ key }}">{{ link.title }}</button>
+          {%- else -%}
+            <a href="{{ link.url }}"{% if link.active %} class="is-active"{% endif %}>{{ link.title }}</a>
+          {%- endif -%}
         {%- endfor -%}
       </nav>
     </div>
@@ -64,8 +132,11 @@
       <div class="morph-menu__cluster">
         <a class="wordmark" href="{{ routes.root_url }}">{{ section.settings.wordmark | default: shop.name }}</a>
         <nav class="morph-menu__nav" aria-label="Mega menu sections">
-          {%- for block in panel_blocks -%}
-            <button type="button" aria-expanded="false" data-mega-trigger="{{ block.id }}">{{ block.settings.title }}</button>
+          {%- for link in nav_menu.links -%}
+            {%- assign key = link.title | handleize -%}
+            {%- if panel_key_list contains key -%}
+              <button type="button" aria-expanded="false" data-mega-trigger="{{ key }}">{{ link.title }}</button>
+            {%- endif -%}
           {%- endfor -%}
         </nav>
       </div>
@@ -76,17 +147,16 @@
     <div class="morph-menu__divider" aria-hidden="true"></div>
     <div class="morph-menu__body">
       <div class="morph-links" data-mega-panel>
-        <p class="morph-links__label" data-mega-label>{{ first_panel.settings.title }}</p>
+        <p class="morph-links__label" data-mega-label>{{ first_title }}</p>
         <div class="morph-links__list" data-mega-links>
-          {%- for link in first_panel.settings.menu.links -%}
+          {%- for link in first_links -%}
             <a href="{{ link.url }}">{{ link.title }}</a>
           {%- endfor -%}
         </div>
-        <a class="morph-links__all" href="{{ first_panel.settings.all_link | default: routes.all_products_collection_url }}" data-mega-all>{{ first_panel.settings.all_label | default: 'View all →' }}</a>
+        <a class="morph-links__all" href="{{ first_href }}" data-mega-all>{{ first_all }}</a>
       </div>
       <div class="morph-products">
         {%- liquid
-          assign mega_source = first_panel.settings.products_collection
           if mega_source == blank or mega_source.products_count == 0
             assign mega_source = collections[settings.new_collection]
           endif
@@ -109,10 +179,10 @@
           </a>
         {%- endfor -%}
       </div>
-      <a class="morph-editorial" href="{{ first_panel.settings.editorial_link | default: routes.all_products_collection_url }}" data-mega-editorial>
-        <span class="morph-editorial__label" data-mega-editorial-label>{{ first_panel.settings.editorial_label | default: 'Editorial' }}</span>
-        <span class="morph-editorial__title" data-mega-editorial-title>{{ first_panel.settings.editorial_title | default: first_panel.settings.title }}</span>
-        <span class="morph-editorial__cta" data-mega-editorial-cta>{{ first_panel.settings.editorial_cta | default: 'Explore →' }}</span>
+      <a class="morph-editorial" href="{{ first_block.settings.editorial_link | default: first_href }}" data-mega-editorial>
+        <span class="morph-editorial__label" data-mega-editorial-label>{{ first_block.settings.editorial_label | default: 'Editorial' }}</span>
+        <span class="morph-editorial__title" data-mega-editorial-title>{{ first_block.settings.editorial_title | default: first_title }}</span>
+        <span class="morph-editorial__cta" data-mega-editorial-cta>{{ first_block.settings.editorial_cta | default: 'Explore →' }}</span>
       </a>
     </div>
   </div>
@@ -128,8 +198,9 @@
       <input type="hidden" name="type" value="product">
     </form>
     <nav class="mobile-nav__links" aria-label="Mobile primary">
-      {%- for block in panel_blocks -%}
-        <a href="{{ block.settings.all_link | default: routes.all_products_collection_url }}"{% if block.settings.directory != 'none' %} data-mobile-dir="{{ block.settings.directory }}"{% endif %}>{{ block.settings.title }}</a>
+      {%- for link in nav_menu.links -%}
+        {%- assign key = link.title | handleize -%}
+        <a href="{{ link.url }}"{% if panel_key_list contains key %} data-mobile-dir="{{ key }}"{% endif %}>{{ link.title }}</a>
       {%- endfor -%}
       {%- for link in section.settings.mobile_extra_menu.links -%}
         <a href="{{ link.url }}">{{ link.title }}</a>
@@ -156,29 +227,72 @@
 {%- comment %} Mega menu data for main.js {% endcomment -%}
 <script>
   window.AugustMegaPanels = {
-    {%- for block in panel_blocks -%}
-      {{ block.id | json }}: {
-        label: {{ block.settings.title | json }},
-        all: {{ block.settings.all_label | default: 'View all →' | json }},
-        href: {{ block.settings.all_link | default: routes.all_products_collection_url | json }},
-        directory: {{ block.settings.directory | json }},
-        links: [
-          {%- for link in block.settings.menu.links -%}
-            { label: {{ link.title | json }}, href: {{ link.url | json }} }{% unless forloop.last %},{% endunless %}
-          {%- endfor -%}
-        ],
-        editorial: {
-          label: {{ block.settings.editorial_label | json }},
-          title: {{ block.settings.editorial_title | default: block.settings.title | json }},
-          cta: {{ block.settings.editorial_cta | json }},
-          href: {{ block.settings.editorial_link | default: block.settings.all_link | default: routes.all_products_collection_url | json }}
-        },
-        products: [
-          {%- for product in block.settings.products_collection.products limit: 4 -%}
-            {%- render 'product-json', product: product -%}{% unless forloop.last %},{% endunless %}
-          {%- endfor -%}
-        ]
-      }{% unless forloop.last %},{% endunless %}
+    {%- assign emitted = 0 -%}
+    {%- for link in nav_menu.links -%}
+      {%- assign key = link.title | handleize -%}
+      {%- if panel_key_list contains key -%}
+        {%- liquid
+          assign ov = nil
+          for block in panel_blocks
+            assign block_key = block.settings.title | handleize
+            if block_key == key
+              assign ov = block
+            endif
+          endfor
+          assign all_label = ov.settings.all_label
+          if all_label == blank
+            assign lowered = link.title | downcase
+            assign all_label = 'Shop all ' | append: lowered | append: ' →'
+          endif
+          assign all_href = ov.settings.all_link | default: link.url | default: routes.all_products_collection_url
+          assign panel_links = ov.settings.menu.links | default: link.links
+          assign has_columns = false
+          for child in link.links
+            if child.links.size > 0
+              assign has_columns = true
+            endif
+          endfor
+          assign tiles = ov.settings.products_collection
+          if tiles == blank and link.type == 'collection_link'
+            assign tiles = link.object
+          endif
+        -%}
+        {%- if emitted > 0 %},{% endif -%}
+        {%- assign emitted = emitted | plus: 1 -%}
+        {{ key | json }}: {
+          label: {{ link.title | json }},
+          all: {{ all_label | json }},
+          href: {{ all_href | json }},
+          directory: {{ ov.settings.directory | default: 'none' | json }},
+          links: [
+            {%- for child in panel_links -%}
+              { label: {{ child.title | json }}, href: {{ child.url | json }} }{% unless forloop.last %},{% endunless %}
+            {%- endfor -%}
+          ],
+          columns: [
+            {%- if has_columns -%}
+              {%- for child in link.links -%}
+                { head: {{ child.title | json }}, href: {{ child.url | json }}, items: [
+                  {%- for grandchild in child.links -%}
+                    { label: {{ grandchild.title | json }}, href: {{ grandchild.url | json }} }{% unless forloop.last %},{% endunless %}
+                  {%- endfor -%}
+                ] }{% unless forloop.last %},{% endunless %}
+              {%- endfor -%}
+            {%- endif -%}
+          ],
+          editorial: {
+            label: {{ ov.settings.editorial_label | default: 'Editorial' | json }},
+            title: {{ ov.settings.editorial_title | default: link.title | json }},
+            cta: {{ ov.settings.editorial_cta | default: 'Explore →' | json }},
+            href: {{ ov.settings.editorial_link | default: all_href | json }}
+          },
+          products: [
+            {%- for product in tiles.products limit: 4 -%}
+              {%- render 'product-json', product: product -%}{% unless forloop.last %},{% endunless %}
+            {%- endfor -%}
+          ]
+        }
+      {%- endif -%}
     {%- endfor -%}
   };
 </script>
@@ -209,6 +323,13 @@
     },
     {
       "type": "link_list",
+      "id": "menu",
+      "label": "Navigation menu",
+      "default": "main-menu",
+      "info": "Nested menu: items with sub-links open the mega menu; sub-sub-links become a directory grid (Brands, Categories)."
+    },
+    {
+      "type": "link_list",
       "id": "mobile_extra_menu",
       "label": "Extra mobile links",
       "info": "Shown under the main items in the mobile menu (e.g. August Inn, Events)."
@@ -221,23 +342,24 @@
   "blocks": [
     {
       "type": "mega_panel",
-      "name": "Menu item",
-      "limit": 6,
+      "name": "Menu item extras",
+      "limit": 8,
       "settings": [
-        { "type": "text", "id": "title", "label": "Label", "default": "New arrivals" },
+        { "type": "paragraph", "content": "Adds product tiles, an editorial card or a “view all” link to one item of the navigation menu. Links themselves live in Online Store → Navigation." },
+        { "type": "text", "id": "title", "label": "Menu item label (must match)", "default": "New Arrivals" },
         {
           "type": "select",
           "id": "directory",
           "label": "Panel content",
           "default": "none",
           "options": [
-            { "value": "none", "label": "Links from a menu" },
+            { "value": "none", "label": "Sub-links from the navigation menu" },
             { "value": "brands", "label": "Brand directory (all vendors, A–Z)" },
-            { "value": "categories", "label": "Category directory" }
+            { "value": "categories", "label": "Category directory (from product tags)" }
           ]
         },
-        { "type": "link_list", "id": "menu", "label": "Links", "info": "Used when Panel content is “Links from a menu”." },
-        { "type": "text", "id": "all_label", "label": "“View all” label", "default": "Shop all →" },
+        { "type": "link_list", "id": "menu", "label": "Replace sub-links with this menu" },
+        { "type": "text", "id": "all_label", "label": "“View all” label" },
         { "type": "url", "id": "all_link", "label": "“View all” link" },
         { "type": "header", "content": "Product tiles" },
         { "type": "collection", "id": "products_collection", "label": "Collection for the four tiles" },
@@ -261,12 +383,10 @@
     }
   ],
   "default": {
+    "settings": { "menu": "main-menu" },
     "blocks": [
-      { "type": "mega_panel", "settings": { "title": "New arrivals", "directory": "none", "all_label": "Shop all new arrivals →", "editorial_title": "New\narrivals" } },
-      { "type": "mega_panel", "settings": { "title": "Brands", "directory": "brands", "all_label": "View all brands →" } },
-      { "type": "mega_panel", "settings": { "title": "Categories", "directory": "categories", "all_label": "Shop all categories →" } },
-      { "type": "mega_panel", "settings": { "title": "Shop by color", "directory": "none", "all_label": "Browse all colors →" } },
-      { "type": "mega_panel", "settings": { "title": "Sale", "directory": "none", "all_label": "Shop all sale →", "editorial_title": "Sale" } },
+      { "type": "mega_panel", "settings": { "title": "New Arrivals", "editorial_title": "New\narrivals" } },
+      { "type": "mega_panel", "settings": { "title": "Sale", "editorial_title": "Sale" } },
       { "type": "promo", "settings": { "label": "New arrivals" } },
       { "type": "promo", "settings": { "label": "Sale" } }
     ]

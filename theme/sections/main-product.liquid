@@ -14,6 +14,36 @@
   if short == blank
     assign short = product.description | strip_html | truncate: 180
   endif
+  assign cutline = product.metafields.theme.cutline.value
+  assign preorder = false
+  if product.metafields.theme.preorder.value == true
+    assign preorder = true
+  endif
+  assign atb_label = s.atb_label
+  if preorder
+    assign atb_label = s.preorder_label | default: 'Pre-order'
+  endif
+  comment
+    Colorways: the live theme stores a collection handle in theme.siblings
+    whose products are the other colors of this style. Each sibling's
+    theme.cutline is its color name.
+  endcomment
+  assign siblings = blank
+  assign sibs_handle = product.metafields.theme.siblings.value
+  if sibs_handle != blank and s.show_siblings
+    assign siblings = collections[sibs_handle].products
+    if siblings.size < 2
+      assign siblings = blank
+    endif
+  endif
+  assign add_cutline_property = false
+  if cutline != blank and sibs_handle != blank
+    assign title_down = product.title | downcase
+    assign cutline_down = cutline | downcase
+    unless title_down contains cutline_down
+      assign add_cutline_property = true
+    endunless
+  endif
   assign related = blank
   if s.related_collection != blank
     assign related = collections[s.related_collection].products
@@ -61,11 +91,33 @@
     <div class="glass-panel buy-box">
       <div class="buy-box__brand">{{ product.vendor }}</div>
       <h1 class="buy-box__title">{{ product.title }}</h1>
+      {%- if cutline != blank -%}<div class="buy-box__cutline">{{ cutline }}</div>{%- endif -%}
       <div class="buy-box__price" data-pdp-price>
         {%- if variant.compare_at_price > variant.price -%}<span class="price-was">{{ variant.compare_at_price | money }}</span> {% endif -%}
         {{- variant.price | money -}}
       </div>
       {%- if short != blank -%}<p class="buy-box__desc">{{ short }}</p>{%- endif -%}
+
+      {%- if siblings != blank -%}
+        <div class="buy-box__siblings" data-pdp-siblings>
+          <div class="buy-box__label">{{ s.siblings_label }}{% if cutline != blank %} <span>{{ cutline }}</span>{% endif %}</div>
+          <div class="sibling-row">
+            {%- for sib in siblings limit: 24 -%}
+              {%- assign sib_name = sib.metafields.theme.cutline.value | default: sib.title -%}
+              <a
+                class="sibling{% if sib.handle == product.handle %} is-current{% endif %}{% unless sib.available %} is-soldout{% endunless %}"
+                href="{{ sib.url }}"
+                title="{{ sib_name | escape }}"
+                {% if sib.handle == product.handle %}aria-current="page"{% endif %}
+              >
+                {%- if sib.featured_image -%}
+                  <img src="{{ sib.featured_image | image_url: width: 88 }}" srcset="{{ sib.featured_image | image_url: width: 88 }} 1x, {{ sib.featured_image | image_url: width: 176 }} 2x" alt="{{ sib_name | escape }}" loading="lazy" width="44" height="44">
+                {%- endif -%}
+              </a>
+            {%- endfor -%}
+          </div>
+        </div>
+      {%- endif -%}
 
       {%- form 'product', product, class: 'buy-box__form', data-pdp-form: '' -%}
         {%- if has_options -%}
@@ -82,15 +134,20 @@
         {%- endif -%}
         <input type="hidden" name="id" value="{{ variant.id }}" data-pdp-variant>
         <input type="hidden" name="quantity" value="1">
-        <button type="submit" class="btn btn--primary btn--block" data-sheet-open="atb-sheet" data-pdp-atb data-label="{{ s.atb_label | escape }}" data-soldout="{{ s.soldout_label | escape }}"{% unless variant.available %} disabled{% endunless %}>
-          {%- if variant.available -%}{{ s.atb_label }} — {{ variant.price | money }}{%- else -%}{{ s.soldout_label }}{%- endif -%}
+        {%- comment -%} Same line-item properties the live theme writes, so orders look identical in admin. {%- endcomment -%}
+        {%- if preorder -%}<input type="hidden" name="properties[Sale type]" value="Pre-order">{%- endif -%}
+        {%- if add_cutline_property -%}<input type="hidden" name="properties[Color]" value="{{ cutline | escape }}">{%- endif -%}
+        <button type="submit" class="btn btn--primary btn--block" data-sheet-open="atb-sheet" data-pdp-atb data-label="{{ atb_label | escape }}" data-soldout="{{ s.soldout_label | escape }}"{% if preorder %} data-preorder="true"{% endif %}{% unless variant.available %} disabled{% endunless %}>
+          {%- if variant.available -%}{{ atb_label }} — {{ variant.price | money }}{%- else -%}{{ s.soldout_label }}{%- endif -%}
         </button>
       {%- endform -%}
 
       {%- if s.note != blank -%}<p class="buy-box__note">{{ s.note }}</p>{%- endif -%}
 
       {%- for block in section.blocks -%}
-        {%- if block.type == 'ask_ai' -%}
+        {%- if block.type == '@app' -%}
+          <div class="buy-box__app" {{ block.shopify_attributes }}>{% render block %}</div>
+        {%- elsif block.type == 'ask_ai' -%}
           <div class="ask-ai" {{ block.shopify_attributes }}>
             <input class="ask-ai__input" type="text" value="{{ block.settings.placeholder | escape }}" readonly />
             <div class="ask-ai__chips">
@@ -196,6 +253,10 @@
     { "type": "range", "id": "thumb_count", "label": "Thumbnails", "min": 2, "max": 8, "step": 1, "default": 5 },
     { "type": "text", "id": "atb_label", "label": "Add to bag label", "default": "Add to bag" },
     { "type": "text", "id": "soldout_label", "label": "Sold out label", "default": "Sold out" },
+    { "type": "text", "id": "preorder_label", "label": "Pre-order label", "default": "Pre-order", "info": "Shown when the product's theme.preorder metafield is true (same flag the live theme uses)." },
+    { "type": "header", "content": "Colorways", "info": "Reads theme.siblings (a collection handle) and theme.cutline (color name) — the live store's metafields." },
+    { "type": "checkbox", "id": "show_siblings", "label": "Show colorway swatches", "default": true },
+    { "type": "text", "id": "siblings_label", "label": "Colorway label", "default": "Color" },
     { "type": "text", "id": "note", "label": "Note under button", "default": "Free local pickup in Madison  ·  Ships nationwide" },
     { "type": "header", "content": "More from August" },
     { "type": "checkbox", "id": "show_related", "label": "Show related products", "default": true },
@@ -208,6 +269,7 @@
     { "type": "text", "id": "atb_view_bag", "label": "View bag button", "default": "View bag" }
   ],
   "blocks": [
+    { "type": "@app" },
     {
       "type": "ask_ai",
       "name": "Ask anything",

@@ -33,10 +33,13 @@
   assign card_index = 0
 -%}
 
-{%- comment %} Client catalog = the Everything collection (feed, swipe, mega menu) {% endcomment -%}
-{%- paginate everything.products by 250 -%}
-  {% render 'catalog-json', products: everything.products, limit: 250 %}
-{%- endpaginate -%}
+{%- comment %}
+  Client catalog = the Everything collection (feed, swipe, mega menu).
+  36 full records is plenty for the home feed; the old 250-product paginate
+  rendered ~250 heavy product-json snippets per request and could push the
+  home page past Liquid's render limits (blank/404-looking home in the editor).
+{% endcomment -%}
+{% render 'catalog-json', products: everything.products, limit: 36 %}
 
 <div class="card-stack" id="main" data-card-stack data-section-id="{{ section.id }}">
 

@@ -301,14 +301,27 @@ a.account-head__settings {
   }
 }
 
-/* Theme editor: keep section wrappers from breaking the card stack */
+/* Section wrappers.
+   Shopify wraps every section in <div id="shopify-section-…">. The chrome
+   sections (header, footer, tab bar) and the home card stack position their
+   content absolutely against the .page stage, so their wrappers cover the
+   stage too: same containing block as the prototype, and — unlike
+   display:contents — a real box the theme editor can outline and scroll to.
+   No z-index, so .page-scroll (z 1) and the chrome (z 40) paint above the
+   wrappers and clicks never land on them. */
 .shopify-section-home,
 .shopify-section-header,
 .shopify-section-footer,
-.shopify-section-tabbar,
+.shopify-section-tabbar {
+  position: absolute;
+  inset: 0;
+}
+
+/* Content sections live inside .page-scroll and flow normally. */
 .shopify-section-plp,
 .shopify-section-pdp,
 .shopify-section-cart,
-.shopify-section-story {
-  display: contents;
+.shopify-section-story,
+.shopify-section-apps {
+  display: block;
 }

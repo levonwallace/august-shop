@@ -5,13 +5,16 @@
   collection on a PLP, search hits on /search, product + related on a PDP.
 
   Usage: {% render 'catalog-json', products: collection.products, limit: 250 %}
+         {% render 'catalog-json', products: everything.products, limit: 24, lite: true %}
+  `lite: true` emits product-json-lite (no tags/variants/metafields) — use it
+  for the site-wide floor and anything that repeats on every page.
 {% endcomment %}
 {%- assign cap = limit | default: 250 -%}
 <script>
   window.AugustBootstrap = window.AugustBootstrap || { products: [] };
   window.AugustBootstrap.products = (window.AugustBootstrap.products || []).concat([
     {%- for product in products limit: cap -%}
-      {%- render 'product-json', product: product -%}{%- unless forloop.last -%},{%- endunless -%}
+      {%- if lite -%}{%- render 'product-json-lite', product: product -%}{%- else -%}{%- render 'product-json', product: product -%}{%- endif -%}{%- unless forloop.last -%},{%- endunless -%}
     {%- endfor -%}
   ]);
 </script>

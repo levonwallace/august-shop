@@ -1,0 +1,16 @@
+{% comment %}
+  Display label for a navigation link — mirrors js/main.js navLabel():
+  ALL-CAPS menu titles from Online Store → Navigation ("SHOP BY COLOR",
+  "AUGUST INN") become sentence case; mixed-case titles are left alone.
+
+  Usage: {% render 'nav-label', title: link.title %}
+{% endcomment %}
+{%- liquid
+  assign upper = title | upcase
+  assign letters = title | remove: ' ' | remove: '&' | remove: '-'
+  if title == upper and letters.size > 2
+    echo title | downcase | capitalize
+  else
+    echo title
+  endif
+-%}

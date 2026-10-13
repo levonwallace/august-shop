@@ -1,0 +1,39 @@
+{% comment %}
+  Lightweight product → JSON for the mega-menu tiles and the site-wide
+  catalog floor. Same keys js/catalog.js reads for cards (id, handle, url,
+  title, brand, price, compare, sale, img, available, cat) but none of the
+  tag loops / variant arrays / metafield lookups of product-json, so a page
+  can carry ~100 of these without approaching Liquid's render limits.
+
+  Usage: {% render 'product-json-lite', product: product %}
+{% endcomment %}
+{%- liquid
+  assign sale = false
+  if product.compare_at_price > product.price
+    assign sale = true
+  endif
+  assign type_down = product.type | downcase
+  assign cat = 'apparel'
+  if type_down contains 'shoe' or type_down contains 'sneaker' or type_down contains 'boot' or type_down contains 'sandal' or type_down contains 'footwear'
+    assign cat = 'shoes'
+  elsif type_down contains 'hat' or type_down contains 'cap' or type_down contains 'bag' or type_down contains 'sock' or type_down contains 'wallet' or type_down contains 'accessor' or type_down contains 'beanie'
+    assign cat = 'accessories'
+  elsif type_down contains 'candle' or type_down contains 'incense' or type_down contains 'ceramic' or type_down contains 'book' or type_down contains 'vinyl' or type_down contains 'object'
+    assign cat = 'objects'
+  endif
+-%}
+{
+  "id": {{ product.id | json }},
+  "variantId": {{ product.selected_or_first_available_variant.id | json }},
+  "handle": {{ product.handle | json }},
+  "url": {{ product.url | json }},
+  "title": {{ product.title | json }},
+  "brand": {{ product.vendor | json }},
+  "cat": {{ cat | json }},
+  "sale": {{ sale }},
+  "available": {{ product.available }},
+  "price": {{ product.price | divided_by: 100.0 }},
+  "compare": {% if sale %}{{ product.compare_at_price | divided_by: 100.0 }}{% else %}null{% endif %},
+  "img": {% if product.featured_image %}{{ product.featured_image | image_url: width: 600 | json }}{% else %}""{% endif %},
+  "lite": true
+}

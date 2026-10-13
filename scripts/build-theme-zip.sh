@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # Build an uploadable Shopify theme zip from /theme.
 #
-#   npm run theme:zip            → dist/august-2.0-theme.zip
+#   npm run theme:zip            → dist/august-2.1-liquid-theme.zip
 #   npm run theme:zip -- ~/Desktop/out.zip
 #
 # Shopify rejects zips whose top level is a folder ("missing template
@@ -9,7 +9,7 @@
 # the macOS resource forks Finder adds.
 set -euo pipefail
 root="$(cd "$(dirname "$0")/.." && pwd)"
-out="${1:-$root/dist/august-2.0-theme.zip}"
+out="${1:-$root/dist/august-2.1-liquid-theme.zip}"
 
 bash "$root/scripts/sync-theme-assets.sh" >/dev/null
 

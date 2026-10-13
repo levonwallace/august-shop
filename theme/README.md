@@ -22,16 +22,41 @@ draft and share the preview link.
 
 ```bash
 npm run theme:check   # shopify theme check --path theme
-npm run theme:zip     # sync assets, check, write dist/august-2.0-theme.zip
+npm run theme:zip     # sync assets, check, write dist/august-2.1-liquid-theme.zip
 ```
 
 Shopify admin → Online Store → Themes → **Add theme → Upload zip file** →
-pick `dist/august-2.0-theme.zip`. It lands as an unpublished theme. Use
+pick `dist/august-2.1-liquid-theme.zip`. It lands as an unpublished theme. Use
 **Customize** to edit, **Preview** for the share link.
 
 The zip is built from the *contents* of this folder so `layout/theme.liquid`
 sits at the zip root. Zipping the folder in Finder adds a wrapper directory
 and Shopify rejects it (`missing template 'layout/theme.liquid'`).
+
+## Render budget (why pages stayed blank / 404-looking in the editor)
+
+Every product the page mentions is rendered twice — once as markup, once
+as catalog JSON for the prototype JS — and Liquid stops rendering (the
+footer group vanishes from the editor sidebar) when a page asks for too
+much. Keep to this budget:
+
+- `snippets/product-json-lite` for anything that repeats on every page:
+  the mega-menu tiles (12 per panel) and the site-wide floor in
+  `layout/theme.liquid` (24 products).
+- `snippets/product-json` (full: tags, variants, metafields) only where
+  the filters need it: the PLP / search (`per_page`, default 48) and the
+  home feed (36).
+- Never `paginate … by 250` a collection just to serialise it.
+
+## Theme editor
+
+- Non-home templates render inside `.page-scroll` (`layout/theme.liquid`);
+  the home card stack scrolls itself.
+- Section wrappers for header / footer / tab bar / home cover the `.page`
+  stage (`theme-live.css`) so the editor can outline and scroll to them.
+- In design mode a re-rendered chrome or home section reloads the preview
+  (the prototype JS boots once); selecting a home card block jumps the
+  stack to that card.
 
 ## Pre-loaded content
 

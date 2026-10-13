@@ -73,7 +73,10 @@
       endfor
     endif
   endfor
-  assign first_title = first_link.title
+  capture first_title
+    render 'nav-label', title: first_link.title
+  endcapture
+  assign first_title = first_title | strip
   assign first_href = first_block.settings.all_link | default: first_link.url | default: routes.all_products_collection_url
   assign first_all = first_block.settings.all_label
   if first_all == blank
@@ -104,9 +107,9 @@
         {%- for link in nav_menu.links -%}
           {%- assign key = link.title | handleize -%}
           {%- if panel_key_list contains key -%}
-            <button type="button" aria-expanded="false" data-mega-trigger="{{ key }}">{{ link.title }}</button>
+            <button type="button" aria-expanded="false" data-mega-trigger="{{ key }}">{% render 'nav-label', title: link.title %}</button>
           {%- else -%}
-            <a href="{{ link.url }}"{% if link.active %} class="is-active"{% endif %}>{{ link.title }}</a>
+            <a href="{{ link.url }}"{% if link.active %} class="is-active"{% endif %}>{% render 'nav-label', title: link.title %}</a>
           {%- endif -%}
         {%- endfor -%}
       </nav>
@@ -140,7 +143,7 @@
           {%- for link in nav_menu.links -%}
             {%- assign key = link.title | handleize -%}
             {%- if panel_key_list contains key -%}
-              <button type="button" aria-expanded="false" data-mega-trigger="{{ key }}">{{ link.title }}</button>
+              <button type="button" aria-expanded="false" data-mega-trigger="{{ key }}">{% render 'nav-label', title: link.title %}</button>
             {%- endif -%}
           {%- endfor -%}
         </nav>
@@ -205,10 +208,10 @@
     <nav class="mobile-nav__links" aria-label="Mobile primary">
       {%- for link in nav_menu.links -%}
         {%- assign key = link.title | handleize -%}
-        <a href="{{ link.url }}"{% if panel_key_list contains key %} data-mobile-dir="{{ key }}"{% endif %}>{{ link.title }}</a>
+        <a href="{{ link.url }}"{% if panel_key_list contains key %} data-mobile-dir="{{ key }}"{% endif %}>{% render 'nav-label', title: link.title %}</a>
       {%- endfor -%}
       {%- for link in section.settings.mobile_extra_menu.links -%}
-        <a href="{{ link.url }}">{{ link.title }}</a>
+        <a href="{{ link.url }}">{% render 'nav-label', title: link.title %}</a>
       {%- endfor -%}
       <a href="{{ routes.cart_url }}">Bag</a>
     </nav>
@@ -244,9 +247,13 @@
               assign ov = block
             endif
           endfor
+          capture nav_label
+            render 'nav-label', title: link.title
+          endcapture
+          assign nav_label = nav_label | strip
           assign all_label = ov.settings.all_label
           if all_label == blank
-            assign lowered = link.title | downcase
+            assign lowered = nav_label | downcase
             assign all_label = 'Shop all ' | append: lowered | append: ' →'
           endif
           assign all_href = ov.settings.all_link | default: link.url | default: routes.all_products_collection_url
@@ -265,7 +272,7 @@
         {%- if emitted > 0 %},{% endif -%}
         {%- assign emitted = emitted | plus: 1 -%}
         {{ key | json }}: {
-          label: {{ link.title | json }},
+          label: {{ nav_label | json }},
           all: {{ all_label | json }},
           href: {{ all_href | json }},
           directory: {{ ov.settings.directory | default: 'none' | json }},
@@ -287,13 +294,13 @@
           ],
           editorial: {
             label: {{ ov.settings.editorial_label | default: 'Editorial' | json }},
-            title: {{ ov.settings.editorial_title | default: link.title | json }},
+            title: {{ ov.settings.editorial_title | default: nav_label | json }},
             cta: {{ ov.settings.editorial_cta | default: 'Explore →' | json }},
             href: {{ ov.settings.editorial_link | default: all_href | json }}
           },
           products: [
             {%- for product in tiles.products limit: 12 -%}
-              {%- render 'product-json', product: product -%}{% unless forloop.last %},{% endunless %}
+              {%- render 'product-json-lite', product: product -%}{% unless forloop.last %},{% endunless %}
             {%- endfor -%}
           ]
         }

@@ -206,12 +206,14 @@
     </script>
 
     {%- comment %}
-      Site-wide catalog floor: the Everything collection (first 50) so the
-      mega menu, search recents, related products and swipe lookups always
-      have real products. Home / PLP / search / PDP sections append more.
+      Site-wide catalog floor: the Everything collection (first 24, lite
+      JSON) so the mega menu, search recents, related products and swipe
+      lookups always have real products. Home / PLP / search / PDP sections
+      append their own, richer product JSON. Kept light on purpose — this
+      runs on every page alongside the header's panel tiles.
     {% endcomment -%}
     {%- unless request.page_type == 'index' or request.page_type == 'collection' or request.page_type == 'search' -%}
-      {% render 'catalog-json', products: everything.products, limit: 50 %}
+      {% render 'catalog-json', products: everything.products, limit: 24, lite: true %}
     {%- endunless -%}
     {%- if settings.aux_blog != blank and blogs[settings.aux_blog].handle != blank -%}
       {% render 'aux-json', kind: 'mixes', blog: blogs[settings.aux_blog], articles: blogs[settings.aux_blog].articles %}
@@ -223,10 +225,41 @@
     <div class="page page--{{ page_class }}">
       {% sections 'header-group' %}
 
-      {{ content_for_layout }}
+      {%- comment %}
+        Every prototype page except the home card stack scrolls inside
+        .page-scroll (the .page stage is a fixed-height, overflow-hidden
+        viewport so the glass chrome can float over it). The card stack
+        owns its own scrolling, so the home template renders bare.
+      {% endcomment -%}
+      {%- if request.page_type == 'index' -%}
+        {{ content_for_layout }}
+      {%- else -%}
+        <div class="page-scroll">
+          {{ content_for_layout }}
+        </div>
+      {%- endif -%}
 
       {% sections 'footer-group' %}
     </div>
+
+    {%- if request.design_mode -%}
+      <script>
+        /* Theme editor: the prototype JS boots once on DOMContentLoaded, so a
+           re-rendered section (settings change) reloads the preview to re-bind;
+           selecting a home card block jumps the card stack to that card. */
+        document.addEventListener("shopify:section:load", function (e) {
+          if (e.target && e.target.querySelector("[data-card-stack], .site-header, .site-footer, .tabbar")) {
+            window.location.reload();
+          }
+        });
+        document.addEventListener("shopify:block:select", function (e) {
+          var card = e.target && e.target.closest ? e.target.closest("[data-card]") : null;
+          if (!card) return;
+          var dot = document.querySelector('[data-dot="' + card.getAttribute("data-card") + '"]');
+          if (dot) dot.click();
+        });
+      </script>
+    {%- endif -%}
 
     {%- comment %}
       Same order as the prototype HTML. `defer` keeps that order and still

@@ -17,6 +17,9 @@ import urllib.parse
 import urllib.request
 from http.server import SimpleHTTPRequestHandler, ThreadingHTTPServer
 
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+import storefront  # noqa: E402  (reads .env; optional)
+
 
 SHOP = "https://august-shop.com"
 UA = "AugustPrototype/1.0 (local search proxy)"
@@ -25,6 +28,8 @@ CACHE_LOCK = threading.Lock()
 PRODUCTS = []
 PRODUCTS_BY_HANDLE = {}
 CACHE_READY = False
+CACHE_EVENT = threading.Event()
+LIVE_CATALOG = []
 
 
 def shop_get(path_qs, timeout=12):
@@ -282,8 +287,33 @@ def merge_results(primary, extra, limit):
     return out
 
 
+def refresh_from_storefront():
+    """Real catalog + availability via the Storefront API (.env)."""
+    global CACHE_READY
+    try:
+        collected = storefront.products()
+    except storefront.StorefrontError as exc:
+        sys.stderr.write("storefront catalog failed (%s) — falling back to products.json\n" % exc)
+        return False
+    by_handle = {p["handle"]: p for p in collected}
+    live = [p for p in collected if p.get("available")][: storefront.PROTOTYPE_LIMIT]
+    with CACHE_LOCK:
+        PRODUCTS[:] = collected
+        PRODUCTS_BY_HANDLE.clear()
+        PRODUCTS_BY_HANDLE.update(by_handle)
+        LIVE_CATALOG[:] = live
+        CACHE_READY = True
+    CACHE_EVENT.set()
+    sys.stderr.write(
+        "storefront: cached %s products, prototype catalog = %s newest in stock\n" % (len(collected), len(live))
+    )
+    return True
+
+
 def refresh_catalog():
     global CACHE_READY
+    if storefront.configured() and refresh_from_storefront():
+        return
     page = 1
     collected = []
     while page <= 10:
@@ -304,6 +334,7 @@ def refresh_catalog():
         PRODUCTS_BY_HANDLE.clear()
         PRODUCTS_BY_HANDLE.update(by_handle)
         CACHE_READY = True
+    CACHE_EVENT.set()
     sys.stderr.write("cached %s products from august-shop.com\n" % len(collected))
 
 
@@ -326,8 +357,30 @@ class NoCacheHandler(SimpleHTTPRequestHandler):
         self.end_headers()
         self.wfile.write(body)
 
+    def _js(self, source):
+        body = source.encode("utf-8")
+        self.send_response(200)
+        self.send_header("Content-Type", "application/javascript; charset=utf-8")
+        self.send_header("Content-Length", str(len(body)))
+        self.end_headers()
+        self.wfile.write(body)
+
     def do_GET(self):
         parsed = urllib.parse.urlparse(self.path)
+        if parsed.path == "/api/catalog.js":
+            # Loaded before js/catalog.js: swaps the sample catalog for the
+            # real shop when the Storefront API is configured.
+            if not storefront.configured():
+                self._js("/* Storefront API not configured (.env) — using the sample catalog */\n")
+                return
+            CACHE_EVENT.wait(timeout=20)
+            with CACHE_LOCK:
+                live = list(LIVE_CATALOG)
+            if not live:
+                self._js("/* Storefront catalog not ready — using the sample catalog */\n")
+                return
+            self._js("window.AugustLiveCatalog = %s;\n" % json.dumps(live, ensure_ascii=False))
+            return
         if parsed.path == "/api/search":
             qs = urllib.parse.parse_qs(parsed.query)
             q = (qs.get("q") or [""])[0].strip()
@@ -386,6 +439,14 @@ class NoCacheHandler(SimpleHTTPRequestHandler):
             if not handle or not re.match(r"^[a-z0-9-]+$", handle):
                 self._json({"error": "bad handle"}, 400)
                 return
+            if storefront.configured():
+                try:
+                    found = storefront.product(handle)
+                    if found:
+                        self._json({"product": found})
+                        return
+                except storefront.StorefrontError as exc:
+                    sys.stderr.write("storefront product failed: %s\n" % exc)
             try:
                 raw = shop_get("/products/%s.js" % urllib.parse.quote(handle))
                 self._json({"product": normalize_ajax(raw)})
@@ -412,5 +473,9 @@ if __name__ == "__main__":
     threading.Thread(target=refresh_catalog, daemon=True).start()
     server = ThreadingHTTPServer(("", port), NoCacheHandler)
     print(f"Serving with no-store caching on :{port}")
-    print("Shopify proxy: /api/search?q=  /api/product?handle=")
+    print("Shopify proxy: /api/search?q=  /api/product?handle=  /api/catalog.js")
+    if storefront.configured():
+        print("Storefront API: %s (API %s) — prototype uses the live catalog" % (storefront.DOMAIN, storefront.VERSION))
+    else:
+        print("Storefront API: not configured (.env) — prototype uses the sample catalog")
     server.serve_forever()

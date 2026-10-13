@@ -10,7 +10,9 @@
     "theme:sync": "bash ./scripts/sync-theme-assets.sh",
     "theme:push": "npm run theme:sync && shopify theme push --unpublished --path theme",
     "theme:zip": "bash ./scripts/build-theme-zip.sh",
-    "theme:check": "shopify theme check --path theme"
+    "theme:check": "shopify theme check --path theme",
+    "shopify:check": "python3 scripts/storefront.py check",
+    "shopify:pull": "python3 scripts/storefront.py pull"
   },
   "dependencies": {
     "serve": "^14.2.4"

@@ -11,3 +11,12 @@ theme/assets/*.woff2
 
 # Built theme zips
 dist/
+
+# Local secrets (Shopify Storefront / Admin tokens)
+.env
+.env.*
+!.env.example
+
+# Storefront API snapshots (npm run shopify:pull)
+data/
+__pycache__/

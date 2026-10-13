@@ -17,6 +17,19 @@ npm run dev
 Starts a static server on `http://localhost:5173` and opens the browser.
 Ctrl+C to stop. Uses only Python 3 (macOS default) — no Node deps required.
 
+### Live shop data (Storefront API)
+
+Copy `.env.example` to `.env` and fill in the store domain and a Headless
+Storefront token. The dev server then swaps the sample catalog for the
+newest in-stock products from the real shop (`/api/catalog.js`), and PDP /
+search lookups read live availability. Without `.env` it falls back to the
+sample catalog and the public `products.json` proxy.
+
+```bash
+npm run shopify:check   # token access + every handle the theme references exists
+npm run shopify:pull    # snapshot collections, blogs, menus, products → data/
+```
+
 To view mobile pixels in Chrome/Safari DevTools, toggle the device toolbar
 and pick **iPhone 15 Pro**. The layout is mobile-first from `≤900px` down.
 

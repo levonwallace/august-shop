@@ -872,14 +872,22 @@ window.AugustCatalog = (() => {
      When that exists the sample above is ignored entirely. */
   const BOOT = window.AugustBootstrap || null;
   const LIVE = !!(BOOT && BOOT.live);
+  /* Prototype on the dev server: /api/catalog.js sets AugustLiveCatalog
+     from the Storefront API (.env), so the demo shows the real shop. */
+  const DEV_LIVE = window.AugustLiveCatalog;
+  const FROM_API = !LIVE && Array.isArray(DEV_LIVE) && DEV_LIVE.length > 0;
   const SOURCE =
-    LIVE && Array.isArray(BOOT.products) && BOOT.products.length ? BOOT.products : PRODUCTS;
+    LIVE && Array.isArray(BOOT.products) && BOOT.products.length
+      ? BOOT.products
+      : FROM_API
+        ? DEV_LIVE
+        : PRODUCTS;
 
   /* Colorway duplicates share a title — collapse them so each PDP is a
      distinct product. Shopify products are already unique by id. */
   const seenKeys = new Set();
   const UNIQUE = SOURCE.filter((p) => {
-    const key = LIVE ? String(p.id || p.handle || p.title) : p.title.toLowerCase();
+    const key = LIVE || FROM_API ? String(p.id || p.handle || p.title) : p.title.toLowerCase();
     if (seenKeys.has(key)) return false;
     seenKeys.add(key);
     return true;

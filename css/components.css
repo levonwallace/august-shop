@@ -503,6 +503,39 @@ body.mega-open .mega-backdrop {
   }
 }
 
+/* In-menu browsing: the chosen sub-link is highlighted while its products
+   load into the tile grid; a directory collapses to one column + a back link. */
+.morph-links__list a.is-active {
+  opacity: 1;
+  font-weight: 500;
+}
+
+.morph-links__list .morph-links__back {
+  margin-bottom: 6px;
+  font-size: 12px;
+  letter-spacing: 0.4px;
+  opacity: 0.55;
+}
+
+.morph-products.is-loading {
+  opacity: 0.45;
+  transition: opacity 0.18s ease;
+}
+
+.morph-products__empty {
+  grid-column: 1 / -1;
+  margin: 0;
+  padding: 24px 0;
+  font-size: 14px;
+  color: #666;
+}
+
+.morph-products__empty a {
+  color: var(--color-ink);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
 .site-header.is-mega-open .morph-menu:has(.morph-menu__body.is-directory) {
   height: calc(68dvh / var(--ui-scale));
   min-height: 520px;

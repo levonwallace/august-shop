@@ -191,7 +191,7 @@ document.addEventListener("DOMContentLoaded", () => {
       // Storefront proxy, so the tiles match what the live site is pushing.
       const cm = (item.url || "").match(/^\/collections\/([a-z0-9-]+)\/?$/i);
       if (cm && cm[1] !== "all" && window.AugustShop?.byCollection) {
-        window.AugustShop.byCollection(cm[1], 8).then((res) => {
+        window.AugustShop.byCollection(cm[1], 12).then((res) => {
           const hits = (Array.isArray(res) ? res : res?.products || []).filter((p) => p.img);
           if (hits.length) built[key].products = hits;
         });
@@ -219,7 +219,7 @@ document.addEventListener("DOMContentLoaded", () => {
     document.documentElement.classList.add("has-live-menu");
   };
 
-  const MEGA_TILES = 8;
+  const MEGA_TILES = 12;
   function fillMegaProducts(poolKey, curated) {
     if (!window.AugustCatalog) return;
     const all = window.AugustCatalog.PRODUCTS;
@@ -243,9 +243,10 @@ document.addEventListener("DOMContentLoaded", () => {
         for (let n = have; n < want; n++) grid.appendChild(tpl.cloneNode(true));
       }
     }
+    grid?.querySelector(".morph-products__empty")?.remove();
     document.querySelectorAll(".mega-product").forEach((el, i) => {
-      // Don't repeat products to pad the second row; show a partial row instead.
-      el.hidden = items.length >= 4 && i >= items.length;
+      // Don't repeat products to pad the later rows; show a partial row instead.
+      el.hidden = !items.length || (items.length >= 4 && i >= items.length);
       const p = items[i % Math.max(items.length, 1)];
       if (!p) return;
       el.href = window.AugustCatalog.href(p);
@@ -424,8 +425,12 @@ document.addEventListener("DOMContentLoaded", () => {
 
   const headerDesktop = document.querySelector(".header-desktop");
 
+  let megaSection = null;
+  let previewSeq = 0;
   const setMegaOpen = (open, section) => {
     if (!header || !morph) return;
+    if (open && section) megaSection = section;
+    previewSeq += 1; // cancel any in-flight in-menu preview
     header.classList.toggle("is-mega-open", open);
     document.body.classList.toggle("mega-open", open);
     morph.setAttribute("aria-hidden", String(!open));
@@ -516,6 +521,113 @@ document.addEventListener("DOMContentLoaded", () => {
   megaClose.forEach((btn) => {
     btn.addEventListener("click", () => setMegaOpen(false));
   });
+
+  // ── Browse inside the menu ─────────────────────────────────────
+  // Sub-links, directory entries and column heads preview their products in
+  // the tile grid instead of leaving the page. Product tiles, "Shop all" and
+  // the editorial card still navigate. Works on prototype URLs
+  // (collection.html?brand=…) and theme URLs (/collections/handle).
+  const menuPreviewFetch = (href) => {
+    const Shop = window.AugustShop;
+    const Cat = window.AugustCatalog;
+    let u;
+    try {
+      u = new URL(href, location.href);
+    } catch {
+      return null;
+    }
+    if (u.origin !== location.origin) return null;
+    const q = u.searchParams;
+    const path = u.pathname;
+    const local = (fn) => Promise.resolve(Cat ? Cat.PRODUCTS.filter(fn) : []);
+    const asList = (r) => (Array.isArray(r) ? r : r?.products || []);
+    const brand = q.get("brand") || (/\/collections\/vendors\/?$/.test(path) ? q.get("q") : null);
+    if (brand) {
+      return Shop?.byBrand
+        ? Shop.byBrand(brand, 24).then(asList)
+        : local((p) => (Cat ? Cat.brandMatch(p.brand, [brand]) : p.brand === brand));
+    }
+    if (q.get("cat")) {
+      const c = q.get("cat");
+      return local((p) => p.cat === c);
+    }
+    if (q.get("type")) {
+      const t = q.get("type");
+      return local((p) => p.type === t);
+    }
+    const coll = q.get("collection") || (path.match(/\/collections\/([^/?#]+)\/?$/) || [])[1] || "";
+    if (coll && coll !== "all" && coll !== "vendors" && Shop?.byCollection) {
+      return Shop.byCollection(coll, 24).then(asList);
+    }
+    if (/sale\.html$/.test(path) || /sale|clearance/i.test(coll) || q.get("sale")) return local((p) => p.sale);
+    if (/collection\.html$/.test(path) || coll === "all") return local(() => true);
+    return null;
+  };
+
+  const previewInMenu = (a, fetcher) => {
+    const label = a.textContent.trim();
+    const href = a.getAttribute("href");
+    const megaBody = document.querySelector(".morph-menu__body");
+    const grid = document.querySelector(".morph-products");
+    if (megaBody?.classList.contains("is-directory") && megaLinks) {
+      // Collapse the directory to the clicked entry's column, with a way back.
+      const col = a.closest(".brand-dir__col");
+      const siblings = col ? [...col.querySelectorAll("a:not(.brand-dir__head)")] : [a];
+      const parent = megaPanels[megaSection] || {};
+      megaLinks.innerHTML =
+        `<a class="morph-links__back" href="${parent.href || "#"}" data-mega-back>← ${parent.label || "Back"}</a>` +
+        siblings
+          .map(
+            (s) =>
+              `<a href="${s.getAttribute("href")}"${s === a ? ' class="is-active"' : ""}>${s.textContent.trim()}</a>`
+          )
+          .join("");
+      megaBody.classList.remove("is-directory");
+      if (megaLabel) megaLabel.hidden = false;
+      if (megaAll) megaAll.hidden = false;
+    } else if (megaLinks) {
+      megaLinks.querySelectorAll("a").forEach((l) => l.classList.toggle("is-active", l === a));
+    }
+    if (megaLabel) megaLabel.textContent = label;
+    if (megaAll) {
+      megaAll.textContent = `Shop all ${label} →`;
+      megaAll.href = href;
+    }
+    grid?.classList.add("is-loading");
+    const seq = ++previewSeq;
+    fetcher
+      .then((items) => (items || []).filter((p) => p && p.img))
+      .catch(() => [])
+      .then((list) => {
+        if (seq !== previewSeq) return;
+        grid?.classList.remove("is-loading");
+        fillMegaProducts("all", list);
+        if (!list.length && grid) {
+          grid.insertAdjacentHTML(
+            "beforeend",
+            `<p class="morph-products__empty">Nothing to preview here yet. <a href="${href}">Open ${label} →</a></p>`
+          );
+        }
+      });
+  };
+
+  if (morph) {
+    morph.addEventListener("click", (e) => {
+      const a = e.target.closest("a");
+      if (!a || !morph.contains(a)) return;
+      if (a.hasAttribute("data-mega-back")) {
+        e.preventDefault();
+        setMegaOpen(true, megaSection);
+        return;
+      }
+      if (!a.closest("[data-mega-links]")) return; // tiles, "Shop all", editorial, wordmark navigate
+      if (e.metaKey || e.ctrlKey || e.shiftKey || e.button !== 0) return; // new-tab intent
+      const fetcher = menuPreviewFetch(a.getAttribute("href") || "");
+      if (!fetcher) return;
+      e.preventDefault();
+      previewInMenu(a, fetcher);
+    });
+  }
 
   if (backdrop) {
     backdrop.addEventListener("click", () => setMegaOpen(false));

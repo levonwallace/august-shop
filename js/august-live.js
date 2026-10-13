@@ -247,9 +247,44 @@
       ).slice(0, limit);
     };
 
-    // Collection landing pages are Liquid-rendered in the theme; the
-    // prototype-only ?collection= PLP path is never reached here.
-    Shop.byCollection = async () => ({ title: "", products: [] });
+    // Collection landing pages are Liquid-rendered in the theme; this is only
+    // used by the mega menu to preview a collection's products in place.
+    Shop.byCollection = async (handle, limit = 12) => {
+      const h = String(handle || "").trim().toLowerCase();
+      if (!h) return { title: "", products: [] };
+      try {
+        const res = await fetch(`${rootPath}/collections/${encodeURIComponent(h)}/products.json?limit=${limit}`, {
+          headers: { Accept: "application/json" },
+          credentials: "same-origin",
+        });
+        if (!res.ok) throw new Error("collection " + res.status);
+        const data = await res.json();
+        const products = (data.products || [])
+          .map((p) => {
+            const v = (p.variants || [])[0] || {};
+            const price = Number(v.price || 0);
+            const compare = Number(v.compare_at_price || 0);
+            return Shop.remember({
+              id: String(p.id),
+              handle: p.handle,
+              url: `${rootPath}/products/${p.handle}`,
+              title: p.title,
+              brand: p.vendor || "",
+              price,
+              compare,
+              sale: compare > price,
+              available: (p.variants || []).some((x) => x.available),
+              img: sized(p.images?.[0]?.src, 600),
+              cat: catFromType(p.product_type),
+              type: "",
+            });
+          })
+          .filter((p) => p.img);
+        return { title: "", products };
+      } catch {
+        return { title: "", products: [] };
+      }
+    };
 
     Shop.product = async (handle) => {
       const hit = Shop.cached("h:" + handle) || Shop.cached(handle);

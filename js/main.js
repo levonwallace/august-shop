@@ -314,6 +314,16 @@ document.addEventListener("DOMContentLoaded", () => {
   const toggle = document.querySelector("[data-nav-toggle]");
   const panel = document.querySelector("[data-mobile-nav]");
   if (toggle && panel) {
+    // Blurred scrim behind the open sheet; a sibling of .site-header so it
+    // layers under the header/tab bar (z 40) but over the page.
+    const header = toggle.closest(".site-header") || panel.parentElement;
+    let scrim = document.querySelector(".mobile-nav__scrim");
+    if (!scrim && header && header.parentElement) {
+      scrim = document.createElement("div");
+      scrim.className = "mobile-nav__scrim";
+      scrim.setAttribute("aria-hidden", "true");
+      header.parentElement.insertBefore(scrim, header);
+    }
     const setOpen = (open) => {
       toggle.setAttribute("aria-expanded", String(open));
       toggle.setAttribute("aria-label", open ? "Close menu" : "Open menu");
@@ -324,6 +334,10 @@ document.addEventListener("DOMContentLoaded", () => {
     setOpen(false);
     toggle.addEventListener("click", () => {
       setOpen(toggle.getAttribute("aria-expanded") !== "true");
+    });
+    if (scrim) scrim.addEventListener("click", () => setOpen(false));
+    document.addEventListener("keydown", (e) => {
+      if (e.key === "Escape" && toggle.getAttribute("aria-expanded") === "true") setOpen(false);
     });
 
     const dirToggles = [];

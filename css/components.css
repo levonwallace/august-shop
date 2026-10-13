@@ -262,6 +262,27 @@ body.nav-open .page-scroll {
   overflow: hidden;
 }
 
+/* Blurred scrim behind the open mobile menu (injected by main.js, sits under
+   the header + tab bar at z 40 so the chrome stays crisp). */
+.mobile-nav__scrim {
+  position: fixed;
+  inset: 0;
+  z-index: 39;
+  background: rgba(10, 13, 10, 0.32);
+  backdrop-filter: blur(12px) saturate(140%);
+  -webkit-backdrop-filter: blur(12px) saturate(140%);
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  transition: opacity 0.28s ease, visibility 0.28s ease;
+}
+
+body.nav-open .mobile-nav__scrim {
+  opacity: 1;
+  visibility: visible;
+  pointer-events: auto;
+}
+
 body.mega-open .page-scroll {
   overflow: hidden;
 }
@@ -299,7 +320,9 @@ body.mega-open .mega-backdrop {
   display: flex;
   flex-direction: column;
   width: 100%;
-  max-width: 1376px;
+  /* Full header width — the header spans the viewport (minus its 32px insets),
+     and the open menu should match it rather than cap at a centred column. */
+  max-width: none;
   /* Shop-scale mega: ~42% of the visual viewport. dvh is pre-zoom,
      so divide by --ui-scale to get layout px (same as the page stage). */
   height: calc(42dvh / var(--ui-scale));
